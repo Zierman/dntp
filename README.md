@@ -2,14 +2,14 @@
 
 Downright Neighborly Transfer Protocol
 
-Course project, to develop a a protocol over UDP to provide reliability.
+Course project, to develop a protocol over UDP to provide reliability.
 
 # Running notes
 created using java sdk 1.8.0_152
  
 ## From Command Line
 ### To test running as a package use the helloworld
-1. go to /src in terminal
+1. go to /dntp/src in terminal
 1. `javac hello/HelloWorld.java`    to compile the .java file
 1. `java -cp . hello/HelloWorld`    to run the file. This should output `Hello World!` in the terminal.
 
@@ -27,4 +27,7 @@ relevant stackoverflow:   https://stackoverflow.com/questions/16137713/how-do-i-
 
 # Project Structure
 There are two packages for team testing, hello & socketpractice.
-/src/project1 
+
+There are two packages for the actual project:
+- /src/project1
+- /src/project2
