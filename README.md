@@ -23,6 +23,7 @@ created using java sdk 1.8.0_152
 1. `java -cp . socketpractice/ClientSideSocket` to run the client. You should see `here is the string written out/r/n` in the terminal if it connected to the server correctly. Note that string does not exist on the client, so it must get it from the server.
     1. Also the server terminal should show `server try loop after accept running` after.
 1. You will possibly need to stop the server correctly to ensure it does not keep running. (ctrl + c on mac)
+
 relevant stackoverflow:   https://stackoverflow.com/questions/16137713/how-do-i-run-a-java-program-from-the-command-line-on-windows
 
 # Project Structure
