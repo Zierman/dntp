@@ -275,3 +275,7 @@ fabric.properties
 # End of https://www.gitignore.io/api/eclipse,intellij
 
 
+.idea/codeStyles/codeStyleConfig.xml
+.idea/dntp.iml
+.idea/misc.xml
+.idea/modules.xml
