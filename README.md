@@ -1,12 +1,12 @@
 # dntp
 
 Downright Neighborly Transfer Protocol
-Course project, to develop a a protocol over UDP to make it reliable.
+
+Course project, to develop a a protocol over UDP to provide reliability.
 
 # Running notes
 created using java sdk 1.8.0_152
  
-
 ## From Command Line
 ### To test running as a package use the helloworld
 1. go to /src in terminal
@@ -21,7 +21,10 @@ created using java sdk 1.8.0_152
 1. Go to /dntp/src in the other terminal window.
 1. `javac socketpractice/ClientSideSocket.java` to compile the .java file
 1. `java -cp . socketpractice/ClientSideSocket` to run the client. You should see `here is the string written out/r/n` in the terminal if it connected to the server correctly. Note that string does not exist on the client, so it must get it from the server.
-
+    1. Also the server terminal should show `server try loop after accept running` after.
+1. You will possibly need to stop the server correctly to ensure it does not keep running. (ctrl + c on mac)
 relevant stackoverflow:   https://stackoverflow.com/questions/16137713/how-do-i-run-a-java-program-from-the-command-line-on-windows
 
-
+# Project Structure
+There are two packages for team testing, hello & socketpractice.
+/src/project1 
