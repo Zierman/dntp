@@ -283,4 +283,6 @@ fabric.properties
 
 # Joshua Zierman's Additions 
 joshuaTesting/
+JoshuaTest*
+joshuaTest*
 # End of Joshua Zierman's Additions
