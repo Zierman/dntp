@@ -41,6 +41,7 @@ public class FileAndChunkDemo
 			
 		} catch (IOException e)
 		{
+			// display failure msg
 			System.err.println("File Split failure");
 			e.printStackTrace();
 			return;
