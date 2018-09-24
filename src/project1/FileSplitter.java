@@ -46,8 +46,18 @@ public class FileSplitter {
 			in = new FileInputStream(file);
 		} catch (FileNotFoundException e)
 		{
+			String nl = System.lineSeparator();
 			System.err.println("File to assemble not found.");
 			FileOutputStream out = new FileOutputStream(file);
+			out.write(new String("Hello World!").getBytes());
+			for(Integer i = 0; i < 100; i++)
+			{
+				out.write(nl.getBytes());
+				out.write(i.toString().getBytes());
+			}
+			out.write(nl.getBytes());
+			out.write(new String("-JoshuaZierman").getBytes());
+			
 			out.close();
 			System.err.println(file.getAbsolutePath() + " created");
 			in = new FileInputStream(file);
