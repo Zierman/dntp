@@ -283,8 +283,9 @@ fabric.properties
 
 # Joshua Zierman's Additions 
 joshuaTesting/
-demoFiles/
 JoshuaTest*
 joshuaTest*
 JoshuaUML/
+in.txt
+out.txt
 # End of Joshua Zierman's Additions

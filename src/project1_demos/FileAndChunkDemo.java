@@ -27,8 +27,8 @@ public class FileAndChunkDemo
 		LinkedList<Chunk> chunksSender, chunksReceaver;
 		chunksReceaver = new LinkedList<Chunk>();
 		chunksSender = new LinkedList<Chunk>();
-		FileSplitter splitter = new FileSplitter("demoFiles" + s + "project1" + s + "FileAndChunkDemo" + s + "in.txt", 5);
-		FileAssembler assembler = new FileAssembler("demoFiles" + s + "project1" + s + "FileAndChunkDemo" + s + "out.txt");
+		FileSplitter splitter = new FileSplitter("in.txt", 5);
+		FileAssembler assembler = new FileAssembler("out.txt");
 		File outputFile;
 
 		try
