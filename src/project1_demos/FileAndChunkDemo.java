@@ -23,7 +23,7 @@ public class FileAndChunkDemo
 	 */
 	public static void main(String[] args)
 	{
-		String s = File.separator;
+		final String SEPARATOR = File.separator;
 		LinkedList<Chunk> chunksSender, chunksReceaver;
 		chunksReceaver = new LinkedList<Chunk>();
 		chunksSender = new LinkedList<Chunk>();
