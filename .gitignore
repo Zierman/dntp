@@ -283,9 +283,8 @@ fabric.properties
 
 # Joshua Zierman's Additions 
 joshuaTesting/
-/demoFiles
+demoFiles/
 JoshuaTest*
 joshuaTest*
-out.txt
-UML Diagrams/
+JoshuaUML/
 # End of Joshua Zierman's Additions
