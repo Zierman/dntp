@@ -15,6 +15,7 @@ public class FileSplitter {
 	
 	/** creates a filesplitter object
 	 * @param filename the filename of the file that will split
+	 * @param bytesPerChunk the integer max number of bytes stored in a chunk
 	 */
 	public FileSplitter(String filename, int bytesPerChunk)
 	{
@@ -24,10 +25,9 @@ public class FileSplitter {
 	
 	/** Overwrites the queue of chunks with the chunks made from the file
 	 * @param chunkQueue The queue to be overwritten with the chunks
-	 * @return the queue that was overwritten.
-	 * @throws IOException 
+	 * @throws IOException if there is any problem with IO that cannot be handled in the method
 	 */
-	public <Q extends Queue<Chunk>> void overwrite(Q chunkQueue) throws IOException
+	public void overwrite(Queue<Chunk> chunkQueue) throws IOException
 	{	
 		// Clear the queue
 		chunkQueue.clear();

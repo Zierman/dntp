@@ -53,7 +53,7 @@ public class Chunk implements Iterable<Byte>
 	/**
 	 * Constructs a chunk with the given bytes
 	 * 
-	 * @param bytes
+	 * @param bytes an array of bytes that holds the data for the chunk
 	 */
 	public Chunk(byte[] bytes) {
 		setBytes(bytes);

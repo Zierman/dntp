@@ -31,7 +31,7 @@ public class FileAssembler {
 		}
 		
 		/** Assembles a File from an Iterable collection of Chunks
-		 * @return
+		 * @return the File that is assembled
 		 * @throws IOException if there is a problem writing to file
 		 */public File assembleFile() throws IOException
 		{
