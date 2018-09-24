@@ -3,6 +3,7 @@ package project1;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -39,7 +40,18 @@ public class FileSplitter {
 		
 		// read file
 		File file = new File(path);
-		FileInputStream in = new FileInputStream(file);
+		FileInputStream in;
+		try
+		{
+			in = new FileInputStream(file);
+		} catch (FileNotFoundException e)
+		{
+			System.err.println("File to assemble not found.");
+			FileOutputStream out = new FileOutputStream(file);
+			out.close();
+			System.err.println(file.getAbsolutePath() + " created");
+			in = new FileInputStream(file);
+		}
 		Integer i;
 		while((i = in.read()) != -1)
 		{
@@ -58,12 +70,17 @@ public class FileSplitter {
 			}
 			else
 			{
-				chunkQueue.add(new Chunk(bArray));
 				j = 0;
+				chunkQueue.add(new Chunk(bArray));
+				bArray = new byte[bytesPerChunk];
+				bArray[j++] = b;
 			}
 		}
 		if(j != 0)
 		{
+			Byte[] tmp = new Byte[j];
+			for(int k = 0; k < j; k++)
+				tmp[k] = bArray[k];
 			chunkQueue.add(new Chunk(bArray));
 		}
 		
