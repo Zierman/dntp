@@ -58,7 +58,7 @@ public class Log
 	 */
 	public void print(PrintStream printStream)
 	{
-		printStream.println(log);
+		printStream.print(log);
 	}
 
 	public static String getStringFromBytes(byte[] b)

@@ -124,7 +124,7 @@ public class FileSplitter implements Loggable {
 				chunkQueue.add(new Chunk(bArray));
 				
 				// Logg the chunk added
-				log.add("add Chunk with bytes {" + Log.getStringFromBytes(bArray) + "} added to chunks");
+				log.addLine("add Chunk with bytes {" + Log.getStringFromBytes(bArray) + "} added to chunks");
 				
 				bArray = new byte[bytesPerChunk];
 				bArray[j++] = b;
