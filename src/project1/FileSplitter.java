@@ -24,6 +24,10 @@ public class FileSplitter implements Loggable {
 	 */
 	public FileSplitter(String filename, int bytesPerChunk)
 	{
+		if(bytesPerChunk < 1 || filename.length() < 1 || filename.startsWith(".") || filename.endsWith("."))
+		{
+			throw new IllegalArgumentException();
+		}
 		log.addLine("FileSplitter constructor called");
 		
 		this.filename = filename;
