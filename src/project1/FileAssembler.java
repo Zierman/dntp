@@ -23,6 +23,11 @@ public class FileAssembler implements Loggable {
 		 */
 		public FileAssembler(String filename)
 		{
+			if(filename.length() < 1 || filename.startsWith(".") || filename.endsWith("."))
+			{
+				throw new IllegalArgumentException();
+			}
+			
 			this.filename = filename;
 		}
 		
