@@ -17,7 +17,6 @@ public class FileSender implements Sender
 	private int destinationPort, bytesPerChunk;
 	private String filename;
 	private LinkedList<Chunk> chunks = new LinkedList<Chunk>();
-	private int next = 0; // index of next
 	
 	FileSender(String filename, InetAddress ip, int port, int bytesPerChunk)
 	{
@@ -108,7 +107,7 @@ public class FileSender implements Sender
 	@Override
 	public void resetNextPosition()
 	{
-		next = 0; // there is never more than one file to send 
+		// Does nothing because there is only one file
 	}
 
 	/* (non-Javadoc)
