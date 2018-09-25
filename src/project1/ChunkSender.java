@@ -5,6 +5,7 @@ package project1;
 
 import java.net.InetAddress;
 import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -34,6 +35,14 @@ public class ChunkSender implements Sender
 	public void load(Chunk[] chunks)
 	{
 		this.chunks = chunks;
+	}
+	
+	/** loads the sender with Chunks
+	 * @param chunks the Queue of Chunks
+	 */
+	public void load(Queue<Chunk> chunks)
+	{
+		this.chunks = (Chunk[])chunks.toArray();
 	}
 	
 	/* (non-Javadoc)
