@@ -11,9 +11,26 @@ import java.io.PrintStream;
  */
 public class Log
 {
-	private static enum ByteDisplayMode {INTEGER, HEX, BINARY}
+	public static enum ByteDisplayMode {INTEGER, HEX, BINARY}
 	private static ByteDisplayMode byteDisplayMode = ByteDisplayMode.HEX;
 	
+	/**
+	 * @return the byteDisplayMode
+	 */
+	public static ByteDisplayMode getByteDisplayMode()
+	{
+		return byteDisplayMode;
+	}
+
+	/**
+	 * @param byteDisplayMode the byteDisplayMode to set
+	 */
+	public static void setByteDisplayMode(ByteDisplayMode byteDisplayMode)
+	{
+		Log.byteDisplayMode = byteDisplayMode;
+	}
+
+
 	/** The string holding the log
 	 * 
 	 */
@@ -123,6 +140,20 @@ public class Log
 	 * @param bytes byte array that will be represented in the string
 	 * @return a String that represents the byte array in Hex form
 	 */
+	public static String getHexString(byte[] bytes)
+	{
+		String s = "";
+		ByteDisplayMode tmp = byteDisplayMode;
+		byteDisplayMode = ByteDisplayMode.HEX;
+		getString(bytes);
+		byteDisplayMode = tmp;
+		return s;
+	}
+	
+	/** Gets the String representation of a byte in Hex form
+	 * @param b byte that will be represented in the string
+	 * @return a String that represents the byte in Hex form
+	 */
 	public static String getHexString(byte b)
 	{
 		String s = "x";
@@ -140,6 +171,20 @@ public class Log
 	 * @param bytes byte array that will be represented in the string
 	 * @return a String that represents the byte array in integer form
 	 */
+	public static String getIntegerString(byte[] bytes)
+	{
+		String s = "";
+		ByteDisplayMode tmp = byteDisplayMode;
+		byteDisplayMode = ByteDisplayMode.INTEGER;
+		getString(bytes);
+		byteDisplayMode = tmp;
+		return s;
+	}
+	
+	/** Gets the String representation of a byte in integer form
+	 * @param b byte that will be represented in the string
+	 * @return a String that represents the byte in integer form
+	 */
 	public static String getIntegerString(byte b)
 	{
 		return Integer.toString(b);
@@ -148,6 +193,20 @@ public class Log
 	/** Gets the String representation of a byte array in binary form
 	 * @param bytes byte array that will be represented in the string
 	 * @return a String that represents the byte array in binary form
+	 */
+	public static String getBinaryString(byte[] bytes)
+	{
+		String s = "";
+		ByteDisplayMode tmp = byteDisplayMode;
+		byteDisplayMode = ByteDisplayMode.BINARY;
+		getString(bytes);
+		byteDisplayMode = tmp;
+		return s;
+	}
+	
+	/** Gets the String representation of a byte in binary form
+	 * @param b byte that will be represented in the string
+	 * @return a String that represents the byte in binary form
 	 */
 	public static String getBinaryString(byte b)
 	{
@@ -167,7 +226,7 @@ public class Log
 	/** Logged bytes will be stored in Hex form after this is called
 	 * 
 	 */
-	public static void SetDisplayModeHex()
+	public static void setDisplayModeHex()
 	{
 		byteDisplayMode = ByteDisplayMode.HEX;
 	}
@@ -176,7 +235,7 @@ public class Log
 	/** Logged bytes will be stored in Binary form after this is called
 	 * 
 	 */
-	public static void SetDisplayModeBinary()
+	public static void setDisplayModeBinary()
 	{
 		byteDisplayMode = ByteDisplayMode.BINARY;
 	}
@@ -185,7 +244,7 @@ public class Log
 	/** Logged bytes will be stored in Integer form after this is called
 	 * 
 	 */
-	public static void SetDisplayModeInteger()
+	public static void setDisplayModeInteger()
 	{
 		byteDisplayMode = ByteDisplayMode.INTEGER;
 	}
