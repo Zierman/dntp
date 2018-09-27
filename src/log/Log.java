@@ -61,7 +61,20 @@ public class Log
 		printStream.print(log);
 	}
 
-	public static String getStringFromBytes(byte[] b)
+	/** Gets the String representation of a byte array
+	 * @param b byte array that will be represented in the string
+	 * @return a String that represents the byte array
+	 */
+	public static String getString(byte[] b)
+	{
+		return getHexString(b);
+	}
+
+	/** Gets the String representation of a byte array in Hex form
+	 * @param b byte array that will be represented in the string
+	 * @return a String that represents the byte array in Hex form
+	 */
+	public static String getHexString(byte[] b)
 	{
 		String s = "";
 		boolean first = true;
@@ -71,7 +84,59 @@ public class Log
 			{
 				s += ", ";
 			}
-			s += tmp;
+			String tmpString = Integer.toHexString(tmp).toUpperCase();
+			s += "x";
+			for(int i = tmpString.length(); i < 2; i++)
+			{
+				s += "0";
+			}
+			s += tmpString;
+			first = false;
+		}
+		return s;
+	}
+
+	/** Gets the String representation of a byte array in integer form
+	 * @param b byte array that will be represented in the string
+	 * @return a String that represents the byte array in integer form
+	 */
+	public static String getIntegerString(byte[] b)
+	{
+		String s = "";
+		boolean first = true;
+		for(byte tmp : b )
+		{
+			if(!first)
+			{
+				s += ", ";
+			}
+			s += Integer.toString(tmp);
+			first = false;
+		}
+		return s;
+	}
+	
+	/** Gets the String representation of a byte array in binary form
+	 * @param b byte array that will be represented in the string
+	 * @return a String that represents the byte array in bynary form
+	 */
+	public static String getBinaryString(byte[] b)
+	{
+		String s = "";
+		boolean first = true;
+		for(byte tmp : b )
+		{
+			if(!first)
+			{
+				s += ", ";
+			}
+			String tmpString = Integer.toBinaryString(tmp);
+			s += "b";
+			for(int i = tmpString.length(); i < 8; i++)
+			{
+				s += "0";
+			}
+			s += tmpString;
 			first = false;
 		}
 		return s;
