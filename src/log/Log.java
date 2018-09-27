@@ -11,6 +11,9 @@ import java.io.PrintStream;
  */
 public class Log
 {
+	private static enum ByteDisplayMode {INTEGER, HEX, BINARY}
+	private static ByteDisplayMode byteDisplayMode = ByteDisplayMode.HEX;
+	
 	/** The string holding the log
 	 * 
 	 */
@@ -61,84 +64,129 @@ public class Log
 		printStream.print(log);
 	}
 
-	/** Gets the String representation of a byte array
-	 * @param b byte array that will be represented in the string
+	/** Gets the String representation of a byte
+	 * @param b byte that will be represented in the string
 	 * @return a String that represents the byte array
 	 */
-	public static String getString(byte[] b)
+	public static String getString(byte b)
 	{
-		return getHexString(b);
-	}
-
-	/** Gets the String representation of a byte array in Hex form
-	 * @param b byte array that will be represented in the string
-	 * @return a String that represents the byte array in Hex form
-	 */
-	public static String getHexString(byte[] b)
-	{
-		String s = "";
-		boolean first = true;
-		for(byte tmp : b )
+		String s = null;
+		try
 		{
-			if(!first)
+			switch (byteDisplayMode)
 			{
-				s += ", ";
+			case HEX:
+				s = getHexString(b);
+				break;
+			case BINARY:
+				s = getBinaryString(b);
+				break;
+			case INTEGER:
+				s = getIntegerString(b);
+				break;
+			default:
+				throw new Exception();
 			}
-			String tmpString = Integer.toHexString(tmp).toUpperCase();
-			s += "x";
-			for(int i = tmpString.length(); i < 2; i++)
-			{
-				s += "0";
-			}
-			s += tmpString;
-			first = false;
-		}
-		return s;
-	}
-
-	/** Gets the String representation of a byte array in integer form
-	 * @param b byte array that will be represented in the string
-	 * @return a String that represents the byte array in integer form
-	 */
-	public static String getIntegerString(byte[] b)
-	{
-		String s = "";
-		boolean first = true;
-		for(byte tmp : b )
+		} catch (Exception e)
 		{
-			if(!first)
-			{
-				s += ", ";
-			}
-			s += Integer.toString(tmp);
-			first = false;
+			// this should never happen
+			e.printStackTrace();
 		}
 		return s;
 	}
 	
-	/** Gets the String representation of a byte array in binary form
-	 * @param b byte array that will be represented in the string
-	 * @return a String that represents the byte array in bynary form
+	/** Gets the String representation of a byte array
+	 * @param bytes byte array that will be represented in the string
+	 * @return a String that represents the byte array
 	 */
-	public static String getBinaryString(byte[] b)
+	public static String getString(byte[] bytes)
 	{
 		String s = "";
 		boolean first = true;
-		for(byte tmp : b )
+		for(byte b : bytes)
 		{
-			if(!first)
+			if(first)
+			{
+				first = false;
+			}
+			else
 			{
 				s += ", ";
 			}
-			String tmpString = Integer.toBinaryString(tmp);
-			s += "b";
-			for(int i = tmpString.length(); i < 8; i++)
-			{
-				s += "0";
-			}
-			s += tmpString;
-			first = false;
+			s += getString(b);
 		}
+		
 		return s;
+	}
+
+	/** Gets the String representation of a byte array in Hex form
+	 * @param bytes byte array that will be represented in the string
+	 * @return a String that represents the byte array in Hex form
+	 */
+	public static String getHexString(byte b)
+	{
+		String s = "x";
+		String tmpString = Integer.toHexString(b).toUpperCase();
+		for(int i = tmpString.length(); i < 2; i++)
+		{
+			s += "0";
+		}
+		s += tmpString;
+		
+		return s;
+	}
+
+	/** Gets the String representation of a byte array in integer form
+	 * @param bytes byte array that will be represented in the string
+	 * @return a String that represents the byte array in integer form
+	 */
+	public static String getIntegerString(byte b)
+	{
+		return Integer.toString(b);
+	}
+	
+	/** Gets the String representation of a byte array in binary form
+	 * @param bytes byte array that will be represented in the string
+	 * @return a String that represents the byte array in binary form
+	 */
+	public static String getBinaryString(byte b)
+	{
+
+		String s = "b";
+		String tmpString = Integer.toBinaryString(b);
+		
+		for(int i = tmpString.length(); i < 8; i++)
+		{
+			s += "0";
+		}
+		s += tmpString;
+		
+		return s;
+	}
+	
+	/** Logged bytes will be stored in Hex form after this is called
+	 * 
+	 */
+	public static void SetDisplayModeHex()
+	{
+		byteDisplayMode = ByteDisplayMode.HEX;
+	}
+
+
+	/** Logged bytes will be stored in Binary form after this is called
+	 * 
+	 */
+	public static void SetDisplayModeBinary()
+	{
+		byteDisplayMode = ByteDisplayMode.BINARY;
+	}
+
+
+	/** Logged bytes will be stored in Integer form after this is called
+	 * 
+	 */
+	public static void SetDisplayModeInteger()
+	{
+		byteDisplayMode = ByteDisplayMode.INTEGER;
 	}
 }

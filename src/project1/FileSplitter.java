@@ -109,7 +109,7 @@ public class FileSplitter implements Loggable {
 		while((i = in.read()) != -1)
 		{
 			bytes.add(i.byteValue());
-			log.addLine("read byte " + i.byteValue() + " from " + file.getName());
+			log.addLine("read byte " + Log.getString(i.byteValue()) + " from " + file.getName());
 		}
 		in.close();
 		
