@@ -152,6 +152,7 @@ public class Chunk implements Iterable<Byte>, Loggable
 	@Override
 	public String toString()
 	{
-		return "Chunk{" + Log.getStringFromBytes(bytes) + "}";
+		return "{" + Log.getString(bytes) + "}";
 	}
+	
 }

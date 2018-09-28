@@ -80,22 +80,22 @@ public class FileSplitter implements Loggable {
 			log.addLine("New file created at " + file.getAbsolutePath());
 			
 			out.write(tmpByteArray = new String("Hello World!").getBytes());
-			log.addLine("Writing {" + Log.getStringFromBytes(tmpByteArray) + "}(bytes for \"Hello World!\" to file)");
+			log.addLine("Writing {" + Log.getString(tmpByteArray) + "}(bytes for \"Hello World!\" to file)");
 			
 			for(Integer i = 0; i < 100; i++)
 			{
 				out.write(tmpByteArray = NEWLINE.getBytes());
-				log.addLine("Writing {" + Log.getStringFromBytes(tmpByteArray) + "} to file (bytes for system's NEWLINE)");
+				log.addLine("Writing {" + Log.getString(tmpByteArray) + "} to file (bytes for system's NEWLINE)");
 				
 				out.write(tmpByteArray = i.toString().getBytes());
-				log.addLine("Writing {" + Log.getStringFromBytes(tmpByteArray) + "} to file (bytes for string \"" + i + "\")");
+				log.addLine("Writing {" + Log.getString(tmpByteArray) + "} to file (bytes for string \"" + i + "\")");
 			}
 			
 			out.write(tmpByteArray = NEWLINE.getBytes());
-			log.addLine("Writing {" + Log.getStringFromBytes(tmpByteArray) + "} to file (bytes for system's NEWLINE)");
+			log.addLine("Writing {" + Log.getString(tmpByteArray) + "} to file (bytes for system's NEWLINE)");
 			
 			out.write(tmpByteArray = new String("-JoshuaZierman").getBytes());
-			log.addLine("Writing {" + Log.getStringFromBytes(tmpByteArray) + "} (bytes for \"-JoshuaZierman\")");
+			log.addLine("Writing {" + Log.getString(tmpByteArray) + "} (bytes for \"-JoshuaZierman\")");
 			
 			out.close();
 			log.addLine("close file");
@@ -109,7 +109,7 @@ public class FileSplitter implements Loggable {
 		while((i = in.read()) != -1)
 		{
 			bytes.add(i.byteValue());
-			log.addLine("read byte " + i.byteValue() + " from " + file.getName());
+			log.addLine("read byte " + Log.getString(i.byteValue()) + " from " + file.getName());
 		}
 		in.close();
 		
@@ -128,7 +128,7 @@ public class FileSplitter implements Loggable {
 				chunkQueue.add(new Chunk(bArray));
 				
 				// Logg the chunk added
-				log.addLine("add Chunk with bytes {" + Log.getStringFromBytes(bArray) + "} added to chunks");
+				log.addLine("add Chunk with bytes {" + Log.getString(bArray) + "} added to chunks");
 				
 				bArray = new byte[bytesPerChunk];
 				bArray[j++] = b;
@@ -142,7 +142,7 @@ public class FileSplitter implements Loggable {
 			chunkQueue.add(new Chunk(bArray));
 
 			// Log the chunk added
-			log.add("add Chunk with bytes {" + Log.getStringFromBytes(tmp) + "}");
+			log.add("add Chunk with bytes {" + Log.getString(tmp) + "}");
 		}
 		
 	}

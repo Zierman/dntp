@@ -3,9 +3,12 @@
  */
 package project1;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.LinkedList;
 import java.util.Queue;
+
+import byteIntConverter.ByteIntConverter;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -17,6 +20,7 @@ public class ChunkSender implements Sender
 	private int destinationPort;
 	private Chunk[] chunks;
 	private int next = 0; // index of next
+	private DatagramSocket socket;
 	
 	
 	/** Constructs a ChunkSender
@@ -71,6 +75,10 @@ public class ChunkSender implements Sender
 	{
 		Chunk c = chunks[next++];
 		sendChunk(c);
+		if(!hasNext())
+		{
+			close();
+		}
 	}
 
 	/** sends a Chunk
@@ -78,7 +86,25 @@ public class ChunkSender implements Sender
 	 */
 	private void sendChunk(Chunk c)
 	{
-		// TODO this method needs to be completed
+		try
+		{
+			if(socket == null)
+			{
+				socket = new DatagramSocket();
+			}
+			if(next == 0)
+			{
+				int numberOfChunks = chunks.length;
+				byte[] numberOfChunkBytes = ByteIntConverter.convert(numberOfChunks);
+				DatagramPacket packet = new DatagramPacket(numberOfChunkBytes, numberOfChunkBytes.length, destinationIp, destinationPort);
+				socket.send(packet);
+			}
+			DatagramPacket packet = new DatagramPacket(c.getBytes(), c.getBytes().length, destinationIp, destinationPort);
+			socket.send(packet);
+		}
+		catch (Exception e) {
+			System.err.println("ChunkSender.sendChunk() Failed");
+		}
 	}
 
 	/* (non-Javadoc)
@@ -98,5 +124,10 @@ public class ChunkSender implements Sender
 	{
 		return next < chunks.length;
 	}
-
+	
+	public void close()
+	{
+		if(socket != null)
+			socket.close();
+	}
 }
