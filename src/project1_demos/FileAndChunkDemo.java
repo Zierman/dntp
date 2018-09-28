@@ -8,6 +8,7 @@ import project1.FileSplitter;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.util.LinkedList;
 
 import log.Log;
@@ -23,7 +24,7 @@ public class FileAndChunkDemo
 	 * @param args not used
 	 */
 	public static void main(String[] args)
-	{
+	{	
 		final String SEPARATOR = File.separator;
 		
 		LinkedList<Chunk> chunksSender, chunksReceaver;
@@ -94,6 +95,7 @@ public class FileAndChunkDemo
 			e.printStackTrace();
 			return;
 		}
+		
 
 	}
 }

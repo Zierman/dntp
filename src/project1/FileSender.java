@@ -5,6 +5,7 @@ package project1;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.LinkedList;
 
 /**
@@ -17,6 +18,7 @@ public class FileSender implements Sender
 	private int destinationPort, bytesPerChunk;
 	private String filename;
 	private LinkedList<Chunk> chunks = new LinkedList<Chunk>();
+	private int next;
 	
 	FileSender(String filename, InetAddress ip, int port, int bytesPerChunk)
 	{
@@ -75,6 +77,7 @@ public class FileSender implements Sender
 	public void sendNext()
 	{
 		send();
+		next++;
 	}
 
 	/** Sends the file
@@ -107,7 +110,7 @@ public class FileSender implements Sender
 	@Override
 	public void resetNextPosition()
 	{
-		// Does nothing because there is only one file
+		next = 0;
 	}
 
 	/* (non-Javadoc)
@@ -116,7 +119,18 @@ public class FileSender implements Sender
 	@Override
 	public boolean hasNext()
 	{
-		return false; // there is never more than one file to send
+		return next < 1;
 	}
-
+	
+	/** Demonstrate the FileSender
+	 * @param args
+	 */
+	public static void main(String[] args)
+	{
+		FileSender sender = new FileSender(Project1.getInputFilename(), Project1.getDestinationIp(), Project1.getPort(), Project1.getBytesPerChunk());
+		while(sender.hasNext())
+		{
+			sender.sendNext();
+		}
+	}
 }
