@@ -65,11 +65,15 @@ public class Chunk implements Iterable<Byte>, Loggable
 	 * 
 	 * @param bytes an array of bytes that holds the data for the chunk
 	 */
-	public Chunk(byte[] bytes) {
+	public Chunk(byte[] bytes, int length) {
 		// log
 		log.addLine("Chunk constructor called");
-		
-		setBytes(bytes);
+		byte[] tmp = new byte[length];
+		for(int i = 0; i < length; i ++)
+		{
+			tmp[i] = bytes[i];
+		}
+		setBytes(tmp);
 	}
 
 	/**

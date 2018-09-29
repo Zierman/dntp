@@ -124,7 +124,7 @@ public class FileSplitter implements Loggable {
 			}
 			else // j == bytesPerChunk
 			{
-				chunkQueue.add(new Chunk(bArray));
+				chunkQueue.add(new Chunk(bArray, bArray.length));
 				
 				// Logg the chunk added
 				log.addLine("add Chunk with bytes {" + Log.getString(bArray) + "} added to chunks");
@@ -143,7 +143,7 @@ public class FileSplitter implements Loggable {
 			{
 				tmp[k] = bArray[k];
 			}
-			chunkQueue.add(new Chunk(tmp));
+			chunkQueue.add(new Chunk(tmp, tmp.length));
 
 			// Log the chunk added
 			log.add("add Chunk with bytes {" + Log.getString(tmp) + "}");
