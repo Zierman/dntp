@@ -1,6 +1,7 @@
 package project1;
 
 import java.io.PrintStream;
+import java.net.DatagramPacket;
 import java.util.Iterator;
 
 import log.Log;
@@ -153,6 +154,15 @@ public class Chunk implements Iterable<Byte>, Loggable
 	public String toString()
 	{
 		return "{" + Log.getString(bytes) + "}";
+	}
+
+	/* (non-Javadoc)
+	 * @see log.Loggable#absorbLog(log.Loggable)
+	 */
+	@Override
+	public void absorbLog(Loggable l)
+	{
+		log.absorb(l.getLog());
 	}
 	
 }

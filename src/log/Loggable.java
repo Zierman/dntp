@@ -25,4 +25,9 @@ public interface Loggable
 	 * 
 	 */
 	public void clearLog();
+	
+	/** Absorbs the log of another loggable object
+	 * @param l the other loggable object
+	 */
+	public void absorbLog(Loggable l);
 }

@@ -102,7 +102,7 @@ public class FileSender implements Sender, Loggable
 			{
 				chunkSender.sendNext();
 			}
-			log.absorb(chunkSender.getLog());
+			absorbLog(chunkSender);
 			
 		} catch (IOException e)
 		{
@@ -129,8 +129,8 @@ public class FileSender implements Sender, Loggable
 		return next < 1;
 	}
 	
-	/** Demonstrate the FileSender
-	 * @param args
+	/** Sends a File to a destination
+	 * @param args filename, bytesPerChunk, toIp, toPort
 	 */
 	public static void main(String[] args)
 	{
@@ -169,22 +169,40 @@ public class FileSender implements Sender, Loggable
 		sender.clearLog();
 	}
 
+	/* (non-Javadoc)
+	 * @see log.Loggable#getLog()
+	 */
 	@Override
 	public Log getLog()
 	{
 		return log;
 	}
 
+	/* (non-Javadoc)
+	 * @see log.Loggable#printLog(java.io.PrintStream)
+	 */
 	@Override
 	public void printLog(PrintStream printStream)
 	{
 		log.print(printStream);
 	}
 
+	/* (non-Javadoc)
+	 * @see log.Loggable#clearLog()
+	 */
 	@Override
 	public void clearLog()
 	{
 		log.clear();
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see log.Loggable#absorbLog(log.Loggable)
+	 */
+	@Override
+	public void absorbLog(Loggable l)
+	{
+		log.absorb(l.getLog());
 	}
 }

@@ -32,6 +32,7 @@ public class ChunkSender implements Sender, Loggable
 	private Chunk[] chunks;
 	private int next = 0; // index of next
 	private DatagramSocket socket;
+	private int maxBytesInChunk = 0;
 	
 	
 	/** Constructs a ChunkSender
@@ -49,7 +50,18 @@ public class ChunkSender implements Sender, Loggable
 	 */
 	public void load(Chunk[] chunks)
 	{
+		this.chunks = new Chunk[chunks.length];
+		int i = 0;
+		for(Chunk c : chunks)
+		{
+			this.chunks[i++] = c;
+			if(c.getBytes().length > maxBytesInChunk)
+			{
+				maxBytesInChunk = c.getBytes().length;
+			}
+		}
 		this.chunks = chunks;
+		
 	}
 	
 	/** loads the sender with Chunks
@@ -62,6 +74,10 @@ public class ChunkSender implements Sender, Loggable
 		for(Chunk c : chunks)
 		{
 			this.chunks[i++] = c;
+			if (c.getBytes().length > maxBytesInChunk)
+			{
+				maxBytesInChunk = c.getBytes().length;
+			}
 		}
 	}
 	
@@ -89,8 +105,8 @@ public class ChunkSender implements Sender, Loggable
 	@Override
 	public void sendNext()
 	{
-		Chunk c = chunks[next++];
-		sendChunk(c);
+		sendChunk(chunks[next]);
+		next++;
 		if(!hasNext())
 		{
 			close();
@@ -101,7 +117,7 @@ public class ChunkSender implements Sender, Loggable
 	 * @param c Chunk to send
 	 */
 	private void sendChunk(Chunk c)
-	{ 
+	{
 		if(c == null)
 		{
 			throw new IllegalArgumentException("chunk was null");
@@ -114,11 +130,23 @@ public class ChunkSender implements Sender, Loggable
 				}
 				if(next == 0)
 				{
+					// Send how many chunks to expect
 					int numberOfChunks = chunks.length;
 					byte[] numberOfChunkBytes = ByteIntConverter.convert(numberOfChunks);
 					DatagramPacket packet = new DatagramPacket(numberOfChunkBytes, numberOfChunkBytes.length, destinationIp, destinationPort);
 					socket.send(packet);
+					log.addLine("sent packet telling receaver to expect " + ByteIntConverter.convert(numberOfChunkBytes) + "Chunks");
+					log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
+					log.addLine("-----------------------------------------------");
+					
+					// Send max number of bytes per chunk
+					packet = new DatagramPacket(ByteIntConverter.convert(getMaxBytesInChunk()), 4, destinationIp, destinationPort);
+					socket.send(packet);
+					log.addLine("sent packet telling receaver that the max number of bytes in a chunk is " + ByteIntConverter.convert(numberOfChunkBytes));
+					log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
+					log.addLine("-----------------------------------------------");
 				}
+				
 				DatagramPacket packet = new DatagramPacket(c.getBytes(), c.getBytes().length, destinationIp, destinationPort);
 				socket.send(packet);
 				log.addLine("ChunkSender sent datagram " + next + "-" + packet.getOffset() + "-"  + (packet.getOffset() + packet.getLength()));
@@ -149,12 +177,18 @@ public class ChunkSender implements Sender, Loggable
 		return next < chunks.length;
 	}
 	
+	/** Close the socket of the ChunkSender
+	 * 
+	 */
 	public void close()
 	{
 		if(socket != null)
 			socket.close();
 	}
 
+	/* (non-Javadoc)
+	 * @see log.Loggable#getLog()
+	 */
 	@Override
 	public Log getLog()
 	{
@@ -162,6 +196,9 @@ public class ChunkSender implements Sender, Loggable
 		return log;
 	}
 
+	/* (non-Javadoc)
+	 * @see log.Loggable#printLog(java.io.PrintStream)
+	 */
 	@Override
 	public void printLog(PrintStream printStream)
 	{
@@ -169,10 +206,30 @@ public class ChunkSender implements Sender, Loggable
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see log.Loggable#clearLog()
+	 */
 	@Override
 	public void clearLog()
 	{
 		log.clear();
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see log.Loggable#absorbLog(log.Loggable)
+	 */
+	@Override
+	public void absorbLog(Loggable l)
+	{
+		log.absorb(l.getLog());
+	}
+
+	/** gets the max number of bytes in any chunk
+	 * @return the maxBytesInChunk
+	 */
+	protected int getMaxBytesInChunk()
+	{
+		return maxBytesInChunk;
 	}
 }

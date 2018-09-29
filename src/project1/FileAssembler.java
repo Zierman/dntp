@@ -107,4 +107,13 @@ public class FileAssembler implements Loggable {
 		{
 			log.clear();
 		}
+		
+		/* (non-Javadoc)
+		 * @see log.Loggable#absorbLog(log.Loggable)
+		 */
+		@Override
+		public void absorbLog(Loggable l)
+		{
+			log.absorb(l.getLog());
+		}
 }
