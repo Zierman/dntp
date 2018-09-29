@@ -120,26 +120,30 @@ public class FileSplitter implements Loggable {
 		{
 			if(j < bytesPerChunk)
 			{
-				bArray[j++] = b;
+				bArray[j] = b;
 			}
-			else
+			else // j == bytesPerChunk
 			{
-				j = 0;
 				chunkQueue.add(new Chunk(bArray));
 				
 				// Logg the chunk added
 				log.addLine("add Chunk with bytes {" + Log.getString(bArray) + "} added to chunks");
-				
+
+				j = 0;
 				bArray = new byte[bytesPerChunk];
-				bArray[j++] = b;
+				bArray[j] = b;
 			}
+			
+			j++;
 		}
 		if(j != 0)
 		{
 			byte[] tmp = new byte[j];
 			for(int k = 0; k < j; k++)
+			{
 				tmp[k] = bArray[k];
-			chunkQueue.add(new Chunk(bArray));
+			}
+			chunkQueue.add(new Chunk(tmp));
 
 			// Log the chunk added
 			log.add("add Chunk with bytes {" + Log.getString(tmp) + "}");

@@ -12,7 +12,7 @@ public class Project1
 	private final static int DESTINATION_PORT = 2010;
 	private static final String INPUT_FILENAME = "in.txt";
 	private static final String OUTPUT_FILENAME = "out.txt";
-	private static final int BYTES_PER_CHUNK = 4;
+	private static final int BYTES_PER_CHUNK = 2;
 	
 	/** gets the destination ip
 	 * @return the InetAddress of the destination

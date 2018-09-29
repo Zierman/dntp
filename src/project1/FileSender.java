@@ -4,16 +4,21 @@
 package project1;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.LinkedList;
+
+import log.Log;
+import log.Loggable;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class FileSender implements Sender
+public class FileSender implements Sender, Loggable
 {
+	private Log log = new Log();
 	private InetAddress destinationIp;
 	private int destinationPort, bytesPerChunk;
 	private String filename;
@@ -96,6 +101,7 @@ public class FileSender implements Sender
 			{
 				chunkSender.sendNext();
 			}
+			log.absorb(chunkSender.getLog());
 			
 		} catch (IOException e)
 		{
@@ -132,5 +138,26 @@ public class FileSender implements Sender
 		{
 			sender.sendNext();
 		}
+		sender.printLog(System.out);
+		sender.clearLog();
+	}
+
+	@Override
+	public Log getLog()
+	{
+		return log;
+	}
+
+	@Override
+	public void printLog(PrintStream printStream)
+	{
+		log.print(printStream);
+	}
+
+	@Override
+	public void clearLog()
+	{
+		log.clear();
+		
 	}
 }

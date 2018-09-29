@@ -5,6 +5,7 @@ package project1_demos;
 
 import project1.FileAssembler;
 import project1.FileSplitter;
+import project1.Project1;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class FileAndChunkDemo
 		
 		chunksSender = new LinkedList<Chunk>();
 		
-		FileSplitter splitter = new FileSplitter("in.txt", 5);
+		FileSplitter splitter = new FileSplitter("in.txt", Project1.getBytesPerChunk());
 		splitter.printLog(System.out);
 		splitter.clearLog();
 		

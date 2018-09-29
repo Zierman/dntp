@@ -31,30 +31,39 @@ public class Log
 	}
 
 
-	/** The string holding the log
+	/** The string holding the logStr
 	 * 
 	 */
-	private String log = "";
+	private String logStr = "";
 	
 	/** The newline string for the system
 	 * 
 	 */
 	private final static String NEWLINE = System.lineSeparator();
 	
-	/** Adds a string to the log followed by a newline
-	 * @param s the string to add to log
+	/** Absorbs another log
+	 * @param otherLog the other log to be absorbed
+	 */
+	public void absorb(Log otherLog)
+	{
+		logStr += otherLog.toString();
+		otherLog.clear();
+	}
+	
+	/** Adds a string to the logStr followed by a newline
+	 * @param s the string to add to logStr
 	 */
 	public void addLine(String s)
 	{
-		log += s + NEWLINE;
+		logStr += s + NEWLINE;
 	}
 	
-	/** Adds a string to the log
-	 * @param s the string to add to log
+	/** Adds a string to the logStr
+	 * @param s the string to add to logStr
 	 */
 	public void add(String s)
 	{
-		log += s;
+		logStr += s;
 	}
 	
 	/* (non-Javadoc)
@@ -62,23 +71,23 @@ public class Log
 	 */
 	public String toString()
 	{
-		return log;
+		return logStr;
 	}
 	
-	/** Clears the log
+	/** Clears the logStr
 	 * 
 	 */
 	public void clear()
 	{
-		log = "";
+		logStr = "";
 	}
 	
-	/** Prints the log
-	 * @param printStream the PrintStream to print the log to.
+	/** Prints the logStr
+	 * @param printStream the PrintStream to print the logStr to.
 	 */
 	public void print(PrintStream printStream)
 	{
-		printStream.print(log);
+		printStream.print(logStr);
 	}
 
 	/** Gets the String representation of a byte
@@ -142,10 +151,9 @@ public class Log
 	 */
 	public static String getHexString(byte[] bytes)
 	{
-		String s = "";
 		ByteDisplayMode tmp = byteDisplayMode;
 		byteDisplayMode = ByteDisplayMode.HEX;
-		getString(bytes);
+		String s =getString(bytes);
 		byteDisplayMode = tmp;
 		return s;
 	}
@@ -173,10 +181,9 @@ public class Log
 	 */
 	public static String getIntegerString(byte[] bytes)
 	{
-		String s = "";
 		ByteDisplayMode tmp = byteDisplayMode;
 		byteDisplayMode = ByteDisplayMode.INTEGER;
-		getString(bytes);
+		String s = getString(bytes);
 		byteDisplayMode = tmp;
 		return s;
 	}
@@ -196,10 +203,9 @@ public class Log
 	 */
 	public static String getBinaryString(byte[] bytes)
 	{
-		String s = "";
 		ByteDisplayMode tmp = byteDisplayMode;
 		byteDisplayMode = ByteDisplayMode.BINARY;
-		getString(bytes);
+		String s = getString(bytes);
 		byteDisplayMode = tmp;
 		return s;
 	}

@@ -3,19 +3,30 @@
  */
 package project1;
 
+import java.io.PrintStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Queue;
 
 import byteIntConverter.ByteIntConverter;
+import log.Log;
+import log.Loggable;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
+ * compile with the following line (from project root):
+ * javac -d bin -cp bin -sourcepath src src\project1\FileSender.java
+ * 
+ * run with the follwoing line (from project root):
+ * java -cp bin project1.FileSender
+ * 
+ * 
  */
-public class ChunkSender implements Sender
+public class ChunkSender implements Sender, Loggable
 {
+	private Log log = new Log();
 	private InetAddress destinationIp;
 	private int destinationPort;
 	private Chunk[] chunks;
@@ -46,7 +57,12 @@ public class ChunkSender implements Sender
 	 */
 	public void load(Queue<Chunk> chunks)
 	{
-		this.chunks = (Chunk[])chunks.toArray();
+		this.chunks = new Chunk[chunks.size()];
+		int i = 0;
+		for(Chunk c : chunks)
+		{
+			this.chunks[i++] = c;
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -85,22 +101,30 @@ public class ChunkSender implements Sender
 	 * @param c Chunk to send
 	 */
 	private void sendChunk(Chunk c)
-	{
+	{ 
+		if(c == null)
+		{
+			throw new IllegalArgumentException("chunk was null");
+		}
 		try
 		{
-			if(socket == null)
-			{
-				socket = new DatagramSocket();
-			}
-			if(next == 0)
-			{
-				int numberOfChunks = chunks.length;
-				byte[] numberOfChunkBytes = ByteIntConverter.convert(numberOfChunks);
-				DatagramPacket packet = new DatagramPacket(numberOfChunkBytes, numberOfChunkBytes.length, destinationIp, destinationPort);
+				if(socket == null)
+				{
+					socket = new DatagramSocket();
+				}
+				if(next == 0)
+				{
+					int numberOfChunks = chunks.length;
+					byte[] numberOfChunkBytes = ByteIntConverter.convert(numberOfChunks);
+					DatagramPacket packet = new DatagramPacket(numberOfChunkBytes, numberOfChunkBytes.length, destinationIp, destinationPort);
+					socket.send(packet);
+				}
+				DatagramPacket packet = new DatagramPacket(c.getBytes(), c.getBytes().length, destinationIp, destinationPort);
 				socket.send(packet);
-			}
-			DatagramPacket packet = new DatagramPacket(c.getBytes(), c.getBytes().length, destinationIp, destinationPort);
-			socket.send(packet);
+				log.addLine("ChunkSender sent datagram " + next + "-" + packet.getOffset() + "-"  + (packet.getOffset() + packet.getLength()));
+				log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
+				log.addLine("-----------------------------------------------");
+			
 		}
 		catch (Exception e) {
 			System.err.println("ChunkSender.sendChunk() Failed");
@@ -129,5 +153,26 @@ public class ChunkSender implements Sender
 	{
 		if(socket != null)
 			socket.close();
+	}
+
+	@Override
+	public Log getLog()
+	{
+		
+		return log;
+	}
+
+	@Override
+	public void printLog(PrintStream printStream)
+	{
+		log.print(printStream);
+		
+	}
+
+	@Override
+	public void clearLog()
+	{
+		log.clear();
+		
 	}
 }
