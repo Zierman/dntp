@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
 
 import log.Log;
@@ -133,7 +134,33 @@ public class FileSender implements Sender, Loggable
 	 */
 	public static void main(String[] args)
 	{
-		FileSender sender = new FileSender(Project1.getInputFilename(), Project1.getDestinationIp(), Project1.getPort(), Project1.getBytesPerChunk());
+		String filename = Project1.getInputFilename();
+		int bytesPerChunk = Project1.getBytesPerChunk();
+		InetAddress toIp = Project1.getDestinationIp();
+		int toPort = Project1.getPort();
+		
+		if(args.length > 0)
+		{
+			filename = args[0];
+		}if(args.length > 1)
+		{
+			bytesPerChunk = Integer.parseInt(args[1]);
+		}if(args.length > 2)
+		{
+			try
+			{
+				toIp = InetAddress.getByName(args[2]);
+			}
+			catch (UnknownHostException e)
+			{
+				throw new IllegalArgumentException("Invalid 3rd argument value. Must be a valid InetAddress name");
+			}
+		}if(args.length > 3)
+		{
+			toPort = Integer.parseInt(args[3]);
+		}
+		
+		FileSender sender = new FileSender(filename, toIp, toPort, bytesPerChunk);
 		while(sender.hasNext())
 		{
 			sender.sendNext();
