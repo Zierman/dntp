@@ -16,6 +16,11 @@ import log.Loggable;
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
+ * compile with the following line (from project root):
+ * javac -d bin -cp bin -sourcepath src src\project1\FileSender.java
+ * 
+ * run with the follwoing line (from project root):
+ * java -cp bin project1.FileSender
  */
 public class FileSender implements Sender, Loggable
 {
@@ -96,6 +101,7 @@ public class FileSender implements Sender, Loggable
 		{
 			FileSplitter splitter = new FileSplitter(filename, bytesPerChunk);
 			splitter.overwrite(chunks);
+			absorbLog(splitter);
 			ChunkSender chunkSender = new ChunkSender(destinationIp, destinationPort);
 			chunkSender.load(chunks);
 			while(chunkSender.hasNext())

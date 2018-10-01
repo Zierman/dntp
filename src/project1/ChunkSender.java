@@ -16,11 +16,6 @@ import log.Loggable;
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
- * compile with the following line (from project root):
- * javac -d bin -cp bin -sourcepath src src\project1\FileSender.java
- * 
- * run with the follwoing line (from project root):
- * java -cp bin project1.FileSender
  * 
  * 
  */
@@ -50,6 +45,7 @@ public class ChunkSender implements Sender, Loggable
 	 */
 	public void load(Chunk[] chunks)
 	{
+		log.addLine("Loading chunks into ChunkSender");
 		this.chunks = new Chunk[chunks.length];
 		int i = 0;
 		for(Chunk c : chunks)
@@ -61,7 +57,8 @@ public class ChunkSender implements Sender, Loggable
 			}
 		}
 		this.chunks = chunks;
-		
+
+		log.addLine("Finished Loading chunks into ChunkSender");
 	}
 	
 	/** loads the sender with Chunks
@@ -69,6 +66,7 @@ public class ChunkSender implements Sender, Loggable
 	 */
 	public void load(Queue<Chunk> chunks)
 	{
+		log.addLine("Loading chunks into ChunkSender");
 		this.chunks = new Chunk[chunks.size()];
 		int i = 0;
 		for(Chunk c : chunks)
@@ -79,6 +77,8 @@ public class ChunkSender implements Sender, Loggable
 				maxBytesInChunk = c.getBytes().length;
 			}
 		}
+
+		log.addLine("Finished Loading chunks into ChunkSender");
 	}
 	
 	/* (non-Javadoc)
@@ -88,6 +88,7 @@ public class ChunkSender implements Sender, Loggable
 	public void setToAddress(InetAddress ip)
 	{
 		destinationIp = ip;
+		log.addLine("ChunkSender set destination address set to " + ip.getCanonicalHostName());
 	}
 
 	/* (non-Javadoc)
@@ -97,6 +98,7 @@ public class ChunkSender implements Sender, Loggable
 	public void setToPort(int port)
 	{
 		destinationPort = port;
+		log.addLine("ChunkSender set destinationPort set to " + port);
 	}
 
 	/* (non-Javadoc)
@@ -127,6 +129,8 @@ public class ChunkSender implements Sender, Loggable
 				if(socket == null)
 				{
 					socket = new DatagramSocket();
+					log.addLine("create new datagram socket");
+					log.addLine("");
 				}
 				if(next == 0)
 				{
@@ -135,23 +139,27 @@ public class ChunkSender implements Sender, Loggable
 					byte[] numberOfChunkBytes = ByteIntConverter.convert(numberOfChunks);
 					DatagramPacket packet = new DatagramPacket(numberOfChunkBytes, numberOfChunkBytes.length, destinationIp, destinationPort);
 					socket.send(packet);
-					log.addLine("sent packet telling receiver to expect " + ByteIntConverter.convert(numberOfChunkBytes) + "Chunks");
-					log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
-					log.addLine("-----------------------------------------------");
+
+					log.addLine("sent packet telling receaver to expect " + ByteIntConverter.convert(numberOfChunkBytes) + "Chunks");
+					log.addLine("\t{" + Log.getString(packet.getData()) + "}");
+					log.addLine("");
+
 					
 					// Send max number of bytes per chunk
 					packet = new DatagramPacket(ByteIntConverter.convert(getMaxBytesInChunk()), 4, destinationIp, destinationPort);
 					socket.send(packet);
-					log.addLine("sent packet telling receiver that the max number of bytes in a chunk is " + ByteIntConverter.convert(numberOfChunkBytes));
-					log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
-					log.addLine("-----------------------------------------------");
+
+					log.addLine("sent packet telling receaver that the max number of bytes in a chunk is " + ByteIntConverter.convert(numberOfChunkBytes));
+					log.addLine("\t{" + Log.getString(packet.getData()) + "}");
+					log.addLine("");
+
 				}
 				
 				DatagramPacket packet = new DatagramPacket(c.getBytes(), c.getBytes().length, destinationIp, destinationPort);
 				socket.send(packet);
 				log.addLine("ChunkSender sent datagram " + next + "-" + packet.getOffset() + "-"  + (packet.getOffset() + packet.getLength()));
-				log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
-				log.addLine("-----------------------------------------------");
+				log.addLine("\t{" + Log.getString(packet.getData()) + "}");
+				log.addLine("");
 			
 		}
 		catch (Exception e) {
@@ -183,7 +191,10 @@ public class ChunkSender implements Sender, Loggable
 	public void close()
 	{
 		if(socket != null)
+		{
 			socket.close();
+			log.addLine("socket closed");
+		}
 	}
 
 	/* (non-Javadoc)

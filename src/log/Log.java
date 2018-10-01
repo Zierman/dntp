@@ -153,7 +153,7 @@ public class Log
 	{
 		ByteDisplayMode tmp = byteDisplayMode;
 		byteDisplayMode = ByteDisplayMode.HEX;
-		String s =getString(bytes);
+		String s = getString(bytes);
 		byteDisplayMode = tmp;
 		return s;
 	}
@@ -165,7 +165,7 @@ public class Log
 	public static String getHexString(byte b)
 	{
 		String s = "x";
-		String tmpString = Integer.toHexString(b).toUpperCase();
+		String tmpString = Integer.toHexString( Byte.toUnsignedInt(b)).toUpperCase();
 		for(int i = tmpString.length(); i < 2; i++)
 		{
 			s += "0";
@@ -194,7 +194,7 @@ public class Log
 	 */
 	public static String getIntegerString(byte b)
 	{
-		return Integer.toString(b);
+		return Integer.toString( Byte.toUnsignedInt(b));
 	}
 	
 	/** Gets the String representation of a byte array in binary form
@@ -218,7 +218,7 @@ public class Log
 	{
 
 		String s = "b";
-		String tmpString = Integer.toBinaryString(b);
+		String tmpString = Integer.toBinaryString( Byte.toUnsignedInt(b));
 		
 		for(int i = tmpString.length(); i < 8; i++)
 		{
