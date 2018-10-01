@@ -51,28 +51,50 @@ public class ChunkReceiver implements Loggable
 	{
 		LinkedList<Chunk> chunks = new LinkedList<Chunk>();
 		
-		//TODO
-		// Set up a socket
-
 		try {
-			
+			// set up socket
 			DatagramSocket socket = new DatagramSocket(port);
+			
 			byte[] initialSize = new byte[INITIAL_BYTE_SIZE];
 			DatagramPacket packet = new DatagramPacket(initialSize, initialSize.length);
 
+			// Ouptut that receiver is running
+			System.out.println("Ready to receive chunks");
 			// receive first packet
 			socket.receive(packet);
-
+			
 			// Determine the number of chunks to expect by converting the byte[] to int
 			int numberOfChunks = ByteIntConverter.convert(packet.getData());
+			log.addLine("Receiver got first datagram");
+			log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
+			log.addLine("\tExpecting " + numberOfChunks + " Chunks");
 
-			// Determine the max bytes per chunk
+			// receive second packet and determine the max bytes per chunk
 			socket.receive(packet);
-
+			int maxSizeOfChunk = ByteIntConverter.convert(packet.getData());
+			log.addLine("Receiver got second datagram");
+			log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
+			log.addLine("\tExpecting " + maxSizeOfChunk + " as maximum bytes per chunk");
+			
 			// Receive all chunks
-
+			packet = new DatagramPacket(new byte[maxSizeOfChunk], maxSizeOfChunk);
+			for(int i = 0; i < numberOfChunks; i++)
+			{
+				//TODO
+				
+				// receive a packet
+				
+				// Make a new chunk from the data of the packet
+					//use packet.getLength() for length parameter in constructor of Chunk
+				
+				// add chunk to collection to be assembled 
+				
+				// logging
+				log.addLine("");
+			}
 
 			// close socket
+			socket.close();
 		} catch (Exception e) {
 			System.err.println("ChunkReceiver.receive() Failed");
 		}
