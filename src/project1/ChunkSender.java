@@ -139,16 +139,20 @@ public class ChunkSender implements Sender, Loggable
 					byte[] numberOfChunkBytes = ByteIntConverter.convert(numberOfChunks);
 					DatagramPacket packet = new DatagramPacket(numberOfChunkBytes, numberOfChunkBytes.length, destinationIp, destinationPort);
 					socket.send(packet);
+
 					log.addLine("sent packet telling receaver to expect " + ByteIntConverter.convert(numberOfChunkBytes) + "Chunks");
 					log.addLine("\t{" + Log.getString(packet.getData()) + "}");
 					log.addLine("");
+
 					
 					// Send max number of bytes per chunk
 					packet = new DatagramPacket(ByteIntConverter.convert(getMaxBytesInChunk()), 4, destinationIp, destinationPort);
 					socket.send(packet);
+
 					log.addLine("sent packet telling receaver that the max number of bytes in a chunk is " + ByteIntConverter.convert(numberOfChunkBytes));
 					log.addLine("\t{" + Log.getString(packet.getData()) + "}");
 					log.addLine("");
+
 				}
 				
 				DatagramPacket packet = new DatagramPacket(c.getBytes(), c.getBytes().length, destinationIp, destinationPort);

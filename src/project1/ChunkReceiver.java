@@ -26,6 +26,8 @@ public class ChunkReceiver implements Loggable
 	private Log log = new Log();
 	private InetAddress ip;
 	private int port;
+	private int INITIAL_BYTE_SIZE = 4;
+
 
 	public ChunkReceiver(InetAddress ip, int port)
 	{
@@ -51,24 +53,31 @@ public class ChunkReceiver implements Loggable
 		
 		//TODO
 		// Set up a socket
-		
-		
-		// receive first packet
-		
-		
-		
-		// Determine the number of chunks to expect by converting the byte[] to int
-		
 
-		// Determine the max bytes per chunk
-		
-		
-		// Receive all chunks
-		
-		
-		// close socket
-		
-		
+		try {
+			
+			DatagramSocket socket = new DatagramSocket(port);
+			byte[] initialSize = new byte[INITIAL_BYTE_SIZE];
+			DatagramPacket packet = new DatagramPacket(initialSize, initialSize.length);
+
+			// receive first packet
+			socket.receive(packet);
+
+			// Determine the number of chunks to expect by converting the byte[] to int
+			int numberOfChunks = ByteIntConverter.convert(packet.getData());
+
+			// Determine the max bytes per chunk
+			socket.receive(packet);
+
+			// Receive all chunks
+
+
+			// close socket
+		} catch (Exception e) {
+			System.err.println("ChunkReceiver.receive() Failed");
+		}
+
+
 		// return list
 		return chunks;
 	}
