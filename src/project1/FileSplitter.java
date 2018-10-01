@@ -13,7 +13,12 @@ import java.util.Queue;
 import log.Log;
 import log.Loggable;
 
+/**
+ * @author Joshua Zierman [py1422xs@metrostate.edu]
+ *
+ */
 public class FileSplitter implements Loggable {
+	private static final boolean SHOW = false;
 	private Log log = new Log();
 	private String filename;
 	private int bytesPerChunk;
@@ -105,37 +110,43 @@ public class FileSplitter implements Loggable {
 			log.addLine("open file at " + path);
 		}
 		
-		Integer i;
-		while((i = in.read()) != -1)
-		{
-			bytes.add(i.byteValue());
-			log.addLine("read byte " + Log.getString(i.byteValue()) + " from " + file.getName());
-		}
-		in.close();
-		
 		// split into chunks and fill queue
 		byte[] bArray = new byte[bytesPerChunk];
+		Integer i;
 		int j = 0;
-		for(Byte b : bytes)
+		while((i = in.read()) != -1)
 		{
+			if(SHOW)
+			{
+				log.addLine("read byte " + Log.getString(i.byteValue()) + " from " + file.getName());
+				System.out.println(in.available() + " remaining");
+			}
+				
 			if(j < bytesPerChunk)
 			{
-				bArray[j] = b;
+				bArray[j] = i.byteValue();
 			}
 			else // j == bytesPerChunk
 			{
 				chunkQueue.add(new Chunk(bArray, bArray.length));
 				
-				// Logg the chunk added
-				log.addLine("add Chunk with bytes {" + Log.getString(bArray) + "} added to chunks");
+				// Log the chunk added
+				if(SHOW)
+					log.addLine("add Chunk with bytes {" + Log.getString(bArray) + "} to Chunk collection");
 
 				j = 0;
 				bArray = new byte[bytesPerChunk];
-				bArray[j] = b;
+				bArray[j] = i.byteValue();
 			}
 			
 			j++;
+//			//>
+//			System.out.println(in.available());
+//			bytes.add(i.byteValue());
+//			log.addLine("read byte " + Log.getString(i.byteValue()) + " from " + file.getName());
+//			//<
 		}
+		in.close();
 		if(j != 0)
 		{
 			byte[] tmp = new byte[j];
@@ -146,7 +157,7 @@ public class FileSplitter implements Loggable {
 			chunkQueue.add(new Chunk(tmp, tmp.length));
 
 			// Log the chunk added
-			log.add("add Chunk with bytes {" + Log.getString(tmp) + "}");
+			log.addLine("add Chunk with bytes {" + Log.getString(tmp) + "} to Chunk collection");
 		}
 		
 	}
