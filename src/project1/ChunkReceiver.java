@@ -94,7 +94,7 @@ public class ChunkReceiver implements Loggable
 				
 				chunks.add(new Chunk(tmp, packet.getLength()));
 				
-				log.add("ChunkReceaver receaved datagram " + i + "-" + packet.getOffset() + "-" + packet.getOffset() + packet.getLength());
+				log.add("ChunkReceiver received datagram " + i + "-" + packet.getOffset() + "-" + packet.getOffset() + packet.getLength());
 				log.addLine(" {" + Log.getHexString(tmp) + "}");
 				log.addLine("");
 			}
