@@ -48,7 +48,6 @@ There are two packages for the actual project:
 
 # Mac/Unix Commands
 `javac -d bin -cp bin -sourcepath src src/project1/FileReceiver.java`
+`javac -d bin -cp bin -sourcepath src src/project1/FileSender.java`
 `java -cp bin project1.FileReceiver "testOut.jpg"`
 `java -cp bin project1.FileSender "test.jpg"`
-`javac -d bin -cp bin -sourcepath src src/project1/FileReceiver.java`
-`javac -d bin -cp bin -sourcepath src src/project1/FileSender.java`

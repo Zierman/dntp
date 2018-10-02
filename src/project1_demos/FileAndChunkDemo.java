@@ -28,17 +28,17 @@ public class FileAndChunkDemo
 	{	
 		final String SEPARATOR = File.separator;
 		
-		LinkedList<Chunk> chunksSender, chunksReceaver;
+		LinkedList<Chunk> chunksSender, chunksReceiver;
 		
-		chunksReceaver = new LinkedList<Chunk>();
+		chunksReceiver = new LinkedList<Chunk>();
 		
 		chunksSender = new LinkedList<Chunk>();
 		
-		FileSplitter splitter = new FileSplitter("in.txt", Project1.getBytesPerChunk());
+		FileSplitter splitter = new FileSplitter("javaSocketTest.jpg", Project1.getBytesPerChunk());
 		splitter.printLog(System.out);
 		splitter.clearLog();
 		
-		FileAssembler assembler = new FileAssembler("out.txt");
+		FileAssembler assembler = new FileAssembler("testout.jpg");
 		assembler.printLog(System.out);
 		assembler.clearLog();
 		
@@ -66,13 +66,13 @@ public class FileAndChunkDemo
 		// simulate transfer of chunks
 		for (Chunk tmpChunk : chunksSender)
 		{
-			chunksReceaver.add(tmpChunk);
-			System.out.println("Chunk " + tmpChunk.toString() + " tranfered");
+			chunksReceiver.add(tmpChunk);
+			System.out.println("Chunk " + tmpChunk.toString() + " transferred");
 		}
 
 		// accept the chunks on the receiving side... ok to
 		// assume perfect transfer for project 1
-		for (Chunk tmpChunk : chunksReceaver)
+		for (Chunk tmpChunk : chunksReceiver)
 		{
 			assembler.accept(tmpChunk);
 			assembler.printLog(System.out);

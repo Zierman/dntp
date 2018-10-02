@@ -105,11 +105,11 @@ public class FileReceiver implements Loggable
 	
 	public void receiveFile() throws IOException
 	{
-		ChunkReceiver receaver = new ChunkReceiver(ip, port);
-		absorbLog(receaver);
+		ChunkReceiver receiver = new ChunkReceiver(ip, port);
+		absorbLog(receiver);
 		
-		LinkedList<Chunk> chunks = receaver.receive();
-		absorbLog(receaver);
+		LinkedList<Chunk> chunks = receiver.receive();
+		absorbLog(receiver);
 		
 		FileAssembler assembler = new FileAssembler(filename);
 		for(Chunk c : chunks)
