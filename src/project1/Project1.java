@@ -14,7 +14,7 @@ public class Project1
 	private static final String OUTPUT_FILENAME = "out.txt";
 	private static final int BYTES_PER_CHUNK = 4;
 	
-	/** gets the destination ip
+	/** gets the destination Address
 	 * @return the InetAddress of the destination
 	 */
 	public static InetAddress getDestinationIp()
