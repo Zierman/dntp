@@ -115,6 +115,7 @@ public class FileSplitter implements Loggable {
 		int cnt = 0; // used for spacing out output
 		while((i = in.read()) != -1)
 		{
+			// let user know that progress is being made
 			if(cnt++ % 1000 == 0)
 			{
 				System.out.println(in.available() + " remaining to be read in file");
