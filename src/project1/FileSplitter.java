@@ -33,7 +33,6 @@ public class FileSplitter implements Loggable {
 		{
 			throw new IllegalArgumentException();
 		}
-		log.addLine("FileSplitter constructor called");
 		
 		this.filename = filename;
 		log.addLine("filename set to \"" + this.filename + "\"");
@@ -48,7 +47,6 @@ public class FileSplitter implements Loggable {
 	 */
 	public void overwrite(Queue<Chunk> chunkQueue) throws IOException
 	{	
-		log.addLine("FileSplitter.overwrite() called");
 		
 		// Clear the queue
 		chunkQueue.clear();

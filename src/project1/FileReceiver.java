@@ -135,7 +135,9 @@ public class FileReceiver implements Loggable
 	@Override
 	public void printLog(PrintStream printStream)
 	{
+		printStream.println("<FileReceiver Log Start>");
 		log.print(printStream);
+		printStream.println("<FileReceiver Log End>");
 	}
 
 	/* (non-Javadoc)

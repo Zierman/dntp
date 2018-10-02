@@ -145,6 +145,7 @@ public class FileSender implements Sender, Loggable
 		InetAddress toIp = Project1.getDestinationIp();
 		int toPort = Project1.getPort();
 		
+		// handle inline args
 		if(args.length > 0)
 		{
 			filename = args[0];
@@ -166,11 +167,14 @@ public class FileSender implements Sender, Loggable
 			toPort = Integer.parseInt(args[3]);
 		}
 		
+		// sendAllFiles ... incidentally only one file
 		FileSender sender = new FileSender(filename, toIp, toPort, bytesPerChunk);
 		while(sender.hasNext())
 		{
 			sender.sendNext();
 		}
+		
+		// print log
 		sender.printLog(System.out);
 		sender.clearLog();
 	}
@@ -189,8 +193,10 @@ public class FileSender implements Sender, Loggable
 	 */
 	@Override
 	public void printLog(PrintStream printStream)
-	{
+	{	
+		printStream.println("<FileSender Log Start>");
 		log.print(printStream);
+		printStream.println("<FileSender Log End>");
 	}
 
 	/* (non-Javadoc)

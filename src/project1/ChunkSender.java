@@ -140,8 +140,8 @@ public class ChunkSender implements Sender, Loggable
 					DatagramPacket packet = new DatagramPacket(numberOfChunkBytes, numberOfChunkBytes.length, destinationIp, destinationPort);
 					socket.send(packet);
 
-					log.addLine("sent packet telling receaver to expect " + ByteIntConverter.convert(numberOfChunkBytes) + "Chunks");
-					log.addLine("\t{" + Log.getString(packet.getData()) + "}");
+					log.add("sent packet telling receaver to expect " + ByteIntConverter.convert(numberOfChunkBytes) + " Chunks");
+					log.addLine(" {" + Log.getString(packet.getData()) + "}");
 					log.addLine("");
 
 					
@@ -149,16 +149,16 @@ public class ChunkSender implements Sender, Loggable
 					packet = new DatagramPacket(ByteIntConverter.convert(getMaxBytesInChunk()), 4, destinationIp, destinationPort);
 					socket.send(packet);
 
-					log.addLine("sent packet telling receaver that the max number of bytes in a chunk is " + ByteIntConverter.convert(numberOfChunkBytes));
-					log.addLine("\t{" + Log.getString(packet.getData()) + "}");
+					log.add("sent packet telling receaver that the max number of bytes in a chunk is " + ByteIntConverter.convert(numberOfChunkBytes));
+					log.addLine(" {" + Log.getString(packet.getData()) + "}");
 					log.addLine("");
 
 				}
 				
 				DatagramPacket packet = new DatagramPacket(c.getBytes(), c.getBytes().length, destinationIp, destinationPort);
 				socket.send(packet);
-				log.addLine("ChunkSender sent datagram " + next + "-" + packet.getOffset() + "-"  + (packet.getOffset() + packet.getLength()));
-				log.addLine("\t{" + Log.getString(packet.getData()) + "}");
+				log.add("ChunkSender sent datagram " + next + "-" + packet.getOffset() + "-"  + (packet.getOffset() + packet.getLength()));
+				log.addLine(" {" + Log.getString(packet.getData()) + "}");
 				log.addLine("");
 			
 		}

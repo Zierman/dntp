@@ -65,16 +65,18 @@ public class ChunkReceiver implements Loggable
 			
 			// Determine the number of chunks to expect by converting the byte[] to int
 			int numberOfChunks = ByteIntConverter.convert(packet.getData());
-			log.addLine("Receiver got first datagram");
-			log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
+			log.add("Receiver got first datagram");
+			log.addLine(" {" + Log.getHexString(packet.getData()) + "}");
 			log.addLine("\tExpecting " + numberOfChunks + " Chunks");
+			log.addLine("");
 
 			// receive second packet and determine the max bytes per chunk
 			socket.receive(packet);
 			int maxSizeOfChunk = ByteIntConverter.convert(packet.getData());
-			log.addLine("Receiver got second datagram");
-			log.addLine("\t{" + Log.getHexString(packet.getData()) + "}");
+			log.add("Receiver got second datagram");
+			log.addLine(" {" + Log.getHexString(packet.getData()) + "}");
 			log.addLine("\tExpecting " + maxSizeOfChunk + " as maximum bytes per chunk");
+			log.addLine("");
 			
 			// Receive all chunks
 			packet = new DatagramPacket(new byte[maxSizeOfChunk], maxSizeOfChunk);
@@ -92,8 +94,8 @@ public class ChunkReceiver implements Loggable
 				
 				chunks.add(new Chunk(tmp, packet.getLength()));
 				
-				log.addLine("ChunkReceaver receaved datagram" + i + "-" + packet.getOffset() + "-" + packet.getOffset() + packet.getLength());
-				log.addLine("\t{" + Log.getHexString(tmp) + "}");
+				log.add("ChunkReceaver receaved datagram " + i + "-" + packet.getOffset() + "-" + packet.getOffset() + packet.getLength());
+				log.addLine(" {" + Log.getHexString(tmp) + "}");
 				log.addLine("");
 			}
 
