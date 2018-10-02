@@ -9,7 +9,7 @@ created using java sdk 1.8.0_152
  
 ## From Command Line
 
-### To run File Receaer Program from Project1
+### To run File Receiver Program from Project1
 1. go to /dntp in terminal
 1. `javac -d bin -cp bin -sourcepath src src\project1\FileReceiver.java` to compile
 1. `java -cp bin project1.FileReceiver [filename] [ip] [port]` to run where `[filename]`, `[ip]`, and `[port]` are optional parameters. 
