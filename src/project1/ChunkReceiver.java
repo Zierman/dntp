@@ -80,16 +80,20 @@ public class ChunkReceiver implements Loggable
 			packet = new DatagramPacket(new byte[maxSizeOfChunk], maxSizeOfChunk);
 			for(int i = 0; i < numberOfChunks; i++)
 			{
-				//TODO
-				
 				// receive a packet
+				socket.receive(packet);
 				
-				// Make a new chunk from the data of the packet
-					//use packet.getLength() for length parameter in constructor of Chunk
+				// Make a new chunk from the data of the packet and put it in the collection
+				byte[] tmp = new byte[packet.getLength()];
+				for(int j = 0; j < tmp.length; j++)
+				{
+					tmp[j] = packet.getData()[j];
+				}
 				
-				// add chunk to collection to be assembled 
+				chunks.add(new Chunk(tmp, packet.getLength()));
 				
-				// logging
+				log.addLine("ChunkReceaver receaved datagram" + i + "-" + packet.getOffset() + "-" + packet.getOffset() + packet.getLength());
+				log.addLine("\t{" + Log.getHexString(tmp) + "}");
 				log.addLine("");
 			}
 

@@ -114,12 +114,17 @@ public class FileSplitter implements Loggable {
 		byte[] bArray = new byte[bytesPerChunk];
 		Integer i;
 		int j = 0;
+		int cnt = 0; // used for spacing out output
 		while((i = in.read()) != -1)
 		{
+			if(cnt++ % 1000 == 0)
+			{
+				System.out.println(in.available() + " remaining");
+			}
 			if(SHOW)
 			{
 				log.addLine("read byte " + Log.getString(i.byteValue()) + " from " + file.getName());
-				System.out.println(in.available() + " remaining");
+				
 			}
 				
 			if(j < bytesPerChunk)
