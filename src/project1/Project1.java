@@ -13,6 +13,7 @@ public class Project1
 	private static final String INPUT_FILENAME = "in.txt";
 	private static final String OUTPUT_FILENAME = "out.txt";
 	private static final int BYTES_PER_CHUNK = 4;
+	private static final int MIN_BYTES_IN_FILE_BEFORE_BPC_OVERRIDE = 2000;
 	
 	/** gets the destination Address
 	 * @return the InetAddress of the destination
@@ -61,5 +62,13 @@ public class Project1
 	public static int getBytesPerChunk()
 	{
 		return BYTES_PER_CHUNK;
+	}
+
+	/**
+	 * @return the minBytesInFileBeforeBpcOverride
+	 */
+	public static int getMinBytesInFileBeforeBpcOverride()
+	{
+		return MIN_BYTES_IN_FILE_BEFORE_BPC_OVERRIDE;
 	}
 }

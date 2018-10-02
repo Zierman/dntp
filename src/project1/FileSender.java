@@ -3,6 +3,7 @@
  */
 package project1;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetAddress;
@@ -145,14 +146,32 @@ public class FileSender implements Sender, Loggable
 		InetAddress toIp = Project1.getDestinationIp();
 		int toPort = Project1.getPort();
 		
-		// handle inline args
+		// handle inline args (and default bytesPerChunk override for large files)
 		if(args.length > 0)
 		{
 			filename = args[0];
-		}if(args.length > 1)
+		}
+		if(args.length > 1)
 		{
 			bytesPerChunk = Integer.parseInt(args[1]);
-		}if(args.length > 2)
+		}
+		else
+		{
+			try
+			{
+				long bytesInFile  = new File(filename).length();
+				if(bytesInFile > Project1.getMinBytesInFileBeforeBpcOverride())
+				{
+					bytesPerChunk = (int)(bytesInFile / 20);
+				}
+				
+			}
+			catch(Exception e)
+			{
+				//dont do anything
+			}
+		}
+		if(args.length > 2)
 		{
 			try
 			{
