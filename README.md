@@ -9,16 +9,16 @@ created using java sdk 1.8.0_152
  
 ## From Command Line
 
-### To run File Sender Program from Project1
-1. go to /dntp in terminal
-1. `javac -d bin -cp bin -sourcepath src src\project1\FileSender.java` to compile
-1. `java -cp bin project1.FileSender [filename] [bytes per chunk] [ip] [port]` to run where `[filename]`, `[bytes per chunk]`, `[ip]`, and `[port]` are optional parameters. 
-- note that parameters must be in the order listed and all previous parameters must be given to pass a later one. 
-
 ### To run File Receaer Program from Project1
 1. go to /dntp in terminal
 1. `javac -d bin -cp bin -sourcepath src src\project1\FileReceiver.java` to compile
 1. `java -cp bin project1.FileReceiver [filename] [ip] [port]` to run where `[filename]`, `[ip]`, and `[port]` are optional parameters. 
+- note that parameters must be in the order listed and all previous parameters must be given to pass a later one. 
+
+### To run File Sender Program from Project1
+1. go to /dntp in terminal
+1. `javac -d bin -cp bin -sourcepath src src\project1\FileSender.java` to compile
+1. `java -cp bin project1.FileSender [filename] [bytes per chunk] [ip] [port]` to run where `[filename]`, `[bytes per chunk]`, `[ip]`, and `[port]` are optional parameters. 
 - note that parameters must be in the order listed and all previous parameters must be given to pass a later one. 
 
 ### To test running as a package use the helloworld
