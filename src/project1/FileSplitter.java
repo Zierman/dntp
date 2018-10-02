@@ -117,12 +117,11 @@ public class FileSplitter implements Loggable {
 		{
 			if(cnt++ % 1000 == 0)
 			{
-				System.out.println(in.available() + " remaining");
+				System.out.println(in.available() + " remaining to be read in file");
 			}
 			if(SHOW)
 			{
 				log.addLine("read byte " + Log.getString(i.byteValue()) + " from " + file.getName());
-				
 			}
 				
 			if(j < bytesPerChunk)
@@ -135,7 +134,9 @@ public class FileSplitter implements Loggable {
 				
 				// Log the chunk added
 				if(SHOW)
+				{
 					log.addLine("add Chunk with bytes {" + Log.getString(bArray) + "} to Chunk collection");
+				}
 
 				j = 0;
 				bArray = new byte[bytesPerChunk];
@@ -160,7 +161,10 @@ public class FileSplitter implements Loggable {
 			chunkQueue.add(new Chunk(tmp, tmp.length));
 
 			// Log the chunk added
-			log.addLine("add Chunk with bytes {" + Log.getString(tmp) + "} to Chunk collection");
+			if(SHOW)
+			{
+				log.addLine("add Chunk with bytes {" + Log.getString(tmp) + "} to Chunk collection");
+			}
 		}
 		
 	}
