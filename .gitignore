@@ -2,8 +2,7 @@
 ### Eclipse template
 
 .metadata
-bin/
-!bin/.dondelete
+bin/*/
 tmp/
 *.tmp
 *.bak
@@ -290,3 +289,4 @@ JoshuaUML/
 out.*
 doc\
 # End of Joshua Zierman's Additions
+src/udp/
