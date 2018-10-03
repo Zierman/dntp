@@ -3,7 +3,6 @@
 
 .metadata
 bin/
-!bin/.dondelete
 tmp/
 *.tmp
 *.bak
@@ -289,4 +288,5 @@ joshuaTest*
 JoshuaUML/
 out.*
 doc\
+!bin/.dondelete
 # End of Joshua Zierman's Additions
