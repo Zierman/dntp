@@ -86,16 +86,10 @@ public class ChunkReceiver implements Loggable
 				socket.receive(packet);
 				
 				// Make a new chunk from the data of the packet and put it in the collection
-				byte[] tmp = new byte[packet.getLength()];
-				for(int j = 0; j < tmp.length; j++)
-				{
-					tmp[j] = packet.getData()[j];
-				}
-				
-				chunks.add(new Chunk(tmp, packet.getLength()));
+				chunks.add(new Chunk(packet.getData(), packet.getLength()));
 				
 				log.add("ChunkReceiver received datagram " + i + "-" + packet.getOffset() + "-" + packet.getOffset() + packet.getLength());
-				log.addLine(" {" + Log.getHexString(tmp) + "}");
+				log.addLine(" {" + Log.getHexString(packet.getData()) + "}");
 				log.addLine("");
 			}
 

@@ -13,7 +13,7 @@ import log.Loggable;
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class Chunk implements Iterable<Byte>, Loggable
+public class Chunk implements Iterable<Byte>
 {
 
 	/**
@@ -54,11 +54,6 @@ public class Chunk implements Iterable<Byte>, Loggable
 	 * An array of bytes that is a chunck of a larger file
 	 */
 	private byte[] bytes;
-	
-	/** the log for this instance's behaviour
-	 * 
-	 */
-	private Log log = new Log();
 
 	/**
 	 * Constructs a chunk with the given bytes
@@ -66,14 +61,19 @@ public class Chunk implements Iterable<Byte>, Loggable
 	 * @param bytes an array of bytes that holds the data for the chunk
 	 */
 	public Chunk(byte[] bytes, int length) {
-		// log
-		log.addLine("Chunk constructor called");
-		byte[] tmp = new byte[length];
-		for(int i = 0; i < length; i ++)
+		if(length != bytes.length)
 		{
-			tmp[i] = bytes[i];
+			byte[] tmp = new byte[length];
+			for(int i = 0; i < length; i ++)
+			{
+				tmp[i] = bytes[i];
+			}
+			setBytes(tmp);
 		}
-		setBytes(tmp);
+		else
+		{
+			setBytes (bytes);
+		}
 	}
 
 	/**
@@ -107,49 +107,8 @@ public class Chunk implements Iterable<Byte>, Loggable
 	{
 		this.bytes = bytes;
 		
-		// log
-		log.add("Chunk bytes set to: ");
-		boolean first = true;
-		for(byte b : bytes)
-		{
-			if(!first)
-			{
-				log.add(", ");
-			}
-			else
-			{
-				first = false;
-			}
-			log.add("" + b);
-		}
 	}
 
-	/* (non-Javadoc)
-	 * @see log.Loggable#getLog()
-	 */
-	@Override
-	public Log getLog()
-	{
-		return log;
-	}
-
-	/* (non-Javadoc)
-	 * @see log.Loggable#printLog(java.io.PrintStream)
-	 */
-	@Override
-	public void printLog(PrintStream printStream)
-	{
-		log.print(printStream);
-	}
-
-	/* (non-Javadoc)
-	 * @see log.Loggable#clearLog()
-	 */
-	@Override
-	public void clearLog()
-	{
-		log.clear();
-	}
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -160,13 +119,5 @@ public class Chunk implements Iterable<Byte>, Loggable
 		return "{" + Log.getString(bytes) + "}";
 	}
 
-	/* (non-Javadoc)
-	 * @see log.Loggable#absorbLog(log.Loggable)
-	 */
-	@Override
-	public void absorbLog(Loggable l)
-	{
-		log.absorb(l.getLog());
-	}
 	
 }
