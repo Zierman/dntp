@@ -13,8 +13,8 @@ import java.util.LinkedList;
  */
 public abstract class Frame
 {
-	protected final Byte FLAG = 0x7E;
-	protected final Byte ESC = 0x7D;
+	private final Byte FLAG = 0x7E;
+	private final Byte ESC = 0x7D;
 	public enum Error {DROP, DELAY, CORRUPT}
 	protected Error error = null;
 	protected Byte frameNumber;
@@ -45,4 +45,15 @@ public abstract class Frame
 	{
 		return (byte) (b ^ 0x20);
 	}
+
+
+	/**
+	 * 
+	 */
+	public void corrupt()
+	{
+		// TODO Auto-generated method stub
+		error = Error.CORRUPT;
+	}
+
 }
