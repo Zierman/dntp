@@ -1,1 +1,0 @@
-I'm putting this file in the project to ensure that the bin folder exists. just ignore it please
