@@ -3,7 +3,7 @@
 
 .metadata
 bin/
-!bin/ignoreme.txt
+!bin/.dondelete
 tmp/
 *.tmp
 *.bak
