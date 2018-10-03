@@ -15,5 +15,6 @@ public class Project2
 	public static final int MAX_PACKET_LENGTH = 20000;
 	public static final int SENDER_PORT = 1012;
 	public static final int RECEIVER_PORT = Project1.getPort();
+	public static final int CHANCE_OF_ERROR = 20;
 	final int TIMEOUT = 2000; // 2000ms
 }
