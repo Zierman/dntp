@@ -1,37 +1,25 @@
 /**
  * File Created by Joshua Zierman on Oct 2, 2018
  */
-package project2;
+package project2.frame;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-
-import project1.Chunk;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class ChunkFrame extends Frame
+public class AckFrame extends Frame
 {
-	private Chunk chunk;
-	
-	public ChunkFrame(Chunk c, byte n)
+	public AckFrame(ChunkFrame f)
 	{
-		super();
-		frameNumber = n;
-		chunk = c;
+		super(f.getAckNumber());
 	}
 	
-	public ChunkFrame(DatagramPacket packet)
+	public AckFrame(DatagramPacket p)
 	{
-		super();
 		//TODO
-	}
-	
-	public Chunk toChunk()
-	{
-		return chunk;
 	}
 
 	/* (non-Javadoc)
@@ -43,4 +31,5 @@ public class ChunkFrame extends Frame
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
 }

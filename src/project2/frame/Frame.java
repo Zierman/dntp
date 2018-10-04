@@ -1,7 +1,7 @@
 /**
  * File Created by Joshua Zierman on Oct 2, 2018
  */
-package project2;
+package project2.frame;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -13,15 +13,18 @@ import java.util.LinkedList;
  */
 public abstract class Frame
 {
-	private final Byte FLAG = 0x7E;
-	private final Byte ESC = 0x7D;
 	public enum Error {DROP, DELAY, CORRUPT}
-	protected Error error = null;
-	protected Byte frameNumber;
+	private static final short BAD = 1;
+	private static final short GOOD = 0;
 	
-	protected Frame(byte frameNumber)
+	protected Error error = null;
+	protected short checkSum = GOOD;
+	protected short length;
+	protected int ackNumber;
+	
+	protected Frame(int ackNumber)
 	{
-		this.frameNumber = frameNumber;
+		this.ackNumber = ackNumber;
 	}
 	
 	public Frame()
@@ -31,19 +34,14 @@ public abstract class Frame
 	
 	public abstract DatagramPacket toDatagramPacket(InetAddress address, int port);
 
-	public Byte getFrameNumber()
+	public int getAckNumber()
 	{
-		return frameNumber;
+		return ackNumber;
 	}
 	
 	public Error getError()
 	{
 		return error;
-	}
-	
-	private static Byte toggle(Byte b)
-	{
-		return (byte) (b ^ 0x20);
 	}
 
 
@@ -52,8 +50,8 @@ public abstract class Frame
 	 */
 	public void corrupt()
 	{
-		// TODO Auto-generated method stub
 		error = Error.CORRUPT;
+		checkSum = BAD;
 	}
 
 }

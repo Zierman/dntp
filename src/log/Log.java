@@ -40,6 +40,10 @@ public class Log
 	 * 
 	 */
 	private final static String NEWLINE = System.lineSeparator();
+
+	public static final String TAB = " \t";
+	
+	
 	
 	/** Absorbs another log
 	 * @param otherLog the other log to be absorbed
