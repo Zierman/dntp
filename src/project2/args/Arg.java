@@ -3,8 +3,6 @@
  */
 package project2.args;
 
-import java.net.UnknownHostException;
-
 import log.Log;
 
 /**
