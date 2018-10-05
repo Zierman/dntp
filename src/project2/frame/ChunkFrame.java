@@ -27,6 +27,7 @@ public class ChunkFrame extends Frame
 	public ChunkFrame(DatagramPacket packet)
 	{
 		super();
+		//TODO
 	}
 	
 	public Chunk toChunk()

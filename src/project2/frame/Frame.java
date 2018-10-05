@@ -34,18 +34,31 @@ public abstract class Frame
 	
 	public abstract DatagramPacket toDatagramPacket(InetAddress address, int port);
 
+	/**Gets the acknowledgement number
+	 * @return the int acknowledgement number
+	 */
 	public int getAckNumber()
 	{
 		return ackNumber;
 	}
 	
+	/** gets the type of error 
+	 * @return an Error value assosiated with the type of error, DROP if the frame was dropped, DELAY if delayed, CORRUPT if corrupted, null if no error
+	 */
 	public Error getError()
 	{
 		return error;
 	}
 
-
-	/**
+	/** Checks to see if the CheckSum passes
+	 * @return true if it passes the checksum, false if corrupted
+	 */
+	public boolean passedCheckSum()
+	{
+		return checkSum == GOOD;
+	}
+	
+	/**corrupts the Frame
 	 * 
 	 */
 	public void corrupt()
