@@ -46,10 +46,9 @@ public class ArgList implements Iterable<Arg<?>>
 			{
 				if(a.matchesFlag(args[i]))
 				{
-					if(a instanceof HelpArg)
+					if(a instanceof ToggleArg)
 					{
-						a.processInlineArg(null);
-						((HelpArg) a).handle();
+						((ToggleArg)a).processInlineArg();
 					}
 					else
 					{

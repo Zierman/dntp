@@ -3,40 +3,27 @@
  */
 package project2.args;
 
-
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class HelpArg extends Arg<Boolean>
+public class HelpArg extends ToggleArg
 {
+
+	private static final String DESIGNERS = "David Whitebird and Joshua Zierman with the help of Travis Peterson";
+	private final String DESCRIPTION;
 
 	/**
 	 * @param flag
 	 */
-	public HelpArg(String flag) {
+	public HelpArg(String flag, String description) {
 		super(flag);
+		this.DESCRIPTION = description;
 	}
 
-	/* (non-Javadoc)
-	 * @see project2.args.Arg#processInlineArg(java.lang.String)
-	 */
-	@Override
-	protected void processInlineArg(String s) throws Exception
-	{
-		value = true;
-	}
-
-	/* (non-Javadoc)
-	 * @see project2.args.Arg#getDefault()
-	 */
-	@Override
-	protected Boolean getDefault()
-	{
-		return false;
-	}
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see project2.args.Arg#getHelpString()
 	 */
 	@Override
@@ -45,20 +32,25 @@ public class HelpArg extends Arg<Boolean>
 		return "Displays help information";
 	}
 
-	public void handle()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see project2.args.ToggleArg#processInlineArg()
+	 */
+	@Override
+	protected void processInlineArg()
 	{
-		if (value == true)
+		System.out.println("Darn Nice Transfer Protocol: File Tranfer");
+		System.out.println("");
+		System.out.println("Desinged by " + DESIGNERS);
+		System.out.println("");
+		System.out.println(DESCRIPTION);
+		System.out.println("");
+		System.out.println("list of inline arguments:");
+		for (Arg<?> arg : ArgList.instance())
 		{
-			System.out.println("Darn Nice Transfer Protocol: File Tranfer");
-			System.out.println("");
-			System.out.println("Desinged by David Whitebird and Joshua Zierman");
-			System.out.println("");
-			System.out.println("list of inline arguments:");
-			for(Arg<?> arg : ArgList.instance())
-			{
-				System.out.println(arg.getHelpLine());
-			}
-			System.exit(0);
+			System.out.println(arg.getHelpLine());
 		}
+		System.exit(0);
 	}
 }

@@ -30,6 +30,7 @@ import project2.frame.ChunkFrame;
  */
 public class Sender
 {
+	private final static String SENDER_PROGRAM_DESCRIPTION = "<description not done>"; // TODO write description of the sender program
 	static FileArg fileArg = new FileArg("-f");	 
 	static SenderAddressArg senderAddress = new SenderAddressArg("-sa");
 	static ProxyAddressArg errorProxyAddress = new ProxyAddressArg("-pa"); 
@@ -40,7 +41,7 @@ public class Sender
 	static WindowSizeArg windowSizeArg = new WindowSizeArg("-w");
 	static TimeoutArg timeoutArg = new TimeoutArg("-t");
 	static MaxSizeOfChunkArg maxSizeOfChunk = new MaxSizeOfChunkArg("-s");
-	static HelpArg helpArg = new HelpArg("-help");
+	static HelpArg helpArg = new HelpArg("-help", SENDER_PROGRAM_DESCRIPTION);
 	
 	public static void main(String[] args) throws Exception
 	{
