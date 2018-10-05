@@ -24,6 +24,7 @@ import project2.args.SenderPortArg;
 import project2.args.TimeoutArg;
 import project2.args.WindowSizeArg;
 import project2.frame.ChunkFrame;
+import project2.slidingWindow.SenderWindow;
 import project2.slidingWindow.SlidingWindow;
 
 /**
@@ -34,15 +35,15 @@ public class Sender
 {
 	private final static String SENDER_PROGRAM_DESCRIPTION = "<description not done>"; // TODO write description of the sender program
 	static FileArg fileArg = new FileArg("-f");	 
-	static SenderAddressArg senderAddress = new SenderAddressArg("-sa");
-	static ProxyAddressArg errorProxyAddress = new ProxyAddressArg("-pa"); 
-	static ReceiverAddressArg receiverAddress = new ReceiverAddressArg("-ra"); 
-	static SenderPortArg senderPort = new SenderPortArg("-sp");
-	static ProxyPortArg errorProxyPort = new ProxyPortArg("-pp");
-	static ReceiverPortArg receiverPort = new ReceiverPortArg("-rp"); 
+	static SenderAddressArg senderAddressArg = new SenderAddressArg("-sa");
+	static ProxyAddressArg errorProxyAddressArg = new ProxyAddressArg("-pa"); 
+	static ReceiverAddressArg receiverAddressArg = new ReceiverAddressArg("-ra"); 
+	static SenderPortArg senderPortArg = new SenderPortArg("-sp");
+	static ProxyPortArg errorProxyPortArg = new ProxyPortArg("-pp");
+	static ReceiverPortArg receiverPortArg = new ReceiverPortArg("-rp"); 
 	static WindowSizeArg windowSizeArg = new WindowSizeArg("-w");
 	static TimeoutArg timeoutArg = new TimeoutArg("-t");
-	static MaxSizeOfChunkArg maxSizeOfChunk = new MaxSizeOfChunkArg("-s");
+	static MaxSizeOfChunkArg maxSizeOfChunkArg = new MaxSizeOfChunkArg("-s");
 	static HelpArg helpArg = new HelpArg("-help", SENDER_PROGRAM_DESCRIPTION);
 	
 	public static void main(String[] args) throws Exception
@@ -56,7 +57,7 @@ public class Sender
 		
 		// split up the file into chunks
 		LinkedList<Chunk> chunkList = new LinkedList<Chunk>();
-		FileSplitter splitter = new FileSplitter(inFile.getAbsolutePath(), maxSizeOfChunk.getValue());
+		FileSplitter splitter = new FileSplitter(inFile.getAbsolutePath(), maxSizeOfChunkArg.getValue());
 		splitter.overwrite(chunkList);
 		
 		// convert chunks into frames
@@ -65,8 +66,8 @@ public class Sender
 		int ackNum = 0;
 		while(!chunkList.isEmpty())
 		{
-//			SlidingWindow window = new SlidingWindow(windowSize, packetSize, socket, timeout, address, port)
-			
+			SenderWindow window = new SenderWindow(windowSize, , socket, timeoutArg.getValue(), errorProxyAddressArg.getValue(), errorProxyPortArg.getValue())
+			window.run();
 		}
 		
 		

@@ -44,4 +44,10 @@ public class ChunkFrame extends Frame
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+
+	public static int  dataPacketLength()
+	{
+		DATA_PACKET_LENGTH = MAX_CHUNK_LENGTH + 12;
+	}
 }

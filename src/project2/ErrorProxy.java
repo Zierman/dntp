@@ -9,6 +9,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 import project2.frame.AckFrame;
@@ -22,6 +23,7 @@ import project2.frame.Frame;
 public class ErrorProxy
 {
 	static final Random RAND = new Random();
+
 	/**
 	 * @param args
 	 * @throws SocketException
@@ -29,78 +31,88 @@ public class ErrorProxy
 	public static void main(String[] args) throws SocketException
 	{
 		int destinationPort = 0;
-		boolean delayed = false;
-		LinkedList<DatagramPacket> delayedPackages = new LinkedList<DatagramPacket>();
+		boolean delayedThisTime = false;
+		Queue<DatagramPacket> delayedPackages = new LinkedList<DatagramPacket>();
 		Frame frame;
 		DatagramSocket socket = new DatagramSocket(Defaluts.PROXY_PORT);
 		DatagramPacket p = new DatagramPacket(new byte[Defaluts.DATA_PACKET_LENGTH], 0);
-		while(true)
+		while (true)
 		{
 			try
 			{
-				socket.receive(p);
-				
-				// determin if the 'from port' matches the receiver or sender to determin the frame type
-				if(p.getPort() == Defaluts.RECEIVER_PORT)
+				// if the number of delayed packets !=
+				// winowSize - (number of sent + number of
+				// dropped);
+				if (true)// TODO fix that
 				{
-					frame = new AckFrame(p);
-					destinationPort = Defaluts.SENDER_PORT;
-				}
-				else if (p.getPort() == Defaluts.SENDER_PORT)
-				{
-					frame = new ChunkFrame(p);
-					destinationPort = Defaluts.RECEIVER_PORT;
-				}
-				else
-				{
-					throw new IOException();
-				}
-				switch (generateError())
-				{
-				case DROP:
-					// do nothing... the packet is gone
-					break;
-				case CORRUPT:
-					frame.corrupt();
-					send(frame, p.getAddress(), destinationPort, socket);
-					break;
-				case DELAY:
-					delayed = true;
-					delayedPackages.add(frame.toDatagramPacket(p.getAddress(), destinationPort));
-					break;
+					socket.receive(p); // this will block
+										// might need an in
+										// if statment
 
-				default:
-					send(frame, p.getAddress(), destinationPort, socket);
-					break;
+					// determin if the 'from port' matches
+					// the receiver or sender to determin
+					// the frame type
+					if (p.getPort() == Defaluts.RECEIVER_PORT)
+					{
+						frame = new AckFrame(p);
+						destinationPort = Defaluts.SENDER_PORT;
+					} else if (p.getPort() == Defaluts.SENDER_PORT)
+					{
+						frame = new ChunkFrame(p);
+						destinationPort = Defaluts.RECEIVER_PORT;
+					} else
+					{
+						throw new IOException();
+					}
+					switch (generateError())
+					{
+					case DROP:
+						// do nothing... the packet is gone
+						break;
+					case CORRUPT:
+						frame.corrupt();
+						send(frame, p.getAddress(), destinationPort, socket);
+						break;
+					case DELAY:
+						// frame.delay();
+						delayedThisTime = true;
+						delayedPackages.add(frame.toDatagramPacket(p.getAddress(), destinationPort));
+						break;
+
+					default:
+						send(frame, p.getAddress(), destinationPort, socket);
+						break;
+					}
+
 				}
-				
-				if((!delayed || delayedPackages.size() > 1) && RAND.nextBoolean() && !delayedPackages.isEmpty() )
+				if ((!delayedThisTime || delayedPackages.size() > 1) && RAND.nextBoolean()) // TODO Max Delay
 				{
 					socket.send(delayedPackages.remove());
 				}
-				delayed = false;
+				delayedThisTime = false;
 			} catch (IOException e)
 			{
-				//Drop the packet
+				// Drop the packet
 			}
 		}
 	}
-	
+
 	/**
 	 * @param frame
 	 * @param destinationPort
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	private static void send(Frame frame, InetAddress address,  int destinationPort, DatagramSocket socket) throws IOException
+	private static void send(Frame frame, InetAddress address, int destinationPort, DatagramSocket socket)
+			throws IOException
 	{
 		socket.send(frame.toDatagramPacket(address, destinationPort));
-		
+
 	}
 
 	private static Frame.Error generateError()
 	{
 		Frame.Error error = null;
-		if(RAND.nextFloat() < Defaluts.CHANCE_OF_ERROR / 100)
+		if (RAND.nextFloat() < Defaluts.CHANCE_OF_ERROR / 100)
 		{
 			switch (RAND.nextInt(3))
 			{
@@ -119,6 +131,6 @@ public class ErrorProxy
 			}
 		}
 		return error;
-		
+
 	}
 }

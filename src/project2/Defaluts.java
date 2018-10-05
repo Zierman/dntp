@@ -16,7 +16,6 @@ public class Defaluts
 {
 	// Chunk and packet length
 	public static final int MAX_CHUNK_LENGTH = 500;
-	public static final int DATA_PACKET_LENGTH = MAX_CHUNK_LENGTH + 12;
 	public static final int ACK_PACKET_LENGTH = 8;
 	
 	// Addresses
