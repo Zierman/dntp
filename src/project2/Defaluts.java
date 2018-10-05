@@ -14,9 +14,16 @@ import project1.Project1;
  */
 public class Defaluts
 {
+	// Project Details
+	public static final String PROJECT_TITLE = "Darn Nice Transfer Protocol: Project 2";
+	public static final String COURSE_STRING = "ICS 460-01";	
+	public static final String[] DESIGNERS = {"David Whitebird","Joshua Zierman","Travis Peterson"};
+	
+	
 	// Chunk and packet length
-	public static final int MAX_CHUNK_LENGTH = 500;
-	public static final int ACK_PACKET_LENGTH = 8;
+//	public static final int ABSOULTE_MAX_CHUNK_LENGTH = MAX_UNSIGNED_SHORT - ACK_PACKET_LENGTH - 4;//TODO
+	public static final short MAX_CHUNK_LENGTH = 500;
+	public static final short ACK_PACKET_LENGTH = 8;
 	
 	// Addresses
 	public static final InetAddress SENDER_ADDRESS = project1.Project1.getDestinationIp();

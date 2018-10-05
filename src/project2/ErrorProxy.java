@@ -35,7 +35,7 @@ public class ErrorProxy
 		Queue<DatagramPacket> delayedPackages = new LinkedList<DatagramPacket>();
 		Frame frame;
 		DatagramSocket socket = new DatagramSocket(Defaluts.PROXY_PORT);
-		DatagramPacket p = new DatagramPacket(new byte[Defaluts.DATA_PACKET_LENGTH], 0);
+		DatagramPacket p = new DatagramPacket(new byte[0], 0);//TODO fix this
 		while (true)
 		{
 			try

@@ -42,7 +42,7 @@ public class ByteIntConverter
 		int val = 0;
 		for(int i = 0; i < bytes.length; i++)
 		{
-			val |= (bytes[i] << (i * 8)) & (0xff<< (i * 8));
+			val |= (bytes[i] << (i * 8)) & (0xff << (i * 8));
 		}
 		return val;
 	}

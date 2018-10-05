@@ -20,6 +20,8 @@ public abstract class Frame
 	private static final short GOOD = 0;
 	
 	protected Error error = null;
+	
+	// From specs
 	protected short checkSum = GOOD;
 	protected short length;
 	protected int ackNumber;

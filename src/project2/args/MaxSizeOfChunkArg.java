@@ -7,7 +7,7 @@ package project2.args;
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class MaxSizeOfChunkArg extends Arg<Integer>
+public class MaxSizeOfChunkArg extends Arg<Short>
 {
 
 	private static final String HELP_MSG = "The maximum size of a chunk in bytes.";
@@ -25,7 +25,7 @@ public class MaxSizeOfChunkArg extends Arg<Integer>
 	@Override
 	protected void processInlineArg(String s) throws Exception
 	{
-		value = Integer.parseInt(s);
+		value = Short.parseShort(s);
 		
 	}
 
@@ -33,7 +33,7 @@ public class MaxSizeOfChunkArg extends Arg<Integer>
 	 * @see project2.args.Arg#getDefault()
 	 */
 	@Override
-	protected Integer getDefault()
+	protected Short getDefault()
 	{
 		return project2.Defaluts.MAX_CHUNK_LENGTH;
 	}

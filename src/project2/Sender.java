@@ -6,6 +6,7 @@ package project2;
 import java.io.File;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketAddress;
 import java.util.LinkedList;
 
 import project1.Chunk;
@@ -21,7 +22,10 @@ import project2.slidingWindow.SlidingWindow;
  */
 public class Sender
 {
+	private final static String SENDER_PROGRAM_TITLE = "ChunkFrame Sender";
 	private final static String SENDER_PROGRAM_DESCRIPTION = "<description not done>"; // TODO write description of the sender program
+	
+	//Args
 	static FileArg fileArg = new FileArg("-f");	 
 	static SenderAddressArg senderAddressArg = new SenderAddressArg("-sa");
 	static ProxyAddressArg errorProxyAddressArg = new ProxyAddressArg("-pa"); 
@@ -34,12 +38,38 @@ public class Sender
 	static ErrorChanceArg errorChanceArg = new ErrorChanceArg("-d");
 	static MaxSizeOfChunkArg maxSizeOfChunkArg = new MaxSizeOfChunkArg("-s");
 	static IntroduceErrorArg introduceErrorArg = new IntroduceErrorArg("-e");
-	static HelpArg helpArg = new HelpArg("-help", SENDER_PROGRAM_DESCRIPTION);
+	
+	//Toggle Args
+	static DebugModeArg debugModeArg = new DebugModeArg("-debug");
+	static HelpArg helpArg = new HelpArg("-help", Sender.SENDER_PROGRAM_TITLE, Sender.SENDER_PROGRAM_DESCRIPTION);
+	
+	//Destination vars
+	static InetAddress destinationAddress;
+	static int destinationPort;
+	
+	//Printer
+	static final Printer P = new Printer(debugModeArg, System.out, System.err); 
 	
 	public static void main(String[] args) throws Exception
 	{
-		// handle the inline arguments
+		// handle the command line arguments
 		ArgList.updateFromMainArgs(args);
+		
+		// Determine Packet Size
+		short packetSize = (short) (project2.Defaluts.ACK_PACKET_LENGTH + 4 + maxSizeOfChunkArg.getValue());
+		
+		// set destination
+		if(introduceErrorArg.getValue())
+		{
+			destinationAddress = errorProxyAddressArg.getValue();
+			destinationPort = errorProxyPortArg.getValue();
+		}
+		else
+		{
+
+			destinationAddress = receiverAddressArg.getValue();
+			destinationPort = receiverPortArg.getValue();
+		}
 		
 		// gets the input file
 		File inFile = fileArg.getValue();
@@ -51,14 +81,13 @@ public class Sender
 		splitter.overwrite(chunkList);
 		
 		// convert chunks into frames
-		ChunkFrame[] window = new ChunkFrame[windowSizeArg.getValue()];
 		int seqNum = 0;
 		int ackNum = 0;
-		while(!chunkList.isEmpty())
-		{
-//			SenderWindow window = new SenderWindow(windowSize, , socket, timeoutArg.getValue(), errorProxyAddressArg.getValue(), errorProxyPortArg.getValue())
-//			window.run();
-		}
+		DatagramSocket socket = new DatagramSocket(destinationPort);
+		
+			SenderWindow window = new SenderWindow(chunkList, windowSizeArg.getValue(), packetSize, socket, timeoutArg.getValue(), destinationAddress, destinationPort);
+			window.run();
+		
 		
 		
 	}

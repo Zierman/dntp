@@ -3,6 +3,8 @@
  */
 package project2.args;
 
+import java.io.PrintStream;
+
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
@@ -10,15 +12,19 @@ package project2.args;
 public class HelpArg extends ToggleArg
 {
 
-	private static final String DESIGNERS = "David Whitebird and Joshua Zierman with the help of Travis Peterson";
-	private final String DESCRIPTION;
+
+	private final String PROGRAM_TITLE;
+	private final String PROGRAM_DESCRIPTION;
+	private static final String[] DESIGNERS = project2.Defaluts.DESIGNERS;
+	private static final PrintStream out = System.out;
 
 	/**
 	 * @param flag
 	 */
-	public HelpArg(String flag, String description) {
+	public HelpArg(String flag, String title, String description) {
 		super(flag);
-		this.DESCRIPTION = description;
+		this.PROGRAM_TITLE = title;
+		this.PROGRAM_DESCRIPTION = description;
 	}
 
 	/*
@@ -40,16 +46,44 @@ public class HelpArg extends ToggleArg
 	@Override
 	protected void processInlineArg()
 	{
-		System.out.println("Darn Nice Transfer Protocol: File Tranfer");
-		System.out.println("");
-		System.out.println("Desinged by " + DESIGNERS);
-		System.out.println("");
-		System.out.println(DESCRIPTION);
-		System.out.println("");
-		System.out.println("list of inline arguments:");
+		
+		//print the project title
+		out.println(project2.Defaluts.PROJECT_TITLE);
+		out.println("");
+		
+		//Show the course the project was assinged in
+		out.println("Assinged in " + project2.Defaluts.COURSE_STRING);
+		out.println("");
+		
+		//print the designers
+		out.print("Desinged by ");
+		for(int i = 0; i < DESIGNERS.length; i++)
+		{
+			if(i!=0)
+			{
+				out.print(", ");
+			}
+			if(i == DESIGNERS.length - 1)
+			{
+				out.print("and ");
+			}
+			out.print(DESIGNERS[i]);
+		}
+		out.println(".");
+		out.println("");
+		
+		out.println(PROGRAM_TITLE);
+		out.println("");
+		
+		// print the Program Description
+		out.println(PROGRAM_DESCRIPTION);
+		out.println("");
+		
+		// Print the list of argumetn flags and info about them
+		out.println("list of inline arguments:");
 		for (Arg<?> arg : ArgList.instance())
 		{
-			System.out.println(arg.getHelpLine());
+			out.println(arg.getHelpLine());
 		}
 		System.exit(0);
 	}

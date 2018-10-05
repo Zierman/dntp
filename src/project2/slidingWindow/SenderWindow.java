@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Timer;
 
+import project1.Chunk;
 import project2.Defaluts;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
@@ -18,7 +21,7 @@ import project2.frame.Frame;
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class SenderWindow
+public class SenderWindow extends SlidingWindow
 {
 	private project2.frame.Frame[] in;
 	private project2.frame.Frame[] out;
@@ -32,12 +35,12 @@ public class SenderWindow
 	private int port;
 	
 	
-	public SenderWindow(int windowSize, int packetSize, DatagramSocket socket, int timeout, InetAddress address, int port)
+	public SenderWindow(Queue<Chunk> chunkList, int windowSize, int packetSize, DatagramSocket socket, int timeout, InetAddress address, int port)
 	{
 		this.in = new Frame[windowSize];
 		this.out = new Frame[windowSize];
 		this.timeout = timeout;
-		this.timedOut = new Boolean[windowSize];
+		this.timedOut = new boolean[windowSize];
 		this.socket = socket;
 		this.packet = new DatagramPacket(new byte[packetSize],packetSize);
 		this.address = address;
@@ -50,23 +53,31 @@ public class SenderWindow
 	private class Receiver implements Runnable
 	{
 
+
 		/* (non-Javadoc)
 		 * @see java.lang.Runnable#run()
 		 */
 		@Override
 		public void run()
 		{
-			while(!ackReceivedAllTrue() && not)
+			while(running)
 			{
-				try
+				if(!allAcsReceived())//TODO check this
 				{
-					socket.receive(packet);
-					tmp = new AckFrame(packet);
-					ackReceived[tmp.getAckNumber()] = true;
+					try
+					{
+						socket.receive(packet);
+						tmp = new AckFrame(packet);
+						ackReceived[tmp.getAckNumber()] = true;
+						
+					} catch (IOException e)
+					{
+						System.err.println(e.getMessage());
+					}
+				}
+				else
+				{
 					
-				} catch (IOException e)
-				{
-					System.err.println(e.getMessage());
 				}
 			}
 		}
@@ -74,7 +85,7 @@ public class SenderWindow
 		/**
 		 * @return
 		 */
-		private boolean ackReceivedAllTrue()
+		private boolean allAcsReceived() //TODO program logic to check for end of transimission ack
 		{
 			boolean allTrue = true;
 			for(Boolean b : ackReceived)
@@ -101,6 +112,25 @@ public class SenderWindow
 		{
 			//TODO
 		}
+		
+	}
+	/* (non-Javadoc)
+	 * @see project2.slidingWindow.SlidingWindow#runReceiver()
+	 */
+	@Override
+	protected void runReceiver()
+	{
+		Receiver receiver = new Receiver();
+		receiver.run();
+		
+	}
+	/* (non-Javadoc)
+	 * @see project2.slidingWindow.SlidingWindow#runSender()
+	 */
+	@Override
+	protected void runSender()
+	{
+		// TODO Auto-generated method stub
 		
 	}
 }
