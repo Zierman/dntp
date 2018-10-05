@@ -22,7 +22,7 @@ public class HelpArg extends Arg<Boolean>
 	 * @see project2.args.Arg#processInlineArg(java.lang.String)
 	 */
 	@Override
-	public void processInlineArg(String s) throws Exception
+	protected void processInlineArg(String s) throws Exception
 	{
 		value = true;
 	}
@@ -31,7 +31,7 @@ public class HelpArg extends Arg<Boolean>
 	 * @see project2.args.Arg#getDefault()
 	 */
 	@Override
-	public Boolean getDefault()
+	protected Boolean getDefault()
 	{
 		return false;
 	}

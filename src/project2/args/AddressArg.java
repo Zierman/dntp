@@ -26,7 +26,7 @@ public abstract class AddressArg extends Arg<InetAddress>
 	 * @see project2.args.Arg#processInlineArg(java.lang.String)
 	 */
 	@Override
-	public void processInlineArg(String s) throws IllegalArgumentException, UnknownHostException
+	protected void processInlineArg(String s) throws IllegalArgumentException, UnknownHostException
 	{
 		value = InetAddress.getByName(s);
 	}

@@ -26,7 +26,7 @@ public class FileArg extends Arg<File>
 	 * @see args.Arg#processInlineArg(java.lang.String)
 	 */
 	@Override
-	public void processInlineArg(String s)
+	protected void processInlineArg(String s)
 	{
 		s = clean(s);
 		if(isBadArg(s))
@@ -72,7 +72,7 @@ public class FileArg extends Arg<File>
 	 * @see args.Arg#getDefault()
 	 */
 	@Override
-	public File getDefault()
+	protected File getDefault()
 	{
 		return project2.Defaluts.INPUT_FILE;
 	}

@@ -3,8 +3,12 @@
  */
 package project2;
 
+import java.io.File;
 import java.net.InetAddress;
+import java.util.LinkedList;
 
+import project1.Chunk;
+import project1.FileSplitter;
 import project2.args.Arg;
 import project2.args.ArgList;
 import project2.args.FileArg;
@@ -18,6 +22,7 @@ import project2.args.SenderAddressArg;
 import project2.args.SenderPortArg;
 import project2.args.TimeoutArg;
 import project2.args.WindowSizeArg;
+import project2.frame.ChunkFrame;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -39,6 +44,36 @@ public class Sender
 	
 	public static void main(String[] args) throws Exception
 	{
+		// handle the inline arguments
 		ArgList.updateFromMainArgs(args);
+		
+		// gets the input file
+		File inFile = fileArg.getValue();
+		
+		
+		// split up the file into chunks
+		LinkedList<Chunk> chunkList = new LinkedList<Chunk>();
+		FileSplitter splitter = new FileSplitter(inFile.getAbsolutePath(), maxSizeOfChunk.getValue());
+		splitter.overwrite(chunkList);
+		
+		// convert chunks into frames
+		ChunkFrame[] window = new ChunkFrame[windowSizeArg.getValue()];
+		int seqNum = 0;
+		int ackNum = 0;
+		while(!chunkList.isEmpty())
+		{
+			if(ackNum < windowSizeArg.getValue())
+			{
+				window[ackNum] = new ChunkFrame(chunkList.poll(), ackNum, ackNum);
+			}
+			else
+			{
+				// Send all in window and get acks 
+				//TODO
+			}
+			
+		}
+		
+		
 	}
 }

@@ -56,14 +56,14 @@ public abstract class Arg <T>
 	 * @param s the String to be processed
 	 * @throws Exception if any exception happens when processing the inline argument
 	 */
-	public abstract void processInlineArg(String s) throws Exception;
+	protected abstract void processInlineArg(String s) throws Exception;
 	
-	public abstract T getDefault();
+	protected abstract T getDefault();
 
 	/**
 	 * @param e
 	 */
-	public void printErr(String arg, Exception e)
+	protected void printErr(String arg, Exception e)
 	{
 		System.err.println(this.getClass().getName() + " failed to process " + inlineFlag + " " + arg);
 	}
@@ -73,7 +73,7 @@ public abstract class Arg <T>
 	 */
 	protected abstract String getHelpString();
 	
-	public String getHelpLine()
+	protected String getHelpLine()
 	{
 		String argName = getClass().getSimpleName().replace("Arg", "");
 		

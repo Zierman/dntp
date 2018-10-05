@@ -31,7 +31,7 @@ public class SenderPortArg extends PortArg
 	 * @see project2.args.Arg#getDefault()
 	 */
 	@Override
-	public Integer getDefault()
+	protected Integer getDefault()
 	{
 		return project2.Defaluts.SENDER_PORT;
 	}

@@ -23,7 +23,7 @@ public class TimeoutArg extends Arg<Integer>
 	 * @see project2.args.Arg#processInlineArg(java.lang.String)
 	 */
 	@Override
-	public void processInlineArg(String s) throws IllegalArgumentException
+	protected void processInlineArg(String s) throws IllegalArgumentException
 	{
 		value = Integer.parseInt(s);
 	}
@@ -32,7 +32,7 @@ public class TimeoutArg extends Arg<Integer>
 	 * @see project2.args.Arg#getDefault()
 	 */
 	@Override
-	public Integer getDefault()
+	protected Integer getDefault()
 	{
 		return project2.Defaluts.TIMEOUT;
 	}

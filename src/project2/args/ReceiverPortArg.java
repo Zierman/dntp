@@ -31,7 +31,7 @@ public class ReceiverPortArg extends PortArg
 	 * @see project2.args.Arg#getDefault()
 	 */
 	@Override
-	public Integer getDefault()
+	protected Integer getDefault()
 	{
 		return project2.Defaluts.RECEIVER_PORT;
 	}

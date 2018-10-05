@@ -23,7 +23,7 @@ public class MaxSizeOfChunkArg extends Arg<Integer>
 	 * @see project2.args.Arg#processInlineArg(java.lang.String)
 	 */
 	@Override
-	public void processInlineArg(String s) throws Exception
+	protected void processInlineArg(String s) throws Exception
 	{
 		value = Integer.parseInt(s);
 		
@@ -33,7 +33,7 @@ public class MaxSizeOfChunkArg extends Arg<Integer>
 	 * @see project2.args.Arg#getDefault()
 	 */
 	@Override
-	public Integer getDefault()
+	protected Integer getDefault()
 	{
 		return project2.Defaluts.MAX_CHUNK_LENGTH;
 	}

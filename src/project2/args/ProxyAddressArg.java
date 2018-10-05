@@ -34,7 +34,7 @@ public class ProxyAddressArg extends AddressArg
 	 * @see project2.args.Arg#getDefault()
 	 */
 	@Override
-	public InetAddress getDefault()
+	protected InetAddress getDefault()
 	{
 		return project2.Defaluts.PROXY_ADDRESS;
 	}

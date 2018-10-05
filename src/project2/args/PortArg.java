@@ -21,7 +21,7 @@ public abstract class PortArg extends Arg<Integer>
 	 * @see project2.args.Arg#processInlineArg(java.lang.String)
 	 */
 	@Override
-	public void processInlineArg(String s) throws Exception
+	protected void processInlineArg(String s) throws Exception
 	{
 		value = Integer.parseInt(s);
 	}
