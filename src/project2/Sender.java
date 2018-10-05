@@ -65,8 +65,7 @@ public class Sender
 		int ackNum = 0;
 		while(!chunkList.isEmpty())
 		{
-			SlidingWindow window = new SlidingWindow(windowSize, packetSize, socket, timeout, address, port)
-	{);
+//			SlidingWindow window = new SlidingWindow(windowSize, packetSize, socket, timeout, address, port)
 			
 		}
 		
