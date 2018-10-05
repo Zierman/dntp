@@ -90,22 +90,7 @@ public  class Window
 		@Override
 		public void run()
 		{
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
-	private class TimoutTimer extends Timer implements Runnable
-	{
-
-		/* (non-Javadoc)
-		 * @see java.lang.Runnable#run()
-		 */
-		@Override
-		public void run()
-		{
-			
-			
+			//TODO
 		}
 		
 	}
