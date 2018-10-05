@@ -20,7 +20,7 @@ import project2.slidingWindow.SlidingWindow;
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class Sender
+public class ChunkFrameSender
 {
 	private final static String SENDER_PROGRAM_TITLE = "ChunkFrame Sender";
 	private final static String SENDER_PROGRAM_DESCRIPTION = "<description not done>"; // TODO write description of the sender program
@@ -41,14 +41,14 @@ public class Sender
 	
 	//Toggle Args
 	static DebugModeArg debugModeArg = new DebugModeArg("-debug");
-	static HelpArg helpArg = new HelpArg("-help", Sender.SENDER_PROGRAM_TITLE, Sender.SENDER_PROGRAM_DESCRIPTION);
+	static HelpArg helpArg = new HelpArg("-help", ChunkFrameSender.SENDER_PROGRAM_TITLE, ChunkFrameSender.SENDER_PROGRAM_DESCRIPTION);
 	
 	//Destination vars
 	static InetAddress destinationAddress;
 	static int destinationPort;
 	
 	//Printer
-	static final Printer P = new Printer(debugModeArg, System.out, System.err); 
+	static final DebugPrinter debug = new DebugPrinter(debugModeArg, System.out); 
 	
 	public static void main(String[] args) throws Exception
 	{
