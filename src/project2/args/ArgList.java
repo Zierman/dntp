@@ -48,7 +48,7 @@ public class ArgList implements Iterable<Arg<?>>
 				{
 					if(a instanceof ToggleArg)
 					{
-						((ToggleArg)a).processInlineArg();
+						((ToggleArg)a).processInlineArg("");
 					}
 					else
 					{
