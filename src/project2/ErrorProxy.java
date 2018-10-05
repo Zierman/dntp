@@ -11,6 +11,10 @@ import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.Random;
 
+import project2.frame.AckFrame;
+import project2.frame.ChunkFrame;
+import project2.frame.Frame;
+
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
@@ -28,8 +32,8 @@ public class ErrorProxy
 		boolean delayed = false;
 		LinkedList<DatagramPacket> delayedPackages = new LinkedList<DatagramPacket>();
 		Frame frame;
-		DatagramSocket socket = new DatagramSocket(Project2.PROXY_PORT);
-		DatagramPacket p = new DatagramPacket(new byte[Project2.MAX_PACKET_LENGTH], 0);
+		DatagramSocket socket = new DatagramSocket(Defaluts.PROXY_PORT);
+		DatagramPacket p = new DatagramPacket(new byte[Defaluts.DATA_PACKET_LENGTH], 0);
 		while(true)
 		{
 			try
@@ -37,15 +41,15 @@ public class ErrorProxy
 				socket.receive(p);
 				
 				// determin if the 'from port' matches the receiver or sender to determin the frame type
-				if(p.getPort() == Project2.RECEIVER_PORT)
+				if(p.getPort() == Defaluts.RECEIVER_PORT)
 				{
 					frame = new AckFrame(p);
-					destinationPort = Project2.SENDER_PORT;
+					destinationPort = Defaluts.SENDER_PORT;
 				}
-				else if (p.getPort() == Project2.SENDER_PORT)
+				else if (p.getPort() == Defaluts.SENDER_PORT)
 				{
 					frame = new ChunkFrame(p);
-					destinationPort = Project2.RECEIVER_PORT;
+					destinationPort = Defaluts.RECEIVER_PORT;
 				}
 				else
 				{
@@ -96,7 +100,7 @@ public class ErrorProxy
 	private static Frame.Error generateError()
 	{
 		Frame.Error error = null;
-		if(RAND.nextFloat() < Project2.CHANCE_OF_ERROR / 100)
+		if(RAND.nextFloat() < Defaluts.CHANCE_OF_ERROR / 100)
 		{
 			switch (RAND.nextInt(3))
 			{
