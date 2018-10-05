@@ -22,8 +22,8 @@ public class SenderWindow
 {
 	private project2.frame.Frame[] in;
 	private project2.frame.Frame[] out;
-	private Boolean[] timedOut;
-	private Boolean[] ackReceived;
+	private boolean[] timedOut;
+	private boolean[] ackReceived;
 	private DatagramSocket socket;
 	private DatagramPacket packet;
 	private int timeout;
@@ -42,10 +42,12 @@ public class SenderWindow
 		this.packet = new DatagramPacket(new byte[packetSize],packetSize);
 		this.address = address;
 		this.port = port;
+		this.ackReceived = new boolean[windowSize];
+		
 		
 		
 	}
-	private class listener implements Runnable
+	private class Receiver implements Runnable
 	{
 
 		/* (non-Javadoc)
@@ -54,25 +56,13 @@ public class SenderWindow
 		@Override
 		public void run()
 		{
-			while(true)//TODO make condition
+			while(!ackReceivedAllTrue() && not)
 			{
 				try
 				{
 					socket.receive(packet);
-					if(packet.getLength() == project2.Defaluts.ACK_PACKET_LENGTH)
-					{
-						tmp = new AckFrame(packet);
-						ackReceived[tmp.getAckNumber()] = true;
-					}
-					else
-					{
-						tmp = new ChunkFrame(packet);
-						if(tmp.passedCheckSum())
-						{
-							in[tmp.getAckNumber()] = tmp;
-							socket.send(new AckFrame((ChunkFrame) tmp).toDatagramPacket(address, port));
-						}
-					}
+					tmp = new AckFrame(packet);
+					ackReceived[tmp.getAckNumber()] = true;
 					
 				} catch (IOException e)
 				{
@@ -80,9 +70,27 @@ public class SenderWindow
 				}
 			}
 		}
+
+		/**
+		 * @return
+		 */
+		private boolean ackReceivedAllTrue()
+		{
+			boolean allTrue = true;
+			for(Boolean b : ackReceived)
+			{
+				if(!b)
+				{
+					allTrue = false;
+					break;
+				}
+			}
+			
+			return allTrue;
+		}
 		
 	}
-	private class sender implements Runnable
+	private class Sender implements Runnable
 	{
 
 		/* (non-Javadoc)

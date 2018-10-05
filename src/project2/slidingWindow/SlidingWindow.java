@@ -20,5 +20,7 @@ import project2.frame.Frame;
  */
 public abstract class SlidingWindow implements Runnable
 {
-	//TODO
+	protected abstract void receive();
+	
+	protected abstract void send();
 }

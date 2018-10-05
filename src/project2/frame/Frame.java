@@ -3,7 +3,9 @@
  */
 package project2.frame;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.LinkedList;
 
@@ -66,5 +68,11 @@ public abstract class Frame
 		error = Error.CORRUPT;
 		checkSum = BAD;
 	}
+	
+	public void send(DatagramSocket socket, InetAddress address, int port) throws IOException
+	{
+		socket.send(this.toDatagramPacket(address, port));
+	}
 
+//	public static final int DATA_PACKET_LENGTH = MAX_CHUNK_LENGTH + 12;
 }

@@ -57,7 +57,7 @@ public class FileSender implements Sender, Loggable
 	 */
 	private void setFilename(String filename)
 	{
-		if(filename.length() < 1 || filename.startsWith(".") || filename.endsWith("."))
+		if(filename.length() < 1 || filename.endsWith("."))
 		{
 			throw new IllegalArgumentException();
 		}
