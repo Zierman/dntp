@@ -60,6 +60,16 @@ public abstract class Frame
 		return checkSum == GOOD;
 	}
 	
+	public void delay()
+	{
+		error = Error.DELAY;
+	}
+	
+	public void drop()
+	{
+		error = Error.DROP;
+	}
+	
 	/**corrupts the Frame
 	 * 
 	 */
