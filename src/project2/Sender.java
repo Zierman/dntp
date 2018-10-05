@@ -33,6 +33,7 @@ public class Sender
 	static TimeoutArg timeoutArg = new TimeoutArg("-t");
 	static ErrorChanceArg errorChanceArg = new ErrorChanceArg("-d");
 	static MaxSizeOfChunkArg maxSizeOfChunkArg = new MaxSizeOfChunkArg("-s");
+	static IntroduceErrorArg introduceErrorArg = new IntroduceErrorArg("-e");
 	static HelpArg helpArg = new HelpArg("-help", SENDER_PROGRAM_DESCRIPTION);
 	
 	public static void main(String[] args) throws Exception
@@ -55,8 +56,8 @@ public class Sender
 		int ackNum = 0;
 		while(!chunkList.isEmpty())
 		{
-			SenderWindow window = new SenderWindow(windowSize, , socket, timeoutArg.getValue(), errorProxyAddressArg.getValue(), errorProxyPortArg.getValue())
-			window.run();
+//			SenderWindow window = new SenderWindow(windowSize, , socket, timeoutArg.getValue(), errorProxyAddressArg.getValue(), errorProxyPortArg.getValue())
+//			window.run();
 		}
 		
 		
