@@ -4,6 +4,7 @@
 package project2;
 
 import java.io.File;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.LinkedList;
 
@@ -23,6 +24,7 @@ import project2.args.SenderPortArg;
 import project2.args.TimeoutArg;
 import project2.args.WindowSizeArg;
 import project2.frame.ChunkFrame;
+import project2.slidingWindow.SlidingWindow;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -63,15 +65,8 @@ public class Sender
 		int ackNum = 0;
 		while(!chunkList.isEmpty())
 		{
-			if(ackNum < windowSizeArg.getValue())
-			{
-				window[ackNum] = new ChunkFrame(chunkList.poll(), ackNum, ackNum);
-			}
-			else
-			{
-				// Send all in window and get acks 
-				//TODO
-			}
+			SlidingWindow window = new SlidingWindow(windowSize, packetSize, socket, timeout, address, port)
+	{);
 			
 		}
 		
