@@ -1,6 +1,6 @@
 package project2.args;
 
-import project2.Defaluts;
+import project2.Defaults;
 
 public class ErrorChanceArg extends Arg <Integer>
 {
@@ -21,7 +21,7 @@ public class ErrorChanceArg extends Arg <Integer>
     protected Integer getDefault()
     {
 
-        return Defaluts.CHANCE_OF_ERROR;
+        return Defaults.CHANCE_OF_ERROR;
     }
 
     @Override

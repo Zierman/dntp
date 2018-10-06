@@ -34,7 +34,7 @@ public class TimeoutArg extends Arg<Integer>
 	@Override
 	protected Integer getDefault()
 	{
-		return project2.Defaluts.TIMEOUT;
+		return project2.Defaults.TIMEOUT;
 	}
 
 	/* (non-Javadoc)

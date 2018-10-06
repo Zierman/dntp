@@ -36,7 +36,7 @@ public class SenderAddressArg extends AddressArg
 	@Override
 	protected InetAddress getDefault()
 	{
-		return project2.Defaluts.SENDER_ADDRESS;
+		return project2.Defaults.SENDER_ADDRESS;
 	}
 
 }

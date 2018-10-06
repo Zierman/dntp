@@ -12,7 +12,7 @@ import project1.Project1;
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class Defaluts
+public class Defaults
 {
 	// Project Details
 	public static final String PROJECT_TITLE = "Darn Nice Transfer Protocol: Project 2";

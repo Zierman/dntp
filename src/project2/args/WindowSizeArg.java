@@ -33,7 +33,7 @@ public class WindowSizeArg extends Arg<Integer>
 	@Override
 	protected Integer getDefault()
 	{
-		return project2.Defaluts.WINDOW_SIZE;
+		return project2.Defaults.WINDOW_SIZE;
 	}
 
 	/* (non-Javadoc)

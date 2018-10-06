@@ -56,7 +56,7 @@ public class ChunkFrameSender
 		ArgList.updateFromMainArgs(args);
 		
 		// Determine Packet Size
-		short packetSize = (short) (project2.Defaluts.ACK_PACKET_LENGTH + 4 + maxSizeOfChunkArg.getValue());
+		short packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunkArg.getValue());
 		
 		// set destination
 		if(introduceErrorArg.getValue())

@@ -9,6 +9,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.LinkedList;
 
+import byteIntConverter.ByteShortConverter;
+
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
@@ -62,6 +64,11 @@ public abstract class Frame
 		return checkSum == GOOD;
 	}
 	
+	public boolean failedCheckSum()
+	{
+		return !passedCheckSum();
+	}
+	
 	public void delay()
 	{
 		error = Error.DELAY;
@@ -87,4 +94,19 @@ public abstract class Frame
 	}
 
 //	public static final int DATA_PACKET_LENGTH = MAX_CHUNK_LENGTH + 12;
+	
+	public static short getLength(DatagramPacket packet)
+	{
+		byte[] bytes = new byte[2];
+
+		bytes[0] = packet.getData()[2];
+		bytes[1] = packet.getData()[3];
+		
+		return ByteShortConverter.convert(bytes);
+	}
+	
+	public static boolean isLengthOfAck(DatagramPacket packet)
+	{
+		return getLength(packet) == project2.Defaults.ACK_PACKET_LENGTH;
+	}
 }

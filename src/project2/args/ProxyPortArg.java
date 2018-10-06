@@ -33,7 +33,7 @@ public class ProxyPortArg extends PortArg
 	@Override
 	protected Integer getDefault()
 	{
-		return project2.Defaluts.PROXY_PORT;
+		return project2.Defaults.PROXY_PORT;
 	}
 
 }

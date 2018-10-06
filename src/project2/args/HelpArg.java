@@ -15,7 +15,7 @@ public class HelpArg extends ToggleArg
 
 	private final String PROGRAM_TITLE;
 	private final String PROGRAM_DESCRIPTION;
-	private static final String[] DESIGNERS = project2.Defaluts.DESIGNERS;
+	private static final String[] DESIGNERS = project2.Defaults.DESIGNERS;
 	private static final PrintStream out = System.out;
 
 	/**
@@ -48,11 +48,11 @@ public class HelpArg extends ToggleArg
 	{
 		
 		//print the project title
-		out.println(project2.Defaluts.PROJECT_TITLE);
+		out.println(project2.Defaults.PROJECT_TITLE);
 		out.println("");
 		
 		//Show the course the project was assinged in
-		out.println("Assinged in " + project2.Defaluts.COURSE_STRING);
+		out.println("Assinged in " + project2.Defaults.COURSE_STRING);
 		out.println("");
 		
 		//print the designers

@@ -35,7 +35,7 @@ public class MaxSizeOfChunkArg extends Arg<Short>
 	@Override
 	protected Short getDefault()
 	{
-		return project2.Defaluts.MAX_CHUNK_LENGTH;
+		return project2.Defaults.MAX_CHUNK_LENGTH;
 	}
 
 	/* (non-Javadoc)

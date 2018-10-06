@@ -5,7 +5,7 @@ package project2.args;
 
 import java.io.File;
 
-import project2.Defaluts;
+import project2.Defaults;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -74,7 +74,7 @@ public class FileArg extends Arg<File>
 	@Override
 	protected File getDefault()
 	{
-		return project2.Defaluts.INPUT_FILE;
+		return project2.Defaults.INPUT_FILE;
 	}
 	
 	public File getOutFile()
@@ -87,13 +87,13 @@ public class FileArg extends Arg<File>
 		int i = path.lastIndexOf(".");
 		if (i < 0)
 		{
-			path = path + project2.Defaluts.COPY_SUFIX;
+			path = path + project2.Defaults.COPY_SUFIX;
 		}
 		else
 		{
 			String start = path.substring(0, i);
 			String end = path.substring(i);
-			path = start + project2.Defaluts.COPY_SUFIX + end;
+			path = start + project2.Defaults.COPY_SUFIX + end;
 		}
 		return new File(path);
 	}

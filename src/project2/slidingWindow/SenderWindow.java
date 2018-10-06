@@ -12,7 +12,7 @@ import java.util.Queue;
 import java.util.Timer;
 
 import project1.Chunk;
-import project2.Defaluts;
+import project2.Defaults;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 import project2.frame.Frame;

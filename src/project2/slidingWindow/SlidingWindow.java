@@ -9,7 +9,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Timer;
 
-import project2.Defaluts;
+import project2.Defaults;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 import project2.frame.Frame;

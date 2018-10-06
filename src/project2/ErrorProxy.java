@@ -34,7 +34,7 @@ public class ErrorProxy
 		boolean delayedThisTime = false;
 		Queue<DatagramPacket> delayedPackages = new LinkedList<DatagramPacket>();
 		Frame frame;
-		DatagramSocket socket = new DatagramSocket(Defaluts.PROXY_PORT);
+		DatagramSocket socket = new DatagramSocket(Defaults.PROXY_PORT);
 		DatagramPacket p = new DatagramPacket(new byte[0], 0);//TODO fix this
 		while (true)
 		{
@@ -52,14 +52,14 @@ public class ErrorProxy
 					// determin if the 'from port' matches
 					// the receiver or sender to determin
 					// the frame type
-					if (p.getPort() == Defaluts.RECEIVER_PORT)
+					if (p.getPort() == Defaults.RECEIVER_PORT)
 					{
 						frame = new AckFrame(p);
-						destinationPort = Defaluts.SENDER_PORT;
-					} else if (p.getPort() == Defaluts.SENDER_PORT)
+						destinationPort = Defaults.SENDER_PORT;
+					} else if (p.getPort() == Defaults.SENDER_PORT)
 					{
 						frame = new ChunkFrame(p);
-						destinationPort = Defaluts.RECEIVER_PORT;
+						destinationPort = Defaults.RECEIVER_PORT;
 					} else
 					{
 						throw new IOException();
@@ -112,7 +112,7 @@ public class ErrorProxy
 	private static Frame.Error generateError()
 	{
 		Frame.Error error = null;
-		if (RAND.nextFloat() < Defaluts.CHANCE_OF_ERROR / 100)
+		if (RAND.nextFloat() < Defaults.CHANCE_OF_ERROR / 100)
 		{
 			switch (RAND.nextInt(3))
 			{

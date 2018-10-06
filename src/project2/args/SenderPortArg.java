@@ -33,7 +33,7 @@ public class SenderPortArg extends PortArg
 	@Override
 	protected Integer getDefault()
 	{
-		return project2.Defaluts.SENDER_PORT;
+		return project2.Defaults.SENDER_PORT;
 	}
 
 }
