@@ -78,13 +78,18 @@ public abstract class Arg <T>
 		String argName = getClass().getSimpleName().replace("Arg", "");
 		
 		// get the needed white space to format nicely
-		String ws = "";
+		String ws1 = "";
+		for(int i = getFlag().length(); i < ArgList.getMaxArgFlagLength(); i++)
+		{
+			ws1 += " ";
+		}
+		String ws2 = "";
 		for(int i = argName.length(); i < ArgList.getMaxArgNameLength(); i++)
 		{
-			ws += " ";
+			ws2 += " ";
 		}
 		
-		return inlineFlag + Log.TAB + argName + ws + Log.TAB + getHelpString();
+		return inlineFlag + ws1 + Log.TAB + argName + ws2 + Log.TAB + getHelpString();
 	}
 
 	

@@ -15,6 +15,7 @@ public class ArgList implements Iterable<Arg<?>>
 	private final static LinkedList<Arg<?>> list = new LinkedList<Arg<?>>();
 	private final static ArgList argList = new ArgList();
 	private static int maxArgNameLength = 0;
+	private static int maxArgFlagLength = 0;
 	
 	private static final long serialVersionUID = 5503336292592915469L;
 	private ArgList()
@@ -30,10 +31,19 @@ public class ArgList implements Iterable<Arg<?>>
 	public static void addArg(Arg<?> arg)
 	{
 		list.add(arg);
+		
+		// set max name length
 		int tmp = arg.getClass().getSimpleName().replace("Arg", "").length();
 		if(tmp > maxArgNameLength)
 		{
 			maxArgNameLength = tmp;
+		}
+		
+		// set max flag length
+		tmp = arg.getFlag().length();
+		if(tmp > maxArgFlagLength)
+		{
+			maxArgFlagLength = tmp;
 		}
 	}
 	
@@ -81,5 +91,10 @@ public class ArgList implements Iterable<Arg<?>>
 	public Iterator<Arg<?>> iterator()
 	{
 		return list.iterator();
+	}
+
+	public static int getMaxArgFlagLength()
+	{
+		return maxArgFlagLength ;
 	}
 }

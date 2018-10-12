@@ -47,4 +47,5 @@ public class Defaults
 	// filename and path
 	public static final File INPUT_FILE = new File("in.txt");
 	public static final String COPY_SUFIX = "_copy";
+	public static final Integer NUMBER_OF_ACK_NUMBERS = 2; // must be > 1
 }

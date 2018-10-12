@@ -17,6 +17,19 @@ import byteIntConverter.ByteShortConverter;
  */
 public abstract class Frame
 {
+	
+	public static class CheckSumFailException extends Exception
+	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public CheckSumFailException()
+		{
+			super("The check sum failed");
+		}
+	}
 	public enum Error {DROP, DELAY, CORRUPT}
 	private static final short BAD = 1;
 	private static final short GOOD = 0;

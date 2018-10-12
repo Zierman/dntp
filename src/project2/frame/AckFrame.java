@@ -19,13 +19,28 @@ import project2.Defaults;
  */
 public class AckFrame extends Frame
 {
+	public static class AckFrameLengthMismatchException extends Exception
+	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		AckFrameLengthMismatchException()
+		{
+			super("AckFrame's length data and expected length do not match.");
+		}
+	}
+	
+	public static final int LENGTH = Defaults.ACK_PACKET_LENGTH;
+
 	public AckFrame(ChunkFrame f)
 	{
 		super(f.getAckNumber());
-		length = Defaults.ACK_PACKET_LENGTH;
+		length = LENGTH;
 	}
 	
-	public AckFrame(DatagramPacket p)
+	public AckFrame(DatagramPacket p) throws AckFrameLengthMismatchException
 	{
 		byte[] packetB = p.getData();
 		int i = 0;
@@ -45,6 +60,10 @@ public class AckFrame extends Frame
 		}
 		this.length = byteIntConverter.ByteShortConverter.convert(lenB);
 		
+		if(this.length != LENGTH)
+		{
+			throw new AckFrameLengthMismatchException();
+		}
 		// gets Ack number bytes
 		for(byte b : acknoB)
 		{
