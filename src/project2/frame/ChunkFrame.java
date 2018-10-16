@@ -130,4 +130,11 @@ public class ChunkFrame extends Frame
 		
 		return new DatagramPacket(bytes, length, address, port);
 	}
+
+	public int getSequenceNumber()
+	{
+		return sequenceNumber;
+	}
+
+	
 }

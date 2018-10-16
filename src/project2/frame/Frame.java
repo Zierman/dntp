@@ -122,4 +122,9 @@ public abstract class Frame
 	{
 		return getLength(packet) == project2.Defaults.ACK_PACKET_LENGTH;
 	}
+	
+	public int getLength()
+	{
+		return length;
+	}
 }
