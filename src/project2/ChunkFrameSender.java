@@ -39,7 +39,6 @@ public class ChunkFrameSender
 	private static SenderPortArg senderPortArg = new SenderPortArg("-sp");
 	private static ProxyPortArg errorProxyPortArg = new ProxyPortArg("-pp");
 	private static ReceiverPortArg receiverPortArg = new ReceiverPortArg("-rp");
-//	private static WindowSizeArg windowSizeArg = new WindowSizeArg("-w"); // Disabled due to change in project requirements
 	private static TimeoutArg timeoutArg = new TimeoutArg("-t");
 	private static ErrorChanceArg errorChanceArg = new ErrorChanceArg("-d");
 	private static MaxSizeOfChunkArg maxSizeOfChunkArg = new MaxSizeOfChunkArg("-s");
