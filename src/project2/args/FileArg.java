@@ -5,8 +5,6 @@ package project2.args;
 
 import java.io.File;
 
-import project2.Defaults;
-
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
@@ -87,13 +85,13 @@ public class FileArg extends Arg<File>
 		int i = path.lastIndexOf(".");
 		if (i < 0)
 		{
-			path = path + project2.Defaults.COPY_SUFIX;
+			path = path + project2.Defaults.COPY_SUFFIX;
 		}
 		else
 		{
 			String start = path.substring(0, i);
 			String end = path.substring(i);
-			path = start + project2.Defaults.COPY_SUFIX + end;
+			path = start + project2.Defaults.COPY_SUFFIX + end;
 		}
 		return new File(path);
 	}

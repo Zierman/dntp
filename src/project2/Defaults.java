@@ -6,6 +6,7 @@ package project2;
 import java.io.File;
 import java.net.InetAddress;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import project1.Project1;
 
 /**
@@ -46,6 +47,9 @@ public class Defaults
 	
 	// filename and path
 	public static final File INPUT_FILE = new File("in.txt");
-	public static final String COPY_SUFIX = "_copy";
+	public static final String COPY_SUFFIX = "_copy";
 	public static final Integer NUMBER_OF_ACK_NUMBERS = 2; // must be > 1
+
+	// logging
+	public static final Boolean REQUIRED_LOGGING = true;
 }

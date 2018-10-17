@@ -4,6 +4,25 @@ Downright Neighborly Transfer Protocol
 
 Course project, to develop a protocol over UDP to provide reliability.
 
+# Project I
+
+## Important Details to Organize
+- Sender cli input is in control of proxy error settings
+- Run help from command line to see running arguments
+- Default ports will be used for updating port numbers
+- getArgsFromSender order of arguments must be precisely the same as the sender method
+
+
+
+
+
+## Important Defaults
+- Reference the `default.java` class 
+
+
+
+# Project II
+
 # Running notes
 created using java sdk 1.8.0_152
  

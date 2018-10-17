@@ -68,6 +68,7 @@ public class ChunkFrameReceiver
 	private static Integer numberOfAckNumbers;
 	private static Boolean introduceError;
 	private static Boolean debugMode;
+	private static Boolean requiredLogArg;
 
 	public static void main(String[] args) throws Exception
 	{
@@ -204,9 +205,10 @@ public class ChunkFrameReceiver
 		receivableArg.add(numberOfAckNumbers);
 		receivableArg.add(introduceError);
 		receivableArg.add(debugMode);
+		receivableArg.add(requiredLogArg);
 		ByteArrayInputStream bais;
 		ObjectInputStream ois;
-		DatagramPacket initilizationPacket = new DatagramPacket(new byte[4], 4);
+		DatagramPacket initializationPacket = new DatagramPacket(new byte[4], 4);
 		ChunkFrame incomingFrame;
 		int len = 0;
 		int expecting = 0;
@@ -218,8 +220,8 @@ public class ChunkFrameReceiver
 		{
 			try
 			{
-				socket.receive(initilizationPacket);
-				len = byteIntConverter.ByteIntConverter.convert(initilizationPacket.getData());
+				socket.receive(initializationPacket);
+				len = byteIntConverter.ByteIntConverter.convert(initializationPacket.getData());
 				done = true;
 				expecting++;
 			}
@@ -230,7 +232,7 @@ public class ChunkFrameReceiver
 		}
 
 		// receive all initialization datapackets
-		initilizationPacket = new DatagramPacket(new byte[len], len);
+		initializationPacket = new DatagramPacket(new byte[len], len);
 		for (Object o : receivableArg)
 		{
 			done = false;
@@ -238,8 +240,8 @@ public class ChunkFrameReceiver
 			{
 				try
 				{
-					socket.receive(initilizationPacket);
-					incomingFrame = new ChunkFrame(initilizationPacket);
+					socket.receive(initializationPacket);
+					incomingFrame = new ChunkFrame(initializationPacket);
 					if(incomingFrame.getAckNumber() < expecting)
 					{
 						socket.send(new AckFrame(incomingFrame).toDatagramPacket(destinationAddress, destinationPort));
