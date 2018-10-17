@@ -7,26 +7,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.Queue;
-
-import com.sun.corba.se.impl.orbutil.threadpool.TimeoutException;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
 import project1.Chunk;
 import project1.FileSplitter;
 import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
-import project2.frame.Frame;
-import project2.slidingWindow.SenderWindow;
-import project2.slidingWindow.SlidingWindow;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -53,6 +45,7 @@ public class ChunkFrameSender
 	// Toggle Args
 	private static IntroduceErrorArg introduceErrorArg = new IntroduceErrorArg("-e");
 	private static DebugModeArg debugModeArg = new DebugModeArg("-debug");
+	private static RequiredLogArg requiredLogArg = new RequiredLogArg( "-reqlog");
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameSender.SENDER_PROGRAM_TITLE, ChunkFrameSender.SENDER_PROGRAM_DESCRIPTION);
 
 	// Destination vars
@@ -61,6 +54,7 @@ public class ChunkFrameSender
 
 	// Printer
 	private static final DebugPrinter debug = new DebugPrinter(debugModeArg, System.out);
+	private static final RequiredLogArg log = new RequiredLogArg(requiredLogArg, System.out);
 
 	public static void main(String[] args) throws Exception
 	{
@@ -188,6 +182,7 @@ public class ChunkFrameSender
 		args.add(numberOfAckNumbersArg);
 		args.add(introduceErrorArg);
 		args.add(debugModeArg);
+		args.add(requiredLogArg);
 		DatagramPacket packet;
 		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.LENGTH], AckFrame.LENGTH);
 		AckFrame ackFrame;
