@@ -13,25 +13,31 @@ import project2.args.DebugModeArg;
  */
 public class DebugPrinter
 {
-	private DebugModeArg debugArg;
-	private PrintStream normalPrintStream, debugPrintStream;
+	private Boolean debugMode;
+	private PrintStream debugPrintStream;
 	
 	
 	public DebugPrinter(DebugModeArg arg, PrintStream debugPrintStream)
 	{
-		debugArg = arg;
+		this.debugMode = arg.getValue();
 		this.debugPrintStream = debugPrintStream;
 	}
 	
+	public DebugPrinter(Boolean debugMode, PrintStream debugPrintStream)
+	{
+		this.debugMode = debugMode;
+		this.debugPrintStream = debugPrintStream;
+	}
+
 	public void print(String s)
 	{
-		if(debugArg.getValue())
+		if(debugMode)
 			debugPrintStream.print(s);
 	}
 	
 	public void println(String s)
 	{
-		if(debugArg.getValue())
+		if(debugMode)
 			debugPrintStream.println(s);
 	}
 }

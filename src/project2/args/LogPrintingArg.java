@@ -4,13 +4,13 @@
 package project2.args;
 
 
-public class RequiredLogArg extends ToggleArg
+public class LogPrintingArg extends ToggleArg
 {
 
     /**
      * @param flag
      */
-    public RequiredLogArg(String flag) {
+    public LogPrintingArg(String flag) {
         super(flag);
     }
 

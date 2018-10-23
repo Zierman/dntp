@@ -16,6 +16,7 @@ import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 
 import javax.swing.text.Position.Bias;
 
@@ -36,6 +37,9 @@ import project2.slidingWindow.SlidingWindow;
  */
 public class ChunkFrameReceiver
 {
+	private static final Random RANDOM = new Random();
+	
+	// documentation constants
 	private final static String RECEIVER_PROGRAM_TITLE = "Chunk Frame Sender Program";
 	private final static String RECEIVER_PROGRAM_DESCRIPTION = "This program sends a file using our version of the Stop and Wait algorithm.";
 
@@ -45,7 +49,6 @@ public class ChunkFrameReceiver
 	private static ReceiverPortArg receiverPortArg = new ReceiverPortArg("-rp");
 
 	// Toggle Args
-	private static DebugModeArg debugModeArg = new DebugModeArg("-debug");
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameReceiver.RECEIVER_PROGRAM_TITLE, ChunkFrameReceiver.RECEIVER_PROGRAM_DESCRIPTION);
 
 	// Destination vars
@@ -53,7 +56,8 @@ public class ChunkFrameReceiver
 	private static int destinationPort;
 
 	// Printer
-	private static final DebugPrinter debug = new DebugPrinter(debugModeArg, System.out);
+	private static DebugPrinter debug;
+	private static LogPrinter log;
 
 	// Arguments to receive from sender
 	private static File file;
@@ -61,13 +65,17 @@ public class ChunkFrameReceiver
 	private static InetAddress receiverAddress = Defaults.RECEIVER_ADDRESS;
 	private static Integer senderPort = Defaults.SENDER_PORT;
 	private static Integer receiverPort = Defaults.RECEIVER_PORT;
-	private static Integer timeout = Defaults.TIMEOUT;
 	private static Integer errorChance = Defaults.CHANCE_OF_ERROR;
 	private static Short maxSizeOfChunk = Defaults.MAX_CHUNK_LENGTH;
 	private static Integer numberOfAckNumbers = Defaults.NUMBER_OF_ACK_NUMBERS;
-	private static Boolean introduceError;
-	private static Boolean debugMode;
-	private static Boolean requiredLogArg;
+	private static Boolean introduceError = false;
+	private static Boolean debugMode = false;
+	private static Boolean logPrintingMode = false;
+	private static Integer maxDelay = Defaults.MAX_DELAY;
+
+	// Delayed Frames
+	private static DelayedFrameCollection<AckFrame> delayedFrames;
+
 
 	public static void main(String[] args) throws Exception
 	{
@@ -76,17 +84,27 @@ public class ChunkFrameReceiver
 
 		// set up the socket
 		DatagramSocket socket = new DatagramSocket(receiverPortArg.getValue());
-		socket.setSoTimeout(Defaults.TIMEOUT);
 
 		// Get arg info from sender.
 		getArgsFromSender(socket);
-
-		// Determine Packet Size
-		short packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunk);
+		
+		// initialize the printers
+		debug = new DebugPrinter(debugMode, System.out);
+		log = new LogPrinter(logPrintingMode, System.out);
 
 		// set destination
 		destinationAddress = senderAddress;
 		destinationPort = senderPort;
+		
+		// update socket from default to specified values
+		socket = new DatagramSocket(receiverPort);
+		
+		// set up the delayed frame collection
+		delayedFrames = new DelayedFrameCollection<AckFrame>(socket, destinationAddress, destinationPort);
+
+		// Determine Packet Size
+		short chunkPacketSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunk);
+
 
 		// set the expected ackNum to 0
 		int expectedAck = 0;
@@ -97,7 +115,7 @@ public class ChunkFrameReceiver
 		Chunk chunk;
 		ChunkFrame chunkFrame;
 		ChunkFrame last = null;
-		DatagramPacket chunkPacket = new DatagramPacket(new byte[maxSizeOfChunk + AckFrame.LENGTH + 4], maxSizeOfChunk + AckFrame.LENGTH + 4);
+		DatagramPacket chunkPacket = new DatagramPacket(new byte[chunkPacketSize], chunkPacketSize);
 		Queue<Chunk> chunkList = new LinkedList<Chunk>();
 		
 		boolean end = false;
@@ -114,6 +132,10 @@ public class ChunkFrameReceiver
 					// receive chunk packet
 					socket.receive(chunkPacket);
 					
+					// Log received packet info
+					//TODO put real message in this
+					log.println("Apples");
+					
 					// extract the chunk frame
 					chunkFrame = new ChunkFrame(chunkPacket);
 
@@ -126,8 +148,54 @@ public class ChunkFrameReceiver
 					// if it passed checksum and is a match to the expected ack number
 					if(ackMatch && sumCheckPass)
 					{
-						// send acknowledgement
+						// make acknowledgement frame
 						ackFrame = new AckFrame(chunkFrame);
+						
+						// introduce errors
+						if(introduceError)
+						{
+							// generate errors randomly using the generator
+							ackFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChance));
+						}
+						
+						// simulate delays
+						if(ackFrame.isDelayed())
+						{
+							//TODO output
+							
+							/*
+							 * The delayedFrames collection is essentially a funnel that we put the frames we want to delay. 
+							 * The collection contains a runnable sender that will automatically send the frames when the 
+							 * delay elapses. 
+							 */
+							delayedFrames.add(ackFrame, delay());
+						}
+						
+						// simulate drops
+						else if(ackFrame.isDropped())
+						{
+							//TODO output
+						}
+						
+						// simulate sending corrupt package
+						else if(ackFrame.failedCheckSum())
+						{				
+							//TODO output
+							
+							// send the package
+							socket.send(chunkPacket);
+							
+						}
+						
+						// normal case
+						else
+						{
+
+							//TODO output
+							
+							// send the package
+							socket.send(chunkPacket);
+						}
 						ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
 						socket.send(ackPacket);
 						
@@ -167,7 +235,7 @@ public class ChunkFrameReceiver
 				}
 				catch (SocketTimeoutException e)
 				{
-					// TODO write error output for Timeout
+					// We don't care about timeouts on the receiver
 				}
 				catch (Exception e)
 				{
@@ -176,6 +244,11 @@ public class ChunkFrameReceiver
 			}
 		}
 		socket.close();
+	}
+
+	private static int delay()
+	{
+		return RANDOM.nextInt(maxDelay);
 	}
 
 	private static void getArgsFromSender(DatagramSocket socket)
@@ -187,13 +260,13 @@ public class ChunkFrameReceiver
 		receivableArg.add(receiverAddress);
 		receivableArg.add(senderPort);
 		receivableArg.add(receiverPort);
-		receivableArg.add(timeout);
 		receivableArg.add(errorChance);
 		receivableArg.add(maxSizeOfChunk);
 		receivableArg.add(numberOfAckNumbers);
 		receivableArg.add(introduceError);
 		receivableArg.add(debugMode);
-		receivableArg.add(requiredLogArg);
+		receivableArg.add(logPrintingMode);
+		receivableArg.add(maxDelay);
 		ByteArrayInputStream bais;
 		ObjectInputStream ois;
 		DatagramPacket initializationPacket = new DatagramPacket(new byte[4], 4);

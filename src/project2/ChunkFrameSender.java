@@ -48,12 +48,12 @@ public class ChunkFrameSender
 	// Toggle Args
 	private static IntroduceErrorArg introduceErrorArg = new IntroduceErrorArg("-e");
 	private static DebugModeArg debugModeArg = new DebugModeArg("-debug");
-	private static RequiredLogArg requiredLogArg = new RequiredLogArg("-reqlog");
+	private static LogPrintingArg logPrintingArg = new LogPrintingArg("-reqlog");
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameSender.SENDER_PROGRAM_TITLE, ChunkFrameSender.SENDER_PROGRAM_DESCRIPTION);
 
 	// Printer
 	private static final DebugPrinter debug = new DebugPrinter(debugModeArg, System.out);
-	private static final RequirementsLog log = new RequirementsLog(requiredLogArg, System.out);
+	private static final LogPrinter log = new LogPrinter(logPrintingArg, System.out);
 
 	// Delayed Frames
 	private static DelayedFrameCollection<ChunkFrame> delayedFrames;
@@ -63,15 +63,12 @@ public class ChunkFrameSender
 
 		int sequenceNumber = 0;
 		int ackNumber = 0;
-		short packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + Defaults.MAX_CHUNK_LENGTH);
 		InetAddress destinationAddress;
 		int destinationPort;
 		
 		// handle the command line arguments
 		ArgList.updateFromMainArgs(args);
 
-		// Determine Packet Size
-		packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunkArg.getValue());
 
 		// set destination
 		destinationAddress = receiverAddressArg.getValue();
@@ -89,8 +86,7 @@ public class ChunkFrameSender
 		DatagramSocket socket = new DatagramSocket(senderPortArg.getValue());
 		socket.setSoTimeout(timeoutArg.getValue());
 
-		// make connection and transmit setup info (this will not be effected by
-		// the error proxy)
+		// make connection and transmit setup info 
 		setupConnection(socket, destinationAddress, destinationPort);
 		
 		// set up the delayed frame collection
@@ -197,7 +193,7 @@ public class ChunkFrameSender
 
 	private static int delay()
 	{
-		return RANDOM.nextInt();
+		return RANDOM.nextInt(maxDelayArg.getValue());
 	}
 
 	private static void setupConnection(DatagramSocket socket, InetAddress destinationAddress, int destinationPort) throws IOException
@@ -219,7 +215,8 @@ public class ChunkFrameSender
 		args.add(numberOfAckNumbersArg);
 		args.add(introduceErrorArg);
 		args.add(debugModeArg);
-		args.add(requiredLogArg);
+		args.add(logPrintingArg);
+		args.add(maxDelayArg);
 		DatagramPacket packet;
 		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.LENGTH], AckFrame.LENGTH);
 		AckFrame ackFrame;
