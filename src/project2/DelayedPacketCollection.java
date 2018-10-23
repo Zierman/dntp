@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.Timer;
 
 
-public class DelayedPacketManager
+public class DelayedPacketCollection
 {
 	private class Node implements Comparable<Node>
 	{
