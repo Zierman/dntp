@@ -108,8 +108,11 @@ public class ChunkFrameSender
 			chunkFrame = new ChunkFrame(chunk, sequenceNumber, ackNumber);
 
 			// generate errors randomly using the generator
-			chunkFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChanceArg.getValue()));
-
+			if(introduceErrorArg.getValue())
+			{
+				chunkFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChanceArg.getValue()));
+			}
+			
 			// Send it with the stop and wait
 			sendWithStopAndWait(chunkFrame, ackNumber, socket, destinationAddress, destinationPort);
 
