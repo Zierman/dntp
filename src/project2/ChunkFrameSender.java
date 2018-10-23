@@ -58,6 +58,17 @@ public class ChunkFrameSender
 	// Printer
 	private static final DebugPrinter debug = new DebugPrinter(debugModeArg, System.out);
 	private static final RequirementsLog log = new RequirementsLog(requiredLogArg, System.out);
+	
+	// other static vars
+	private static AckFrame ackFrame;
+	private static DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.LENGTH], AckFrame.LENGTH);
+	private static Chunk chunk;
+	private static ChunkFrame chunkFrame;
+	private static DatagramPacket chunkPacket;
+	private static DelayedFrameCollection<ChunkFrame> delayedFrames = new DelayedFrameCollection<ChunkFrame>();
+	private static int sequenceNumber = 0;
+	private static int ackNumber = 0;
+	private static short packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + Defaults.MAX_CHUNK_LENGTH);
 
 	public static void main(String[] args) throws Exception
 	{
@@ -65,7 +76,7 @@ public class ChunkFrameSender
 		ArgList.updateFromMainArgs(args);
 
 		// Determine Packet Size
-		short packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunkArg.getValue());
+		packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunkArg.getValue());
 
 		// set destination
 		destinationAddress = receiverAddressArg.getValue();
@@ -87,27 +98,21 @@ public class ChunkFrameSender
 		// the error proxy)
 		setupConnection(socket, destinationAddress, destinationPort);
 
-		// set the seqNum and ackNum to 0
-		int sequenceNumber = 0;
-		int ackNumber = 0;
-
 		// frame, package, and send all chunks using Stop and Wait
-		AckFrame ackFrame;
-		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.LENGTH], AckFrame.LENGTH);
-		Chunk chunk;
-		ChunkFrame chunkFrame;
-		DatagramPacket chunkPacket;
-		DelayedPacketCollection delayedPackets = new DelayedPacketCollection();
-
 		while (!chunkList.isEmpty())
 		{
+			chunkFrame = null;
 			boolean done = false;
-			boolean ackMatch = false;
-			boolean sumCheckPass = false;
 
-			// get the next chunk
-			chunk = chunkList.remove();
-
+			// get next delayed frame that is ready (will be null if none are ready)
+			chunkFrame = delayedFrames.getNextReadyFrame();
+			
+			// get the next chunk if we are not handling a delayed frame
+			if(chunkFrame == null)
+			{
+				chunk = chunkList.remove();
+			}
+			
 			// frame the chunk
 			chunkFrame = new ChunkFrame(chunk, sequenceNumber, ackNumber);
 			
@@ -124,34 +129,7 @@ public class ChunkFrameSender
 			}
 			do
 			{
-				try
-				{		
-					// send the package
-					socket.send(chunkPacket);
-
-					// receive a package or timeout
-					socket.receive(ackPacket);
-
-					// extract ack frame from package
-					ackFrame = new AckFrame(ackPacket);
-
-					// check if received ack number matches expected ack number
-					ackMatch = ackFrame.getAckNumber() == ackNumber;
-
-					// check if the ackFrame passed the check sum
-					sumCheckPass = ackFrame.passedCheckSum();
-
-					// Determines if we are done trying to send the packet again
-					done = ackMatch && sumCheckPass;
-				}
-				catch (SocketTimeoutException e)
-				{
-					// TODO write error output for Timeout
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace(); // TODO adjust this if desired
-				}
+				send(chunkPacket, socket);
 			}
 			while (!done);
 
@@ -163,6 +141,42 @@ public class ChunkFrameSender
 			sequenceNumber++;
 		}
 		socket.close();
+	}
+
+	private static void send(DatagramPacket chunkPacket, DatagramSocket socket)
+	{
+		boolean done = false;
+		boolean ackMatch = false;
+		boolean sumCheckPass = false;
+		
+		try
+		{		
+			// send the package
+			socket.send(chunkPacket);
+
+			// receive a package or timeout
+			socket.receive(ackPacket);
+
+			// extract ack frame from package
+			ackFrame = new AckFrame(ackPacket);
+
+			// check if received ack number matches expected ack number
+			ackMatch = ackFrame.getAckNumber() == ackNumber;
+
+			// check if the ackFrame passed the check sum
+			sumCheckPass = ackFrame.passedCheckSum();
+
+			// Determines if we are done trying to send the packet again
+			done = ackMatch && sumCheckPass;
+		}
+		catch (SocketTimeoutException e)
+		{
+			// TODO write error output for Timeout
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace(); // TODO adjust this if desired
+		}
 	}
 
 	private static int delay()
