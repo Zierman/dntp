@@ -10,6 +10,7 @@ import java.net.InetAddress;
 import java.util.LinkedList;
 
 import byteIntConverter.ByteShortConverter;
+import project2.frame.Frame.Error;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -87,9 +88,19 @@ public abstract class Frame
 		error = Error.DELAY;
 	}
 	
+	public boolean isDelayed()
+	{
+		return error == Error.DELAY;
+	}
+	
 	public void drop()
 	{
 		error = Error.DROP;
+	}
+
+	public boolean isDropped()
+	{
+		return error == Error.DROP;
 	}
 	
 	/**corrupts the Frame

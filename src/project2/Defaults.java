@@ -42,6 +42,9 @@ public class Defaults
 	// timeout time in ms
 	public final static int TIMEOUT = 2000;
 	
+	// maximum delay for delayed packets in ms
+	public static final Integer MAX_DELAY = 10000;
+	
 	// size of the sliding window
 	public final static int WINDOW_SIZE = 4;
 	

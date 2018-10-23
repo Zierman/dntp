@@ -13,7 +13,9 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 
+import oracle.jrockit.jfr.parser.ChunkParser;
 import project1.Chunk;
 import project1.FileSplitter;
 import project2.args.*;
@@ -26,6 +28,8 @@ import project2.frame.ChunkFrame;
  */
 public class ChunkFrameSender
 {
+	private static final Random RANDOM = new Random();
+	
 	private final static String SENDER_PROGRAM_TITLE = "Chunk Frame Sender Program";
 	private final static String SENDER_PROGRAM_DESCRIPTION = "This program sends a file using our version of the Stop and Wait algorithm.";
 
@@ -39,6 +43,7 @@ public class ChunkFrameSender
 	private static ErrorChanceArg errorChanceArg = new ErrorChanceArg("-d");
 	private static MaxSizeOfChunkArg maxSizeOfChunkArg = new MaxSizeOfChunkArg("-s");
 	private static NumberOfAckNumbersArg numberOfAckNumbersArg = new NumberOfAckNumbersArg("-acknums");
+	private static MaxDelayArg maxDelayArg = new MaxDelayArg("-md");
 
 	// Toggle Args
 	private static IntroduceErrorArg introduceErrorArg = new IntroduceErrorArg("-e");
@@ -92,6 +97,7 @@ public class ChunkFrameSender
 		Chunk chunk;
 		ChunkFrame chunkFrame;
 		DatagramPacket chunkPacket;
+		DelayedPacketCollection delayedPackets = new DelayedPacketCollection();
 
 		while (!chunkList.isEmpty())
 		{
@@ -104,17 +110,26 @@ public class ChunkFrameSender
 
 			// frame the chunk
 			chunkFrame = new ChunkFrame(chunk, sequenceNumber, ackNumber);
+			
+			// generate errors randomly using the generator
+			chunkFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChanceArg.getValue()));
 
 			// package the frame
 			chunkPacket = chunkFrame.toDatagramPacket(destinationAddress, destinationPort);
+			
+			// handle delays
+			if(chunkFrame.isDelayed())
+			{
+				delayedPackets.add(chunkPacket, delay());
+			}
 			do
 			{
 				try
-				{
+				{		
 					// send the package
 					socket.send(chunkPacket);
 
-					// receive a package
+					// receive a package or timeout
 					socket.receive(ackPacket);
 
 					// extract ack frame from package
@@ -148,6 +163,11 @@ public class ChunkFrameSender
 			sequenceNumber++;
 		}
 		socket.close();
+	}
+
+	private static int delay()
+	{
+		return RANDOM.nextInt();
 	}
 
 	private static void setupConnection(DatagramSocket socket, InetAddress destinationAddress, int destinationPort) throws IOException

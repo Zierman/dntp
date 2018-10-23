@@ -29,7 +29,6 @@ public class DelayedPacketCollection
 	}
 	
 	private PriorityQueue<Node> queue = new PriorityQueue<>();
-	private static final Random RANDOM = new Random();
 	
 	public void add(DatagramPacket p, int msDelay)
 	{
