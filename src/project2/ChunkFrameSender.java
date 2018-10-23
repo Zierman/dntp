@@ -102,7 +102,6 @@ public class ChunkFrameSender
 		while (!chunkList.isEmpty())
 		{
 			chunkFrame = null;
-			boolean done = false;
 
 			// get next delayed frame that is ready (will be null if none are ready)
 			chunkFrame = delayedFrames.getNextReadyFrame();
@@ -119,63 +118,74 @@ public class ChunkFrameSender
 			// generate errors randomly using the generator
 			chunkFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChanceArg.getValue()));
 
-			// package the frame
-			chunkPacket = chunkFrame.toDatagramPacket(destinationAddress, destinationPort);
 			
 			// handle delays
 			if(chunkFrame.isDelayed())
 			{
-				delayedPackets.add(chunkPacket, delay());
+				delayedFrames.add(chunkFrame, delay());
 			}
-			do
+			
+			// handle drops
+			else if(chunkFrame.isDropped())
 			{
-				send(chunkPacket, socket);
+				
 			}
-			while (!done);
-
-			// progress to next ackNumber
-			ackNumber++;
-			ackNumber %= numberOfAckNumbersArg.getValue();
-
-			// progress to next sequence number
-			sequenceNumber++;
+			
+			// if not dropped or delayed we send
+			else
+			{
+				// package the frame
+				chunkPacket = chunkFrame.toDatagramPacket(destinationAddress, destinationPort);
+				
+				//Send it with the stop and wait
+				sendAndWait(chunkPacket, socket);
+	
+				// progress to next ackNumber
+				ackNumber++;
+				ackNumber %= numberOfAckNumbersArg.getValue();
+	
+				// progress to next sequence number
+				sequenceNumber++;
+			}
 		}
 		socket.close();
 	}
 
-	private static void send(DatagramPacket chunkPacket, DatagramSocket socket)
+	private static void sendAndWait(DatagramPacket chunkPacket, DatagramSocket socket)
 	{
 		boolean done = false;
 		boolean ackMatch = false;
 		boolean sumCheckPass = false;
-		
-		try
-		{		
-			// send the package
-			socket.send(chunkPacket);
-
-			// receive a package or timeout
-			socket.receive(ackPacket);
-
-			// extract ack frame from package
-			ackFrame = new AckFrame(ackPacket);
-
-			// check if received ack number matches expected ack number
-			ackMatch = ackFrame.getAckNumber() == ackNumber;
-
-			// check if the ackFrame passed the check sum
-			sumCheckPass = ackFrame.passedCheckSum();
-
-			// Determines if we are done trying to send the packet again
-			done = ackMatch && sumCheckPass;
-		}
-		catch (SocketTimeoutException e)
+		while(!done)
 		{
-			// TODO write error output for Timeout
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace(); // TODO adjust this if desired
+			try
+			{		
+				// send the package
+				socket.send(chunkPacket);
+	
+				// receive a package or timeout
+				socket.receive(ackPacket);
+	
+				// extract ack frame from package
+				ackFrame = new AckFrame(ackPacket);
+	
+				// check if received ack number matches expected ack number
+				ackMatch = ackFrame.getAckNumber() == ackNumber;
+	
+				// check if the ackFrame passed the check sum
+				sumCheckPass = ackFrame.passedCheckSum();
+	
+				// Determines if we are done trying to send the packet again
+				done = ackMatch && sumCheckPass;
+			}
+			catch (SocketTimeoutException e)
+			{
+				// TODO write error output for Timeout
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace(); // TODO adjust this if desired
+			}
 		}
 	}
 
