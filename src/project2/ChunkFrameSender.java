@@ -29,7 +29,7 @@ import project2.frame.ChunkFrame;
 public class ChunkFrameSender
 {
 	private static final Random RANDOM = new Random();
-	
+
 	private final static String SENDER_PROGRAM_TITLE = "Chunk Frame Sender Program";
 	private final static String SENDER_PROGRAM_DESCRIPTION = "This program sends a file using our version of the Stop and Wait algorithm.";
 
@@ -51,27 +51,22 @@ public class ChunkFrameSender
 	private static RequiredLogArg requiredLogArg = new RequiredLogArg("-reqlog");
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameSender.SENDER_PROGRAM_TITLE, ChunkFrameSender.SENDER_PROGRAM_DESCRIPTION);
 
-	// Destination vars
-	private static InetAddress destinationAddress;
-	private static int destinationPort;
-
 	// Printer
 	private static final DebugPrinter debug = new DebugPrinter(debugModeArg, System.out);
 	private static final RequirementsLog log = new RequirementsLog(requiredLogArg, System.out);
-	
-	// other static vars
-	private static AckFrame ackFrame;
-	private static DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.LENGTH], AckFrame.LENGTH);
-	private static Chunk chunk;
-	private static ChunkFrame chunkFrame;
-	private static DatagramPacket chunkPacket;
-	private static DelayedFrameCollection<ChunkFrame> delayedFrames = new DelayedFrameCollection<ChunkFrame>();
-	private static int sequenceNumber = 0;
-	private static int ackNumber = 0;
-	private static short packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + Defaults.MAX_CHUNK_LENGTH);
+
+	// Delayed Frames
+	private static DelayedFrameCollection<ChunkFrame> delayedFrames;
 
 	public static void main(String[] args) throws Exception
 	{
+
+		int sequenceNumber = 0;
+		int ackNumber = 0;
+		short packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + Defaults.MAX_CHUNK_LENGTH);
+		InetAddress destinationAddress;
+		int destinationPort;
+		
 		// handle the command line arguments
 		ArgList.updateFromMainArgs(args);
 
@@ -97,80 +92,88 @@ public class ChunkFrameSender
 		// make connection and transmit setup info (this will not be effected by
 		// the error proxy)
 		setupConnection(socket, destinationAddress, destinationPort);
+		
+		// set up the delayed frame collection
+		delayedFrames = new DelayedFrameCollection<ChunkFrame>(socket, destinationAddress, destinationPort);
 
 		// frame, package, and send all chunks using Stop and Wait
 		while (!chunkList.isEmpty())
 		{
-			chunkFrame = null;
+			ChunkFrame chunkFrame = null;
 
-			// get next delayed frame that is ready (will be null if none are ready)
-			chunkFrame = delayedFrames.getNextReadyFrame();
-			
 			// get the next chunk if we are not handling a delayed frame
-			if(chunkFrame == null)
-			{
-				chunk = chunkList.remove();
-			}
-			
+			Chunk chunk = chunkList.remove();
+
 			// frame the chunk
 			chunkFrame = new ChunkFrame(chunk, sequenceNumber, ackNumber);
-			
+
 			// generate errors randomly using the generator
 			chunkFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChanceArg.getValue()));
 
-			
-			// handle delays
-			if(chunkFrame.isDelayed())
-			{
-				delayedFrames.add(chunkFrame, delay());
-			}
-			
-			// handle drops
-			else if(chunkFrame.isDropped())
-			{
-				
-			}
-			
-			// if not dropped or delayed we send
-			else
-			{
-				// package the frame
-				chunkPacket = chunkFrame.toDatagramPacket(destinationAddress, destinationPort);
-				
-				//Send it with the stop and wait
-				sendAndWait(chunkPacket, socket);
-	
-				// progress to next ackNumber
-				ackNumber++;
-				ackNumber %= numberOfAckNumbersArg.getValue();
-	
-				// progress to next sequence number
-				sequenceNumber++;
-			}
+			// Send it with the stop and wait
+			sendWithStopAndWait(chunkFrame, ackNumber, socket, destinationAddress, destinationPort);
+
+			// progress to next ackNumber
+			ackNumber++;
+			ackNumber %= numberOfAckNumbersArg.getValue();
+
+			// progress to next sequence number
+			sequenceNumber++;
 		}
 		socket.close();
 	}
 
-	private static void sendAndWait(DatagramPacket chunkPacket, DatagramSocket socket)
+	private static void sendWithStopAndWait(ChunkFrame chunkFrame, int expectedAckNumber, DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
 	{
 		boolean done = false;
 		boolean ackMatch = false;
 		boolean sumCheckPass = false;
+		DatagramPacket chunkPacket = chunkFrame.toDatagramPacket(destinationAddress, destinationPort);
+		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.LENGTH], AckFrame.LENGTH);
 		while(!done)
 		{
 			try
 			{		
-				// send the package
-				socket.send(chunkPacket);
-	
+				// simulate delays
+				if(chunkFrame.isDelayed())
+				{
+					
+					/*
+					 * The delayedFrames collection is essentially a funnel that we put the frames we want to delay. 
+					 * The collection contains a runnable sender that will automatically send the frames when the 
+					 * delay elapses. 
+					 */
+					delayedFrames.add(chunkFrame, delay());
+				}
+				
+				// simulate drops
+				else if(chunkFrame.isDropped())
+				{
+					
+				}
+				
+				// simulate sending corrupt package
+				else if(chunkFrame.failedCheckSum())
+				{					
+					// send the package
+					socket.send(chunkPacket);
+				}
+				
+				// normal case
+				else
+				{
+					// send the package
+					socket.send(chunkPacket);
+				}
+				
 				// receive a package or timeout
 				socket.receive(ackPacket);
 	
 				// extract ack frame from package
-				ackFrame = new AckFrame(ackPacket);
+				AckFrame ackFrame = new AckFrame(ackPacket);
 	
 				// check if received ack number matches expected ack number
-				ackMatch = ackFrame.getAckNumber() == ackNumber;
+				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
 	
 				// check if the ackFrame passed the check sum
 				sumCheckPass = ackFrame.passedCheckSum();
@@ -201,7 +204,7 @@ public class ChunkFrameSender
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		Queue<Chunk> chunks = new LinkedList<Chunk>();
-		Queue<Arg> args = new LinkedList<Arg>();
+		Queue<Arg<?>> args = new LinkedList<Arg<?>>();
 		args.add(fileArg);
 		args.add(senderAddressArg);
 		args.add(receiverAddressArg);
@@ -225,7 +228,7 @@ public class ChunkFrameSender
 		socket.setSoTimeout(Defaults.TIMEOUT);
 
 		// convert the values of all needed args to byte arrays
-		for (Arg arg : args)
+		for (Arg<?> arg : args)
 		{
 			oos.writeObject(arg.getValue());
 			oos.flush();

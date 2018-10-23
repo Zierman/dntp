@@ -1,5 +1,9 @@
 package project2;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -32,7 +36,65 @@ public class DelayedFrameCollection <F extends Frame>
 		}
 	}
 	
+	public class DelayedFrameSender implements Runnable
+	{
+		boolean running = false;
+		private InetAddress destinationAddress;
+		private Integer destinationPort;
+		private DatagramSocket socket;
+
+		DelayedFrameSender(DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
+		{
+			this.socket = socket;
+			this.destinationAddress = destinationAddress;
+			this.destinationPort = destinationPort;
+			run();
+		}
+		
+		@Override
+		public void run()
+		{
+			running = true;
+			Queue<F> frames;
+			while(running)
+			{
+				System.out.println("hi");
+				frames = getAllReadyFrames();
+				for(F frame : frames)
+				{
+					try
+					{
+						send(frame);
+					}
+					catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		public void stop()
+		{
+			running = false;
+		}
+		
+		private void send(F frame) throws IOException
+		{
+			DatagramPacket packet = frame.toDatagramPacket(destinationAddress, destinationPort);
+			socket.send(packet);
+		}
+		
+	}
+	
+	public DelayedFrameCollection(DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
+	{
+		delayedFrameSender = new DelayedFrameSender(socket, destinationAddress, destinationPort);
+	}
+	
 	private PriorityQueue<Node> queue = new PriorityQueue<>();
+	private DelayedFrameSender delayedFrameSender;
 	
 	/** Add a frame with a specified delay
 	 * @param frame the frame to add to the delayed frame collection
