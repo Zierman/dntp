@@ -2,6 +2,7 @@ package project2;
 
 import java.io.PrintStream;
 import project2.args.LogPrintingArg;
+import project2.frame.ChunkFrame;
 
 
 public class LogPrinter
@@ -20,6 +21,11 @@ public class LogPrinter
 	{
 		this.logMode = logMode;
 		this.logPrintStream = logPrintStream;
+	}
+	
+	public void sent(ChunkFrame f)
+	{
+		println("SENDing " + f.getSequenceNumber() + "OTHERSTUFF");
 	}
 
 	public void print(String s)
