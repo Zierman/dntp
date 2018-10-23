@@ -127,4 +127,11 @@ public abstract class Frame
 	{
 		return length;
 	}
+
+	public void setError(Error error)
+	{
+		this.error = error;
+	}
+	
+	
 }
