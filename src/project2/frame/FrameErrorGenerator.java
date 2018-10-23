@@ -1,8 +1,6 @@
-package project2;
+package project2.frame;
 
 import java.util.Random;
-
-import project2.frame.Frame;
 
 public class FrameErrorGenerator
 {
