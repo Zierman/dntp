@@ -57,10 +57,8 @@ public class ChunkFrameReceiver
 	// Arguments to receive from sender
 	private static File file;
 	private static InetAddress senderAddress;
-	private static InetAddress errorProxyAddress;
 	private static InetAddress receiverAddress;
 	private static Integer senderPort;
-	private static Integer errorProxyPort;
 	private static Integer receiverPort;
 	private static Integer timeout;
 	private static Integer errorChance;
@@ -86,17 +84,8 @@ public class ChunkFrameReceiver
 		short packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunk);
 
 		// set destination
-		if (introduceError)
-		{
-			destinationAddress = errorProxyAddress;
-			destinationPort = errorProxyPort;
-		}
-		else
-		{
-
-			destinationAddress = senderAddress;
-			destinationPort = senderPort;
-		}
+		destinationAddress = senderAddress;
+		destinationPort = senderPort;
 
 		// set the expected ackNum to 0
 		int expectedAck = 0;
@@ -194,10 +183,8 @@ public class ChunkFrameReceiver
 		Queue<Serializable> receivableArg = new LinkedList<Serializable>();
 		receivableArg.add(file);
 		receivableArg.add(senderAddress);
-		receivableArg.add(errorProxyAddress);
 		receivableArg.add(receiverAddress);
 		receivableArg.add(senderPort);
-		receivableArg.add(errorProxyPort);
 		receivableArg.add(receiverPort);
 		receivableArg.add(timeout);
 		receivableArg.add(errorChance);

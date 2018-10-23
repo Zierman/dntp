@@ -32,10 +32,8 @@ public class ChunkFrameSender
 	// Args
 	private static FileArg fileArg = new FileArg("-f");
 	private static SenderAddressArg senderAddressArg = new SenderAddressArg("-sa");
-	private static ProxyAddressArg errorProxyAddressArg = new ProxyAddressArg("-pa");
 	private static ReceiverAddressArg receiverAddressArg = new ReceiverAddressArg("-ra");
 	private static SenderPortArg senderPortArg = new SenderPortArg("-sp");
-	private static ProxyPortArg errorProxyPortArg = new ProxyPortArg("-pp");
 	private static ReceiverPortArg receiverPortArg = new ReceiverPortArg("-rp");
 	private static TimeoutArg timeoutArg = new TimeoutArg("-t");
 	private static ErrorChanceArg errorChanceArg = new ErrorChanceArg("-d");
@@ -45,7 +43,7 @@ public class ChunkFrameSender
 	// Toggle Args
 	private static IntroduceErrorArg introduceErrorArg = new IntroduceErrorArg("-e");
 	private static DebugModeArg debugModeArg = new DebugModeArg("-debug");
-	private static RequiredLogArg requiredLogArg = new RequiredLogArg( "-reqlog");
+	private static RequiredLogArg requiredLogArg = new RequiredLogArg("-reqlog");
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameSender.SENDER_PROGRAM_TITLE, ChunkFrameSender.SENDER_PROGRAM_DESCRIPTION);
 
 	// Destination vars
@@ -65,17 +63,8 @@ public class ChunkFrameSender
 		short packetSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunkArg.getValue());
 
 		// set destination
-		if (introduceErrorArg.getValue())
-		{
-			destinationAddress = errorProxyAddressArg.getValue();
-			destinationPort = errorProxyPortArg.getValue();
-		}
-		else
-		{
-
-			destinationAddress = receiverAddressArg.getValue();
-			destinationPort = receiverPortArg.getValue();
-		}
+		destinationAddress = receiverAddressArg.getValue();
+		destinationPort = receiverPortArg.getValue();
 
 		// gets the input file
 		File inFile = fileArg.getValue();
@@ -171,10 +160,8 @@ public class ChunkFrameSender
 		Queue<Arg> args = new LinkedList<Arg>();
 		args.add(fileArg);
 		args.add(senderAddressArg);
-		args.add(errorProxyAddressArg);
 		args.add(receiverAddressArg);
 		args.add(senderPortArg);
-		args.add(errorProxyPortArg);
 		args.add(receiverPortArg);
 		args.add(timeoutArg);
 		args.add(errorChanceArg);
@@ -186,8 +173,7 @@ public class ChunkFrameSender
 		DatagramPacket packet;
 		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.LENGTH], AckFrame.LENGTH);
 		AckFrame ackFrame;
-		
-		
+
 		// backup the timout setting of the socket and use default timeout for
 		// this
 		int timeoutBackup = socket.getSoTimeout();
@@ -206,7 +192,7 @@ public class ChunkFrameSender
 			}
 			chunks.add(new Chunk(bytes, bytes.length));
 		}
-		
+
 		// Send max length of packet
 		packet = new DatagramPacket(byteIntConverter.ByteIntConverter.convert(maxLength), 4, destinationAddress, destinationPort);
 
@@ -221,7 +207,7 @@ public class ChunkFrameSender
 				if (ackFrame.getAckNumber() == ackNumber)
 				{
 					ackReceived = true;
-					ackNumber ++;
+					ackNumber++;
 				}
 			}
 			catch (Exception e)
@@ -229,7 +215,7 @@ public class ChunkFrameSender
 				// try again
 			}
 		}
-		
+
 		// send the args
 		for (Chunk c : chunks)
 		{
@@ -246,7 +232,7 @@ public class ChunkFrameSender
 					if (new AckFrame(ackPacket).passedCheckSum())
 					{
 						ackReceived = true;
-						ackNumber ++;
+						ackNumber++;
 					}
 				}
 				catch (Exception e)
