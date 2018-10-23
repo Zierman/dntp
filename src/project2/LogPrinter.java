@@ -25,7 +25,7 @@ public class LogPrinter
 	
 	public void sent(ChunkFrame f)
 	{
-		println("SENDing " + f.getSequenceNumber() + "OTHERSTUFF");
+		println("SENDing " + f.getSequenceNumber() + "OTHERSTUFF");//TODO finish
 	}
 
 	public void print(String s)
