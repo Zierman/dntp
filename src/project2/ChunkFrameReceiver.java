@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
@@ -56,14 +57,14 @@ public class ChunkFrameReceiver
 
 	// Arguments to receive from sender
 	private static File file;
-	private static InetAddress senderAddress;
-	private static InetAddress receiverAddress;
-	private static Integer senderPort;
-	private static Integer receiverPort;
-	private static Integer timeout;
-	private static Integer errorChance;
-	private static Integer maxSizeOfChunk;
-	private static Integer numberOfAckNumbers;
+	private static InetAddress senderAddress = Defaults.SENDER_ADDRESS;
+	private static InetAddress receiverAddress = Defaults.RECEIVER_ADDRESS;
+	private static Integer senderPort = Defaults.SENDER_PORT;
+	private static Integer receiverPort = Defaults.RECEIVER_PORT;
+	private static Integer timeout = Defaults.TIMEOUT;
+	private static Integer errorChance = Defaults.CHANCE_OF_ERROR;
+	private static Short maxSizeOfChunk = Defaults.MAX_CHUNK_LENGTH;
+	private static Integer numberOfAckNumbers = Defaults.NUMBER_OF_ACK_NUMBERS;
 	private static Boolean introduceError;
 	private static Boolean debugMode;
 	private static Boolean requiredLogArg;
@@ -255,6 +256,10 @@ public class ChunkFrameReceiver
 						else if(o instanceof Boolean)
 						{
 							o = (Boolean)ois.readObject();
+						}
+						else if(o instanceof Short)
+						{
+							o = (Short)ois.readObject();
 						}
 						else
 						{
