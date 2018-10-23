@@ -54,7 +54,7 @@ public class ChunkFrameSender
 
 	// Printer
 	private static final DebugPrinter debug = new DebugPrinter(debugModeArg, System.out);
-	private static final RequiredLogArg log = new RequiredLogArg(requiredLogArg, System.out);
+	private static final RequirementsLog log = new RequirementsLog(requiredLogArg, System.out);
 
 	public static void main(String[] args) throws Exception
 	{
