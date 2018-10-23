@@ -13,6 +13,7 @@ import java.util.Queue;
 import java.util.Random;
 
 import project2.frame.AckFrame;
+import project2.frame.AckFrame.AckFrameLengthMismatchException;
 import project2.frame.ChunkFrame;
 import project2.frame.Frame;
 
@@ -20,15 +21,16 @@ import project2.frame.Frame;
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class ErrorProxy
+public class OldErrorProxy
 {
 	static final Random RAND = new Random();
 
 	/**
 	 * @param args
 	 * @throws SocketException
+	 * @throws AckFrameLengthMismatchException 
 	 */
-	public static void main(String[] args) throws SocketException
+	public static void main(String[] args) throws SocketException, AckFrameLengthMismatchException
 	{
 		int destinationPort = 0;
 		boolean delayedThisTime = false;
