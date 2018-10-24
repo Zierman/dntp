@@ -122,7 +122,7 @@ public class ChunkFrameReceiver
 		while (!end)
 		{
 			boolean done = false;
-			boolean ackMatch = false;
+			boolean seqMatch = false;
 			boolean sumCheckPass = false;
 
 			while (!done)
@@ -132,21 +132,20 @@ public class ChunkFrameReceiver
 					// receive chunk packet
 					socket.receive(chunkPacket);
 					
-					// Log received packet info
-					//TODO put real message in this
-					log.println("Apples");
-					
 					// extract the chunk frame
 					chunkFrame = new ChunkFrame(chunkPacket);
+					
+					// Log received packet info
+					//TODO put real message in this
 
-					// check if received ack number matches expected ack number
-					ackMatch = chunkFrame.getAckNumber() == expectedAck;
+					// check if received ack number matches expected ack number TODO
+					seqMatch = chunkFrame.getSequenceNumber() <= expectedSequenceNumber;
 					
 					// check if the ackFrame passed the check sum
 					sumCheckPass = chunkFrame.passedCheckSum();
 					
 					// if it passed checksum and is a match to the expected ack number
-					if(ackMatch && sumCheckPass)
+					if(seqMatch && sumCheckPass)
 					{
 						// make acknowledgement frame
 						ackFrame = new AckFrame(chunkFrame);
@@ -196,13 +195,8 @@ public class ChunkFrameReceiver
 							// send the package
 							socket.send(chunkPacket);
 						}
-						ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
-						socket.send(ackPacket);
 						
-						// set last to the chunk frame
-						last = chunkFrame;
-						
-						// Increment expected ack number
+						// Increment expected ack number TODO
 						expectedAck++;
 						expectedAck %= numberOfAckNumbers;
 						

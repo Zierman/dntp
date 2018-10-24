@@ -149,12 +149,14 @@ public class ChunkFrameSender
 				// simulate drops
 				else if(chunkFrame.isDropped())
 				{
-					
+					//TODO output
 				}
 				
 				// simulate sending corrupt package
 				else if(chunkFrame.failedCheckSum())
-				{					
+				{			
+					//TODO output
+					
 					// send the package
 					socket.send(chunkPacket);
 				}
@@ -162,6 +164,8 @@ public class ChunkFrameSender
 				// normal case
 				else
 				{
+					//TODO output
+					
 					// send the package
 					socket.send(chunkPacket);
 				}
