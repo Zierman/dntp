@@ -114,7 +114,8 @@ public class ChunkFrameSender
 
 			// progress to next ackNumber
 			ackNumber++;
-			ackNumber %= numberOfAckNumbersArg.getValue();
+			ackNumber 
+= numberOfAckNumbersArg.getValue();
 
 			// progress to next sequence number
 			sequenceNumber++;

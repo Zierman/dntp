@@ -11,7 +11,7 @@ public class LogPrinter
 	private PrintStream logPrintStream;
 	
 	
-	public LogPrinter(LogPrintingArg arg, PrintStream logPrintStream, int maxChunkPakageSize, int ackPackageSize)
+	public LogPrinter(LogPrintingArg arg, PrintStream logPrintStream, int maxChunkPakageSize, int ackPackageSize, int FileSize)
 	{
 		this.logMode = arg.getValue();
 		this.logPrintStream = logPrintStream;
