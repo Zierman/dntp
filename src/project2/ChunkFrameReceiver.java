@@ -107,7 +107,7 @@ public class ChunkFrameReceiver
 
 
 		// set the expected ackNum to 0
-		int expectedAck = 0;
+		int expectedSequenceNumber = 0;
 
 		// frame, package, and send all chunks using Stop and Wait
 		AckFrame ackFrame;
@@ -122,7 +122,7 @@ public class ChunkFrameReceiver
 		while (!end)
 		{
 			boolean done = false;
-			boolean seqMatch = false;
+			boolean seqDeservesAck = false;
 			boolean sumCheckPass = false;
 
 			while (!done)
@@ -138,14 +138,15 @@ public class ChunkFrameReceiver
 					// Log received packet info
 					//TODO put real message in this
 
-					// check if received ack number matches expected ack number TODO
-					seqMatch = chunkFrame.getSequenceNumber() <= expectedSequenceNumber;
 					
 					// check if the ackFrame passed the check sum
 					sumCheckPass = chunkFrame.passedCheckSum();
 					
+					// check if received chunk deserves an ack response
+					seqDeservesAck = chunkFrame.getSequenceNumber() <= expectedSequenceNumber && sumCheckPass;
+					
 					// if it passed checksum and is a match to the expected ack number
-					if(seqMatch && sumCheckPass)
+					if(seqDeservesAck)
 					{
 						// make acknowledgement frame
 						ackFrame = new AckFrame(chunkFrame);
@@ -196,21 +197,23 @@ public class ChunkFrameReceiver
 							socket.send(chunkPacket);
 						}
 						
-						// Increment expected ack number TODO
-						expectedAck++;
-						expectedAck %= numberOfAckNumbers;
 						
-						// if the chunk part of the frame is empty we end, if not we add the chunk to the list
-						if(chunkFrame.getLength() == AckFrame.LENGTH + 4) // ChunkFrame has no data
+						// if the chunk part of the frame is empty...
+						if(chunkFrame.getLength() == AckFrame.LENGTH + 4) 
 						{
 							end = true;
 						}
-						else
+						
+						// otherwise if the sequence number matches what we expect...
+						else if(chunkFrame.getSequenceNumber() == expectedSequenceNumber)
 						{
+							// store the chunk to the chunk list
 							chunk = chunkFrame.toChunk();
 							chunkList.add(chunk);
 						}
-						
+
+						// Increment expected sequence number TODO
+						expectedSequenceNumber++;
 
 						// we are done with this one
 						done = true;
