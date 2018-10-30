@@ -167,7 +167,10 @@ public class ChunkFrameReceiver
 						// simulate drops
 						else if(ackFrame.isDropped())
 						{
-							// we don't send
+							// we don't actually send it
+							
+							// log the send
+							log.sent(ackFrame, chunkFrame.getSequenceNumber());
 						}
 						
 						// simulate sending corrupt package

@@ -169,37 +169,45 @@ public class ChunkFrameSender
 				// simulate delays
 				if(chunkFrame.isDelayed())
 				{
-					
 					/*
 					 * The delayedFrames collection is essentially a funnel that we put the frames we want to delay. 
 					 * The collection contains a runnable sender that will automatically send the frames when the 
 					 * delay elapses. 
 					 */
 					delayedFrames.add(chunkFrame, delay());
+					
+					// log the sending
+					log.sent(chunkFrame);
 				}
 				
 				// simulate drops
 				else if(chunkFrame.isDropped())
 				{
-					//TODO output
+					// do not actually send
+					
+					// log the drop
+					log.sent(chunkFrame);
 				}
 				
 				// simulate sending corrupt package
 				else if(chunkFrame.failedCheckSum())
 				{			
-					//TODO output
 					
 					// send the package
 					socket.send(chunkPacket);
+					
+					// log the sending
+					log.sent(chunkFrame);
 				}
 				
 				// normal case
 				else
 				{
-					//TODO output
-					
 					// send the package
 					socket.send(chunkPacket);
+					
+					// log the sending
+					log.sent(chunkFrame);
 				}
 				
 				// receive a package or timeout
@@ -208,6 +216,9 @@ public class ChunkFrameSender
 				// extract ack frame from package
 				AckFrame ackFrame = new AckFrame(ackPacket);
 	
+				// log the received ack
+				log.ackReceived(ackFrame, expectedAckNumber, chunkFrame.getSequenceNumber());
+				
 				// check if received ack number matches expected ack number
 				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
 	
