@@ -4,32 +4,21 @@
 package project2;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
-import javax.swing.text.Position.Bias;
-
-import com.sun.corba.se.impl.orbutil.threadpool.TimeoutException;
-
 import project1.Chunk;
-import project1.FileSplitter;
 import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
-import project2.frame.Frame;
-import project2.slidingWindow.SenderWindow;
-import project2.slidingWindow.SlidingWindow;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -76,6 +65,8 @@ public class ChunkFrameReceiver
 	// Delayed Frames
 	private static DelayedFrameCollection<AckFrame> delayedFrames;
 
+	private static long startTime;
+
 
 	public static void main(String[] args) throws Exception
 	{
@@ -90,7 +81,7 @@ public class ChunkFrameReceiver
 		
 		// initialize the printers
 		debug = new DebugPrinter(debugMode, System.out);
-		log = new LogPrinter(logPrintingMode, System.out);
+		log = new LogPrinter(logPrintingMode, System.out, maxSizeOfChunk + 8, file.length(), startTime);
 
 		// set destination
 		destinationAddress = senderAddress;
@@ -136,7 +127,7 @@ public class ChunkFrameReceiver
 					chunkFrame = new ChunkFrame(chunkPacket);
 					
 					// Log received packet info
-					//TODO put real message in this
+					log.chunkReceived(chunkFrame, expectedSequenceNumber);
 
 					
 					// check if the ackFrame passed the check sum
@@ -161,42 +152,43 @@ public class ChunkFrameReceiver
 						// simulate delays
 						if(ackFrame.isDelayed())
 						{
-							//TODO output
-							
 							/*
 							 * The delayedFrames collection is essentially a funnel that we put the frames we want to delay. 
 							 * The collection contains a runnable sender that will automatically send the frames when the 
 							 * delay elapses. 
 							 */
 							delayedFrames.add(ackFrame, delay());
+
+
+							// log the sending
+							log.sent(ackFrame, chunkFrame.getSequenceNumber());
 						}
 						
 						// simulate drops
 						else if(ackFrame.isDropped())
 						{
-							//TODO output
+							// we don't send
 						}
 						
 						// simulate sending corrupt package
 						else if(ackFrame.failedCheckSum())
-						{				
-							//TODO output
-							
-							// send the package
+						{						
+							// send the corrupt package
 							socket.send(chunkPacket);
-							
+
+							// log the sending
+							log.sent(ackFrame, chunkFrame.getSequenceNumber());
 						}
 						
 						// normal case
 						else
 						{
-
-							//TODO output
-							
 							// send the package
 							socket.send(chunkPacket);
+
+							// log the sending
+							log.sent(ackFrame, chunkFrame.getSequenceNumber());
 						}
-						
 						
 						// if the chunk part of the frame is empty...
 						if(chunkFrame.getLength() == AckFrame.LENGTH + 4) 
@@ -279,7 +271,7 @@ public class ChunkFrameReceiver
 			try
 			{
 				socket.receive(initializationPacket);
-				len = byteIntConverter.ByteIntConverter.convert(initializationPacket.getData());
+				len = byteNumberConverter.ByteIntConverter.convert(initializationPacket.getData());
 				done = true;
 				expecting++;
 			}
@@ -341,6 +333,24 @@ public class ChunkFrameReceiver
 				{
 					// try again
 				}
+			}
+		}
+		
+		// set start time
+		initializationPacket = new DatagramPacket(new byte[8], 8);
+		done = false;
+		while (!done)
+		{
+			try
+			{
+				socket.receive(initializationPacket);
+				startTime = byteNumberConverter.ByteLongConverter.convert(initializationPacket.getData());
+				done = true;
+				expecting++;
+			}
+			catch (Exception e)
+			{
+				// try again
 			}
 		}
 

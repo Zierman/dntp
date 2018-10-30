@@ -19,14 +19,6 @@ public class DebugModeArg extends ToggleArg
 
 	private static final String HELP_MSG = "Prints additional debugging output.";
 
-	/* (non-Javadoc)
-	 * @see project2.args.ToggleArg#processInlineArg()
-	 */
-	@Override
-	protected void processInlineArg()
-	{
-		
-	}
 
 	/* (non-Javadoc)
 	 * @see project2.args.Arg#getHelpString()
@@ -35,6 +27,13 @@ public class DebugModeArg extends ToggleArg
 	protected String getHelpString()
 	{
 		return HELP_MSG;
+	}
+
+
+	@Override
+	protected void processInlineArg()
+	{
+		System.out.println("Debug mode is on");
 	}
 
 }

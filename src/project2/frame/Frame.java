@@ -9,7 +9,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.LinkedList;
 
-import byteIntConverter.ByteShortConverter;
+import byteNumberConverter.ByteShortConverter;
 import project2.frame.Frame.Error;
 
 /**
