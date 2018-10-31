@@ -168,22 +168,6 @@ public class LogPrinter
 	{
 		long endByteOffset = (long) f.getLength() - ChunkFrame.HEADER_SIZE + startOffset - 1;
 		
-		try
-		{
-			if(endByteOffset > fileSize )
-			{
-				throw new Exception("end byte offset(" + endByteOffset + ") too great given the filesize (" + fileSize + ")");
-			}
-			else if(endByteOffset < 0)
-			{
-				throw new Exception("end byte offset was less than zero");
-			}
-		}
-		catch (Exception e) {
-			//TODO
-		}
-		
-
 		return endByteOffset;
 	}
 
@@ -204,22 +188,6 @@ public class LogPrinter
 
 		long startByteOffset = (long) f.getSequenceNumber() * (long) maxChunkSize;
 		
-		try
-		{
-			if(startByteOffset > fileSize - f.getLength() - ChunkFrame.HEADER_SIZE)
-			{
-				throw new Exception("start byte offset(" + startByteOffset + ") too great given the filesize (" + fileSize + ") and chunk size(" + (f.getLength() - ChunkFrame.HEADER_SIZE) + ")");
-			}
-			else if(startByteOffset < 0)
-			{
-				throw new Exception("start byte offset was less than zero");
-			}
-		}
-		catch (Exception e) {
-			//TODO 
-		}
-		
-
 		return startByteOffset;
 	}
 	
