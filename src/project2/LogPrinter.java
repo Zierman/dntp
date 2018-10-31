@@ -5,7 +5,6 @@ import java.util.Date;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 import project2.frame.Frame;
-import sun.security.ssl.Debug;
 
 
 public class LogPrinter
@@ -13,9 +12,7 @@ public class LogPrinter
 	private Boolean printerIsOn;
 	private PrintStream logPrintStream;
 	private Integer maxChunkSize;
-	private Long fileSize;
 	private Integer lastSentSeq = null;
-	private Integer lastSentAck = null;
 	private Long startTime;
 	
 	
@@ -24,7 +21,6 @@ public class LogPrinter
 		this.printerIsOn = printerIsOn;
 		this.logPrintStream = logPrintStream;
 		this.maxChunkSize = maxChunkSize;
-		this.fileSize = filesize;
 		this.startTime = startTime;
 	}
 	
@@ -54,7 +50,6 @@ public class LogPrinter
 			if(chunkSequenceNumber == expected)
 			{
 				println("SENDing ACK " + chunkSequenceNumber + " " + time() + " " + sendErr(f));
-				lastSentAck = f.getAckNumber();
 			}
 			else if(chunkSequenceNumber < expected)
 			{
