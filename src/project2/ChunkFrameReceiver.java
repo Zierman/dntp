@@ -134,7 +134,7 @@ public class ChunkFrameReceiver
 					
 					// Log received packet info
 					//TODO put real message in this
-					log.println("Apples");
+					log.println("Chunk Frame Receiver received packet.");
 					
 					// extract the chunk frame
 					chunkFrame = new ChunkFrame(chunkPacket);

@@ -73,6 +73,9 @@ public class SenderWindow extends SlidingWindow
 					} catch (IOException e)
 					{
 						System.err.println(e.getMessage());
+					} catch (AckFrame.AckFrameLengthMismatchException e)
+					{
+						System.err.println(e.getMessage());
 					}
 				}
 				else
