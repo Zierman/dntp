@@ -8,8 +8,12 @@ public class FrameErrorGenerator
 
 	public static Frame.Error generateError(int chanceOfError) throws Exception
 	{
-		Frame.Error error = null;
-		if (RAND.nextFloat() < chanceOfError / 100)
+		float rand = RAND.nextFloat();
+		float errChance = (float) (chanceOfError / 100.0);
+		Frame.Error error = Frame.Error.NONE;
+		
+		
+		if (rand < errChance)
 		{
 			switch (RAND.nextInt(2))
 			{

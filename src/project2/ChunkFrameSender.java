@@ -3,9 +3,11 @@
  */
 package project2;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -18,6 +20,7 @@ import java.util.Random;
 
 import byteNumberConverter.ByteIntConverter;
 import byteNumberConverter.ByteLongConverter;
+import log.Log;
 import oracle.jrockit.jfr.parser.ChunkParser;
 import project1.Chunk;
 import project1.FileSplitter;
@@ -54,10 +57,11 @@ public class ChunkFrameSender
 	private static LogPrintingArg logPrintingArg = new LogPrintingArg("-reqlog");
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameSender.SENDER_PROGRAM_TITLE, ChunkFrameSender.SENDER_PROGRAM_DESCRIPTION);
 
-	// Printer
+	// Printers
 	private static DebugPrinter debug = new DebugPrinter(false, null);
 	private static LogPrinter log = new LogPrinter(false, null, null, null, null);
 
+	// start time
 	private static Long startTime;
 
 	public static void main(String[] args) throws Exception
@@ -107,7 +111,7 @@ public class ChunkFrameSender
 		// set up log printer (has to happen after the start time is established)
 		debug.println("");
 		debug.println("Setting up the log printer");
-		log = new LogPrinter(logPrintingArg.getValue(), System.out, maxSizeOfChunkArg.getValue() + 8, fileArg.getValue().length(), startTime);
+		log = new LogPrinter(logPrintingArg.getValue(), System.out, (int) maxSizeOfChunkArg.getValue(), fileArg.getValue().length(), startTime);
 		
 		// frame, package, and send all chunks using Stop and Wait
 		debug.println("");
@@ -120,24 +124,21 @@ public class ChunkFrameSender
 			Chunk chunk = chunkList.remove();
 
 			// frame the chunk
-			chunkFrame = new ChunkFrame(chunk, sequenceNumber, ackNumber);
+			chunkFrame = new ChunkFrame(chunk, sequenceNumber);
 
-			// generate errors randomly using the generator
-			if(introduceErrorArg.getValue())
-			{
-				chunkFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChanceArg.getValue()));
-			}
 			
 			// Send it with the stop and wait
-			sendWithStopAndWait(chunkFrame, ackNumber, socket, destinationAddress, destinationPort);
+			sendWithStopAndWait(chunkFrame, socket, destinationAddress, destinationPort);
 
-			// progress to next ackNumber
-			ackNumber++;
-			ackNumber = numberOfAckNumbersArg.getValue();
 
 			// progress to next sequence number
 			sequenceNumber++;
 		}
+		
+		// signal end of transmission
+		sendWithStopAndWait(new ChunkFrame(new Chunk(new byte[0], 0), sequenceNumber++), socket, destinationAddress, destinationPort);
+		
+		// close socket
 		socket.close();
 		
 		debug.println("");
@@ -145,17 +146,23 @@ public class ChunkFrameSender
 	}
 
 
-	private static void sendWithStopAndWait(ChunkFrame chunkFrame, int expectedAckNumber, DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
+	private static void sendWithStopAndWait(ChunkFrame chunkFrame, DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
 	{
 		boolean done = false;
 		boolean ackMatch = false;
 		boolean sumCheckPass = false;
 		DatagramPacket chunkPacket = chunkFrame.toDatagramPacket(destinationAddress, destinationPort);
-		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.LENGTH], AckFrame.LENGTH);
+		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
+		int expectedAckNumber = chunkFrame.getSequenceNumber() % numberOfAckNumbersArg.getValue();
 		while(!done)
 		{
 			try
 			{		
+				// generate errors randomly using the generator
+				if(introduceErrorArg.getValue())
+				{
+					chunkFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChanceArg.getValue()));
+				}
 				
 				// simulate drops
 				if(chunkFrame.isDropped())
@@ -225,8 +232,8 @@ public class ChunkFrameSender
 	{
 		int maxLength = 0;
 		boolean ackReceived = false;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		ByteArrayOutputStream baos;
+		ObjectOutputStream oos;
 		Queue<Chunk> chunks = new LinkedList<Chunk>();
 		Queue<Arg<?>> args = new LinkedList<Arg<?>>();
 		args.add(fileArg);
@@ -234,7 +241,6 @@ public class ChunkFrameSender
 		args.add(receiverAddressArg);
 		args.add(senderPortArg);
 		args.add(receiverPortArg);
-		args.add(timeoutArg);
 		args.add(errorChanceArg);
 		args.add(maxSizeOfChunkArg);
 		args.add(numberOfAckNumbersArg);
@@ -243,18 +249,20 @@ public class ChunkFrameSender
 		args.add(logPrintingArg);
 		args.add(maxDelayArg);
 		DatagramPacket packet;
-		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.LENGTH], AckFrame.LENGTH);
+		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
 		AckFrame ackFrame;
 
 		// backup the timout setting of the socket and use default timeout for
 		// this
 		int timeoutBackup = socket.getSoTimeout();
-		int ackNumber = 0;
+		int seqNum = 0;
 		socket.setSoTimeout(Defaults.TIMEOUT);
 
 		// convert the values of all needed args to byte arrays
 		for (Arg<?> arg : args)
 		{
+			baos = new ByteArrayOutputStream();
+			oos = new ObjectOutputStream(baos);
 			oos.writeObject(arg.getValue());
 			oos.flush();
 			byte[] bytes = baos.toByteArray();
@@ -263,10 +271,12 @@ public class ChunkFrameSender
 				maxLength = bytes.length + Defaults.ACK_PACKET_LENGTH + 4;
 			}
 			chunks.add(new Chunk(bytes, bytes.length));
+			oos.close();
+			baos.close();
 		}
 
 		// Send max length of packet
-		packet = new DatagramPacket(ByteIntConverter.convert(maxLength), 4, destinationAddress, destinationPort);
+		packet = new ChunkFrame(new Chunk(ByteIntConverter.convert(maxLength), 4), seqNum).toDatagramPacket(destinationAddress, destinationPort);
 
 		ackReceived = false;
 		while (!ackReceived)
@@ -276,27 +286,44 @@ public class ChunkFrameSender
 			{
 				socket.receive(ackPacket);
 				ackFrame = new AckFrame(ackPacket);
-				if (ackFrame.getAckNumber() == ackNumber)
+				if (ackFrame.getAckNumber() == seqNum % numberOfAckNumbersArg.getValue())
 				{
 					ackReceived = true;
-					ackNumber++;
+					seqNum++;
 				}
 			}
 			catch (Exception e)
 			{
 				// try again
+				debug.println(e.getLocalizedMessage());
 			}
 		}
 
 		// send the args
 		for (Chunk c : chunks)
-		{
+		{	
+			//TODO DELETE THE TOP OF THIS
+			try
+			{
+				ByteArrayInputStream bais;
+				ObjectInputStream ois;	
+				bais = new ByteArrayInputStream(c.getBytes());
+				ois = new ObjectInputStream(bais);
+				Object o = ois.readObject();
+				System.out.println(o.getClass().getName());
+			}
+			catch (ClassNotFoundException e1)
+			{
+				e1.printStackTrace();
+			}
+			
+			
 			ackReceived = false;
 			while (!ackReceived)
 			{
 				try
 				{
-					ChunkFrame f = new ChunkFrame(c, ackNumber, ackNumber);
+					ChunkFrame f = new ChunkFrame(c, seqNum);
 					packet = f.toDatagramPacket(destinationAddress, destinationPort);
 					socket.send(packet);
 
@@ -304,7 +331,7 @@ public class ChunkFrameSender
 					if (new AckFrame(ackPacket).passedCheckSum())
 					{
 						ackReceived = true;
-						ackNumber++;
+						seqNum++;
 					}
 				}
 				catch (Exception e)
@@ -316,20 +343,23 @@ public class ChunkFrameSender
 		
 		// setup and send start time to keep logs synced
 		startTime = new Date().getTime();
-		packet = new DatagramPacket(ByteLongConverter.convert(startTime), 8, destinationAddress, destinationPort);
+		Chunk c = new Chunk(ByteLongConverter.convert(startTime), 8);
+		ChunkFrame cf = new ChunkFrame(c, seqNum);
+		packet = cf.toDatagramPacket(destinationAddress, destinationPort);
 		
 		ackReceived = false;
 		while (!ackReceived)
 		{
+			System.out.println(".");
 			socket.send(packet);
 			try
 			{
 				socket.receive(ackPacket);
 				ackFrame = new AckFrame(ackPacket);
-				if (ackFrame.getAckNumber() == ackNumber)
+				if (ackFrame.getAckNumber() == seqNum % numberOfAckNumbersArg.getValue())
 				{
 					ackReceived = true;
-					ackNumber++;
+					seqNum++;
 				}
 			}
 			catch (Exception e)
@@ -340,23 +370,6 @@ public class ChunkFrameSender
 
 		// restore timout value of socket
 		socket.setSoTimeout(timeoutBackup);
-		while (!ackReceived)
-		{
-			socket.send(packet);
-			try
-			{
-				socket.receive(ackPacket);
-				ackFrame = new AckFrame(ackPacket);
-				if (ackFrame.getAckNumber() == ackNumber)
-				{
-					ackReceived = true;
-					ackNumber++;
-				}
-			}
-			catch (Exception e)
-			{
-				// try again
-			}
-		}
+		
 	}
 }

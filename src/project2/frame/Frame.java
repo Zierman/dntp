@@ -18,7 +18,6 @@ import project2.frame.Frame.Error;
  */
 public abstract class Frame
 {
-	
 	public static class CheckSumFailException extends Exception
 	{
 		/**
@@ -31,21 +30,15 @@ public abstract class Frame
 			super("The check sum failed");
 		}
 	}
-	public enum Error {DROP, CORRUPT}
+	public enum Error {DROP, CORRUPT, NONE}
 	private static final short BAD = 1;
 	private static final short GOOD = 0;
 	
-	protected Error error = null;
+	protected Error error = Error.NONE;
 	
 	// From specs
 	protected short checkSum = GOOD;
 	protected short length;
-	protected int ackNumber;
-	
-	protected Frame(int ackNumber)
-	{
-		this.ackNumber = ackNumber;
-	}
 	
 	public Frame()
 	{
@@ -54,13 +47,6 @@ public abstract class Frame
 	
 	public abstract DatagramPacket toDatagramPacket(InetAddress address, int port);
 
-	/**Gets the acknowledgement number
-	 * @return the int acknowledgement number
-	 */
-	public int getAckNumber()
-	{
-		return ackNumber;
-	}
 	
 	/** gets the type of error 
 	 * @return an Error value assosiated with the type of error, DROP if the frame was dropped, DELAY if delayed, CORRUPT if corrupted, null if no error

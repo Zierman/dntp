@@ -19,6 +19,18 @@ import project2.Defaults;
  */
 public class AckFrame extends Frame
 {
+
+	private int ackNumber;
+	
+
+	/**Gets the acknowledgement number
+	 * @return the int acknowledgement number
+	 */
+	public int getAckNumber()
+	{
+		return ackNumber;
+	}
+	
 	public static class AckFrameLengthMismatchException extends Exception
 	{
 		/**
@@ -32,44 +44,46 @@ public class AckFrame extends Frame
 		}
 	}
 	
-	public static final int LENGTH = Defaults.ACK_PACKET_LENGTH;
+	public static final int ACK_SIZE = Defaults.ACK_PACKET_LENGTH;
 
-	public AckFrame(ChunkFrame f)
+	public AckFrame(ChunkFrame f, int numberOfAckNumbers)
 	{
-		super(f.getAckNumber());
-		length = LENGTH;
+		super();
+		ackNumber = f.getSequenceNumber() % numberOfAckNumbers;
+		length = ACK_SIZE;
 	}
 	
 	public AckFrame(DatagramPacket p) throws AckFrameLengthMismatchException
 	{
 		byte[] packetB = p.getData();
 		int i = 0;
+		int j = 0;
 		byte[] checkSumB = new byte[2], lenB = new byte[2], acknoB = new byte[4];
 		
 		// gets check sum bytes
-		for(byte b : checkSumB)
+		for(j = 0; j < checkSumB.length; j++, i++)
 		{
-			b = packetB[i++];
+			checkSumB[j] = packetB[i];
 		}
 		this.checkSum = byteNumberConverter.ByteShortConverter.convert(checkSumB);
 		
 		// gets length bytes
-		for(byte b : lenB)
+		for(j = 0; j < lenB.length; j++, i++)
 		{
-			b = packetB[i++];
+			lenB[j] = packetB[i];
 		}
 		this.length = byteNumberConverter.ByteShortConverter.convert(lenB);
 		
-		if(this.length != LENGTH)
+		if(this.length != ACK_SIZE)
 		{
 			throw new AckFrameLengthMismatchException();
 		}
 		// gets Ack number bytes
-		for(byte b : acknoB)
+		for(j = 0; j < acknoB.length; j++, i++)
 		{
-			b = packetB[i++];
+			acknoB[j] = packetB[i];
 		}
-		this.ackNumber = byteNumberConverter.ByteShortConverter.convert(acknoB);
+		this.ackNumber = byteNumberConverter.ByteIntConverter.convert(acknoB);
 		
 		//check for corruption
 		if(failedCheckSum())

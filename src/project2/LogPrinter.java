@@ -5,24 +5,25 @@ import java.util.Date;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 import project2.frame.Frame;
+import sun.security.ssl.Debug;
 
 
 public class LogPrinter
 {
 	private Boolean printerIsOn;
 	private PrintStream logPrintStream;
-	private Integer maxChunkPakageSize;
+	private Integer maxChunkSize;
 	private Long fileSize;
 	private Integer lastSentSeq = null;
 	private Integer lastSentAck = null;
 	private Long startTime;
 	
 	
-	public LogPrinter(Boolean printerIsOn, PrintStream logPrintStream, Integer maxChunkPakageSize, Long filesize, Long startTime)
+	public LogPrinter(Boolean printerIsOn, PrintStream logPrintStream, Integer maxChunkSize, Long filesize, Long startTime)
 	{
 		this.printerIsOn = printerIsOn;
 		this.logPrintStream = logPrintStream;
-		this.maxChunkPakageSize = maxChunkPakageSize;
+		this.maxChunkSize = maxChunkSize;
 		this.fileSize = filesize;
 		this.startTime = startTime;
 	}
@@ -45,19 +46,19 @@ public class LogPrinter
 		}
 	}
 	
-	public void sent(AckFrame f, int sequenceNumber)
+	public void sent(AckFrame f, int chunkSequenceNumber, int expected)
 	{
 		if(printerIsOn)
 		{
 			
-			if(lastSentAck == null || f.getAckNumber() != lastSentSeq)
+			if(chunkSequenceNumber == expected)
 			{
-				println("SENDing ACK " + sequenceNumber + " " + time() + " " + sendErr(f));
+				println("SENDing ACK " + chunkSequenceNumber + " " + time() + " " + sendErr(f));
 				lastSentAck = f.getAckNumber();
 			}
-			else
+			else if(chunkSequenceNumber < expected)
 			{
-				println("ReSend. ACK " + sequenceNumber + " " + time() + " " + sendErr(f));
+				println("ReSend. ACK " + chunkSequenceNumber + " " + time() + " " + sendErr(f));
 			}
 		}
 	}
@@ -165,7 +166,7 @@ public class LogPrinter
 
 	private long endByteOffset(long startOffset, ChunkFrame f)
 	{
-		long endByteOffset = (long) f.getLength() + startOffset;
+		long endByteOffset = (long) f.getLength() - ChunkFrame.HEADER_SIZE + startOffset - 1;
 		
 		try
 		{
@@ -179,7 +180,7 @@ public class LogPrinter
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			//TODO
 		}
 		
 
@@ -201,13 +202,13 @@ public class LogPrinter
 	private long startByteOffset(ChunkFrame f) 
 	{
 
-		long startByteOffset = (long) f.getSequenceNumber() * (long) maxChunkPakageSize;
+		long startByteOffset = (long) f.getSequenceNumber() * (long) maxChunkSize;
 		
 		try
 		{
-			if(startByteOffset > fileSize - maxChunkPakageSize)
+			if(startByteOffset > fileSize - f.getLength() - ChunkFrame.HEADER_SIZE)
 			{
-				throw new Exception("start byte offset(" + startByteOffset + ") too great given the filesize (" + fileSize + ") and max chunk packet size(" + maxChunkPakageSize + ")");
+				throw new Exception("start byte offset(" + startByteOffset + ") too great given the filesize (" + fileSize + ") and chunk size(" + (f.getLength() - ChunkFrame.HEADER_SIZE) + ")");
 			}
 			else if(startByteOffset < 0)
 			{
@@ -215,7 +216,7 @@ public class LogPrinter
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			//TODO 
 		}
 		
 

@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
+import oracle.jrockit.jfr.parser.ChunkParser;
 import project1.Chunk;
 import project1.FileAssembler;
 import project2.args.*;
@@ -33,24 +34,19 @@ public class ChunkFrameReceiver
 	private final static String RECEIVER_PROGRAM_TITLE = "Chunk Frame Sender Program";
 	private final static String RECEIVER_PROGRAM_DESCRIPTION = "This program sends a file using our version of the Stop and Wait algorithm.";
 
-	// Args
-	private static FileArg fileArg = new FileArg("-f");
-	private static ReceiverAddressArg receiverAddressArg = new ReceiverAddressArg("-ra");
-	private static ReceiverPortArg receiverPortArg = new ReceiverPortArg("-rp");
-
 	// Toggle Args
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameReceiver.RECEIVER_PROGRAM_TITLE, ChunkFrameReceiver.RECEIVER_PROGRAM_DESCRIPTION);
 
 	// Destination vars
-	private static InetAddress destinationAddress;
-	private static int destinationPort;
+	private static InetAddress destinationAddress = Defaults.SENDER_ADDRESS;
+	private static int destinationPort = Defaults.SENDER_PORT;
 
 	// Printer
 	private static DebugPrinter debug = new DebugPrinter(false, null);
 	private static LogPrinter log = new LogPrinter(false, null, null, null, null);
 
 	// Arguments to receive from sender
-	private static File inFile;
+	private static File inFile = Defaults.INPUT_FILE;;
 	private static InetAddress senderAddress = Defaults.SENDER_ADDRESS;
 	private static InetAddress receiverAddress = Defaults.RECEIVER_ADDRESS;
 	private static Integer senderPort = Defaults.SENDER_PORT;
@@ -72,14 +68,15 @@ public class ChunkFrameReceiver
 		ArgList.updateFromMainArgs(args);
 
 		// set up the socket
-		DatagramSocket socket = new DatagramSocket(receiverPortArg.getValue());
-
+		int port = Defaults.RECEIVER_PORT;
+		DatagramSocket socket = new DatagramSocket(port);
+		
 		// Get arg info from sender.
 		getArgsFromSender(socket);
 		
 		// initialize the printers
 		debug = new DebugPrinter(debugMode, System.out);
-		log = new LogPrinter(logPrintingMode, System.out, maxSizeOfChunk + 8, inFile.length(), startTime);
+		log = new LogPrinter(logPrintingMode, System.out, (int) maxSizeOfChunk, inFile.length(), startTime);
 
 		// set destination
 		debug.println("");
@@ -117,6 +114,7 @@ public class ChunkFrameReceiver
 		DatagramPacket chunkPacket = new DatagramPacket(new byte[chunkPacketSize], chunkPacketSize);
 		Queue<Chunk> chunkList = new LinkedList<Chunk>();
 		
+		
 		boolean end = false;
 		while (!end)
 		{
@@ -147,8 +145,8 @@ public class ChunkFrameReceiver
 					// if it passed checksum and is a match to the expected ack number
 					if(seqDeservesAck)
 					{
-						// make acknowledgement frame
-						ackFrame = new AckFrame(chunkFrame);
+						// make acknowledgement frame and packet
+						ackFrame = new AckFrame(chunkFrame, numberOfAckNumbers);
 						
 						// introduce errors
 						if(introduceError)
@@ -156,6 +154,8 @@ public class ChunkFrameReceiver
 							// generate errors randomly using the generator
 							ackFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChance));
 						}
+
+						ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
 						
 						// simulate drops
 						if(ackFrame.isDropped())
@@ -163,31 +163,31 @@ public class ChunkFrameReceiver
 							// we don't actually send it
 							
 							// log the send
-							log.sent(ackFrame, chunkFrame.getSequenceNumber());
+							log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
 						}
 						
 						// simulate sending corrupt package
 						else if(ackFrame.failedCheckSum())
 						{						
 							// send the corrupt package
-							socket.send(chunkPacket);
+							socket.send(ackPacket);
 
 							// log the sending
-							log.sent(ackFrame, chunkFrame.getSequenceNumber());
+							log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
 						}
 						
 						// normal case
 						else
 						{
 							// send the package
-							socket.send(chunkPacket);
+							socket.send(ackPacket);
 
 							// log the sending
-							log.sent(ackFrame, chunkFrame.getSequenceNumber());
+							log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
 						}
 						
 						// if the chunk part of the frame is empty...
-						if(chunkFrame.getLength() == AckFrame.LENGTH + 4) 
+						if(chunkFrame.getLength() == ChunkFrame.HEADER_SIZE) 
 						{
 							end = true;
 						}
@@ -198,10 +198,10 @@ public class ChunkFrameReceiver
 							// store the chunk to the chunk list
 							chunk = chunkFrame.toChunk();
 							chunkList.add(chunk);
-						}
 
-						// Increment expected sequence number
-						expectedSequenceNumber++;
+							// Increment expected sequence number
+							expectedSequenceNumber++;
+						}
 
 						// we are done with this one
 						done = true;
@@ -212,7 +212,7 @@ public class ChunkFrameReceiver
 						if(chunkFrame.getSequenceNumber() <= last.getSequenceNumber())
 						{
 							//if so send acknowledgement
-							ackFrame = new AckFrame(chunkFrame);
+							ackFrame = new AckFrame(chunkFrame, numberOfAckNumbers);
 							ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
 							socket.send(ackPacket);
 						}
@@ -247,120 +247,140 @@ public class ChunkFrameReceiver
 
 	private static void getArgsFromSender(DatagramSocket socket)
 	{
-		boolean initilizationDone = false;
-		Queue<Serializable> receivableArg = new LinkedList<Serializable>();
-		receivableArg.add(inFile);
-		receivableArg.add(senderAddress);
-		receivableArg.add(receiverAddress);
-		receivableArg.add(senderPort);
-		receivableArg.add(receiverPort);
-		receivableArg.add(errorChance);
-		receivableArg.add(maxSizeOfChunk);
-		receivableArg.add(numberOfAckNumbers);
-		receivableArg.add(introduceError);
-		receivableArg.add(debugMode);
-		receivableArg.add(logPrintingMode);
-		receivableArg.add(maxDelay);
-		ByteArrayInputStream bais;
-		ObjectInputStream ois;
-		DatagramPacket initializationPacket = new DatagramPacket(new byte[4], 4);
-		ChunkFrame incomingFrame;
-		int len = 0;
 		int expecting = 0;
-		boolean done;
 		
 		// Determine max length of initialization datagrams
-		done = false;
-		while (!done)
-		{
-			try
-			{
-				socket.receive(initializationPacket);
-				len = byteNumberConverter.ByteIntConverter.convert(initializationPacket.getData());
-				done = true;
-				expecting++;
-			}
-			catch (Exception e)
-			{
-				// try again
-			}
-		}
+		int len = getLengthOfInitializingDatagrams(socket, expecting++, numberOfAckNumbers, destinationAddress, destinationPort);
 
 		// receive all initialization datapackets
-		initializationPacket = new DatagramPacket(new byte[len], len);
-		for (Object o : receivableArg)
-		{
-			done = false;
-			while (!done)
-			{
-				try
-				{
-					socket.receive(initializationPacket);
-					incomingFrame = new ChunkFrame(initializationPacket);
-					if(incomingFrame.getAckNumber() < expecting)
-					{
-						socket.send(new AckFrame(incomingFrame).toDatagramPacket(destinationAddress, destinationPort));
-					}
-					else if(incomingFrame.getAckNumber() == expecting && incomingFrame.passedCheckSum())
-					{
-						socket.send(new AckFrame(incomingFrame).toDatagramPacket(destinationAddress, destinationPort));
-						expecting++;
-						byte[] bytes = incomingFrame.toChunk().getBytes();
-						bais = new ByteArrayInputStream(bytes);
-						ois = new ObjectInputStream(bais);
-						if(o instanceof Integer)
-						{
-							o = (Integer)ois.readObject();
-						}
-						else if(o instanceof File)
-						{
-							o = (File)ois.readObject();
-						}
-						else if(o instanceof InetAddress)
-						{
-							o = (InetAddress)ois.readObject();
-						}
-						else if(o instanceof Boolean)
-						{
-							o = (Boolean)ois.readObject();
-						}
-						else if(o instanceof Short)
-						{
-							o = (Short)ois.readObject();
-						}
-						else
-						{
-							o = ois.readObject();
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					// try again
-				}
-			}
-		}
+		inFile = (File) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		senderAddress = (InetAddress) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		receiverAddress = (InetAddress) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		senderPort = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		receiverPort = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		errorChance = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		maxSizeOfChunk = (Short) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		numberOfAckNumbers = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		introduceError = (Boolean) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		debugMode = (Boolean) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		logPrintingMode = (Boolean) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		maxDelay = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
 		
 		// set start time
-		initializationPacket = new DatagramPacket(new byte[8], 8);
-		done = false;
-		while (!done)
-		{
-			try
-			{
-				socket.receive(initializationPacket);
-				startTime = byteNumberConverter.ByteLongConverter.convert(initializationPacket.getData());
-				done = true;
-				expecting++;
-			}
-			catch (Exception e)
-			{
-				// try again
-			}
-		}
+		startTime = getStartTime(socket, expecting, numberOfAckNumbers, destinationAddress, destinationPort);
 		
 		// setUp outFile
 		outFile = FileArg.getOutFile(inFile);
-
+		
 	}
+	
+	private static long getStartTime(DatagramSocket socket, int expecting, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
+	{
+		long startTime = 0;
+		ChunkFrame incomingFrame;
+		int chunkSize = 8;
+		int packetSize = chunkSize + ChunkFrame.HEADER_SIZE;
+		DatagramPacket initializationPacket = new DatagramPacket(new byte[packetSize], packetSize);
+		boolean done = false;
+		while (!done)
+		{
+			try
+			{
+				socket.receive(initializationPacket);
+				incomingFrame = new ChunkFrame(initializationPacket);
+				if(incomingFrame.getSequenceNumber() == expecting && incomingFrame.passedCheckSum())
+				{
+					startTime = byteNumberConverter.ByteLongConverter.convert(incomingFrame.toChunk().getBytes());
+					socket.send(new AckFrame(incomingFrame, numberOfAckNumbers).toDatagramPacket(destinationAddress, destinationPort));
+					done = true;
+				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return startTime;
+	}
+	
+	private static int getLengthOfInitializingDatagrams(DatagramSocket socket, int expecting, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
+	{
+		ChunkFrame incomingFrame;
+		int len = 0;
+		boolean done = false;
+		DatagramPacket initializationPacket = new DatagramPacket(new byte[8+4], 8+4);
+		
+		while (!done)
+		{
+			System.out.print(".");
+			try
+			{
+				socket.receive(initializationPacket);
+				incomingFrame = new ChunkFrame(initializationPacket);
+				if(incomingFrame.getSequenceNumber() == expecting && incomingFrame.passedCheckSum())
+				{
+					len = byteNumberConverter.ByteIntConverter.convert(incomingFrame.toChunk().getBytes());
+					socket.send(new AckFrame(incomingFrame, numberOfAckNumbers).toDatagramPacket(destinationAddress, destinationPort));
+					done = true;
+				}
+			}
+			catch (SocketTimeoutException stoe)
+			{
+				System.err.println("timeout");
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return len;
+	}
+	
+	private static Object receiveObject(DatagramSocket socket, int expecting, int lengthOfInitializationDatagrams, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
+	{
+		Object o = null;
+		ByteArrayInputStream bais;
+		ObjectInputStream ois;
+		DatagramPacket initializationPacket = new DatagramPacket(new byte[lengthOfInitializationDatagrams], lengthOfInitializationDatagrams);
+		ChunkFrame incomingFrame;
+		boolean done = false;
+		
+		while (!done)
+		{
+			try
+			{
+				socket.receive(initializationPacket);
+				incomingFrame = new ChunkFrame(initializationPacket);
+				if(incomingFrame.getSequenceNumber() < expecting)
+				{
+					AckFrame ackFrame = new AckFrame(incomingFrame, numberOfAckNumbers);
+					socket.send(ackFrame.toDatagramPacket(destinationAddress, destinationPort));
+				}
+				else if(incomingFrame.getSequenceNumber() == expecting && incomingFrame.passedCheckSum())
+				{
+					socket.send(new AckFrame(incomingFrame, numberOfAckNumbers).toDatagramPacket(destinationAddress, destinationPort));
+					byte[] bytes = incomingFrame.toChunk().getBytes();
+					bais = new ByteArrayInputStream(bytes);
+					ois = new ObjectInputStream(bais);
+					o = ois.readObject();
+					done = true;
+					ois.close();
+					bais.close();
+					
+				}
+			}
+			catch (SocketTimeoutException stoe)
+			{
+				System.err.println("Timeout");
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return o;
+	}
+	
 }

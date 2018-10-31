@@ -22,7 +22,6 @@ public class Defaults
 	
 	
 	// Chunk and packet length
-//	public static final int ABSOULTE_MAX_CHUNK_LENGTH = MAX_UNSIGNED_SHORT - ACK_PACKET_LENGTH - 4;//TODO
 	public static final short MAX_CHUNK_LENGTH = 500;
 	public static final short ACK_PACKET_LENGTH = 8;
 	

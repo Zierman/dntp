@@ -9,8 +9,6 @@ import java.net.InetAddress;
 import byteNumberConverter.ByteIntConverter;
 import byteNumberConverter.ByteShortConverter;
 import project1.Chunk;
-import project2.Defaults;
-import project2.frame.Frame.Error;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -20,13 +18,14 @@ public class ChunkFrame extends Frame
 {
 	private Chunk chunk;
 	protected int sequenceNumber;
+	public static final int HEADER_SIZE = 8;
 	
-	public ChunkFrame(Chunk c, int sequenceNumber, int ackNumber)
+	public ChunkFrame(Chunk c, int sequenceNumber)
 	{
-		super(ackNumber);
+		super();
 		this.sequenceNumber = sequenceNumber;
 		chunk = c;
-		length = (short) (c.getBytes().length + 4 + Defaults.ACK_PACKET_LENGTH);
+		length = (short) (c.getBytes().length + HEADER_SIZE);
 	}
 	
 	public ChunkFrame(DatagramPacket packet)
@@ -35,47 +34,40 @@ public class ChunkFrame extends Frame
 		
 		byte[] packetB = packet.getData();
 		int i = 0;
+		int j = 0;
 		byte[] checkSumB = new byte[2], 
 				lenB = new byte[2], 
-				acknoB = new byte[4],
 				seqB = new byte[4],
 				dataB;
 		
 		// gets check sum bytes
-		for(byte b : checkSumB)
+		for(j = 0; j < checkSumB.length; j++, i++)
 		{
-			b = packetB[i++];
+			checkSumB[j] = packetB[i];
 		}
 		this.checkSum = byteNumberConverter.ByteShortConverter.convert(checkSumB);
 		
 		// gets length bytes
-		for(byte b : lenB)
+		for(j = 0; j < lenB.length; j++, i++)
 		{
-			b = packetB[i++];
+			lenB[j] = packetB[i];
 		}
 		this.length = byteNumberConverter.ByteShortConverter.convert(lenB);
 		
-		// gets ack number bytes
-		for(byte b : acknoB)
-		{
-			b = packetB[i++];
-		}
-		this.ackNumber = byteNumberConverter.ByteShortConverter.convert(acknoB);
-		
 		// gets the sequence bytes
-		for(byte b : seqB)
+		for(j = 0; j < seqB.length; j++, i++)
 		{
-			b = packetB[i++];
+			seqB[j] = packetB[i];
 		}
-		this.ackNumber = byteNumberConverter.ByteShortConverter.convert(acknoB);
+		this.sequenceNumber = byteNumberConverter.ByteIntConverter.convert(seqB);
 		
 		// gets the data bytes
-		dataB = new byte[length - Defaults.ACK_PACKET_LENGTH - 4];
-		for(byte b : dataB)
+		dataB = new byte[length - HEADER_SIZE];
+		for(j = 0; j < dataB.length; j++, i++)
 		{
-			b = packetB[i++];
+			dataB[j] = packetB[i];
 		}
-		this.ackNumber = byteNumberConverter.ByteShortConverter.convert(acknoB);		
+		this.chunk = new Chunk(dataB, dataB.length);		
 		
 		//check for corruption
 		if(failedCheckSum())
@@ -110,12 +102,6 @@ public class ChunkFrame extends Frame
 			bytes[i++] = b;
 		}
 		
-		// pack ack number
-		for(byte b : ByteIntConverter.convert(ackNumber))
-		{
-			bytes[i++] = b;
-		}
-		
 		// pack sequenceNumber number
 		for(byte b : ByteIntConverter.convert(sequenceNumber))
 		{
@@ -123,7 +109,7 @@ public class ChunkFrame extends Frame
 		}
 		
 		// pack data
-		for(byte b : chunk)
+		for(byte b : chunk.getBytes())
 		{
 			bytes[i++] = b;
 		}
