@@ -9,7 +9,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Queue;
 
-import byteIntConverter.ByteIntConverter;
+import byteNumberConverter.ByteIntConverter;
 import log.Log;
 import log.Loggable;
 

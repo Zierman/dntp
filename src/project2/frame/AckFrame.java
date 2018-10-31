@@ -9,8 +9,8 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import byteIntConverter.ByteIntConverter;
-import byteIntConverter.ByteShortConverter;
+import byteNumberConverter.ByteIntConverter;
+import byteNumberConverter.ByteShortConverter;
 import project2.Defaults;
 
 /**
@@ -51,14 +51,14 @@ public class AckFrame extends Frame
 		{
 			b = packetB[i++];
 		}
-		this.checkSum = byteIntConverter.ByteShortConverter.convert(checkSumB);
+		this.checkSum = byteNumberConverter.ByteShortConverter.convert(checkSumB);
 		
 		// gets length bytes
 		for(byte b : lenB)
 		{
 			b = packetB[i++];
 		}
-		this.length = byteIntConverter.ByteShortConverter.convert(lenB);
+		this.length = byteNumberConverter.ByteShortConverter.convert(lenB);
 		
 		if(this.length != LENGTH)
 		{
@@ -69,7 +69,7 @@ public class AckFrame extends Frame
 		{
 			b = packetB[i++];
 		}
-		this.ackNumber = byteIntConverter.ByteShortConverter.convert(acknoB);
+		this.ackNumber = byteNumberConverter.ByteShortConverter.convert(acknoB);
 		
 		//check for corruption
 		if(failedCheckSum())

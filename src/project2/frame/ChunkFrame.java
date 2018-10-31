@@ -6,8 +6,8 @@ package project2.frame;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 
-import byteIntConverter.ByteIntConverter;
-import byteIntConverter.ByteShortConverter;
+import byteNumberConverter.ByteIntConverter;
+import byteNumberConverter.ByteShortConverter;
 import project1.Chunk;
 import project2.Defaults;
 import project2.frame.Frame.Error;
@@ -46,28 +46,28 @@ public class ChunkFrame extends Frame
 		{
 			b = packetB[i++];
 		}
-		this.checkSum = byteIntConverter.ByteShortConverter.convert(checkSumB);
+		this.checkSum = byteNumberConverter.ByteShortConverter.convert(checkSumB);
 		
 		// gets length bytes
 		for(byte b : lenB)
 		{
 			b = packetB[i++];
 		}
-		this.length = byteIntConverter.ByteShortConverter.convert(lenB);
+		this.length = byteNumberConverter.ByteShortConverter.convert(lenB);
 		
 		// gets ack number bytes
 		for(byte b : acknoB)
 		{
 			b = packetB[i++];
 		}
-		this.ackNumber = byteIntConverter.ByteShortConverter.convert(acknoB);
+		this.ackNumber = byteNumberConverter.ByteShortConverter.convert(acknoB);
 		
 		// gets the sequence bytes
 		for(byte b : seqB)
 		{
 			b = packetB[i++];
 		}
-		this.ackNumber = byteIntConverter.ByteShortConverter.convert(acknoB);
+		this.ackNumber = byteNumberConverter.ByteShortConverter.convert(acknoB);
 		
 		// gets the data bytes
 		dataB = new byte[length - Defaults.ACK_PACKET_LENGTH - 4];
@@ -75,7 +75,7 @@ public class ChunkFrame extends Frame
 		{
 			b = packetB[i++];
 		}
-		this.ackNumber = byteIntConverter.ByteShortConverter.convert(acknoB);		
+		this.ackNumber = byteNumberConverter.ByteShortConverter.convert(acknoB);		
 		
 		//check for corruption
 		if(failedCheckSum())

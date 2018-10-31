@@ -1,4 +1,4 @@
-package byteIntConverter;
+package byteNumberConverter;
 
 /** A tool that allows for easy conversion from int to byte[] and byte[] to int
  * @author Joshua Zierman [py1422xs@metrostate.edu]

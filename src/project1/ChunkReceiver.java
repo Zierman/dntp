@@ -8,7 +8,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.LinkedList;
 
-import byteIntConverter.ByteIntConverter;
+import byteNumberConverter.ByteIntConverter;
 import log.Log;
 import log.Loggable;
 

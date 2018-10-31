@@ -75,13 +75,13 @@ public class FileArg extends Arg<File>
 		return project2.Defaults.INPUT_FILE;
 	}
 	
-	public File getOutFile()
+	public static File getOutFile(File f)
 	{
-		if(value == null)
+		if(f == null)
 		{
 			throw new NullPointerException("FileArg value needs to be set before getOutFile() is called");
 		}
-		String path = value.getPath();
+		String path = f.getPath();
 		int i = path.lastIndexOf(".");
 		if (i < 0)
 		{
