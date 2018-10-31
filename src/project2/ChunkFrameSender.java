@@ -55,17 +55,13 @@ public class ChunkFrameSender
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameSender.SENDER_PROGRAM_TITLE, ChunkFrameSender.SENDER_PROGRAM_DESCRIPTION);
 
 	// Printer
-	private static DebugPrinter debug;
-	private static LogPrinter log;
-
-	// Delayed Frames
-	private static DelayedFrameCollection<ChunkFrame> delayedFrames;
+	private static DebugPrinter debug = new DebugPrinter(false, null);
+	private static LogPrinter log = new LogPrinter(false, null, null, null, null);
 
 	private static Long startTime;
 
 	public static void main(String[] args) throws Exception
 	{
-		System.out.println("START");
 		int sequenceNumber = 0;
 		int ackNumber = 0;
 		InetAddress destinationAddress;
@@ -113,17 +109,11 @@ public class ChunkFrameSender
 		debug.println("Setting up the log printer");
 		log = new LogPrinter(logPrintingArg.getValue(), System.out, maxSizeOfChunkArg.getValue() + 8, fileArg.getValue().length(), startTime);
 		
-		// set up the delayed frame collection
-		debug.println("");
-		debug.println("setting up the delayed frame collection device");
-		delayedFrames = new DelayedFrameCollection<ChunkFrame>(socket, destinationAddress, destinationPort);
-
 		// frame, package, and send all chunks using Stop and Wait
 		debug.println("");
 		debug.println("sending all chunks with stop and wait");
 		while (!chunkList.isEmpty())
 		{
-			debug.print(".");
 			ChunkFrame chunkFrame = null;
 
 			// get the next chunk if we are not handling a delayed frame
@@ -166,22 +156,9 @@ public class ChunkFrameSender
 		{
 			try
 			{		
-				// simulate delays
-				if(chunkFrame.isDelayed())
-				{
-					/*
-					 * The delayedFrames collection is essentially a funnel that we put the frames we want to delay. 
-					 * The collection contains a runnable sender that will automatically send the frames when the 
-					 * delay elapses. 
-					 */
-					delayedFrames.add(chunkFrame, delay());
-					
-					// log the sending
-					log.sent(chunkFrame);
-				}
 				
 				// simulate drops
-				else if(chunkFrame.isDropped())
+				if(chunkFrame.isDropped())
 				{
 					// do not actually send
 					
@@ -230,7 +207,7 @@ public class ChunkFrameSender
 			}
 			catch (SocketTimeoutException e)
 			{
-				// TODO write error output for Timeout
+				log.timeout(chunkFrame);
 			}
 			catch (Exception e)
 			{

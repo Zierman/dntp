@@ -11,15 +11,12 @@ public class FrameErrorGenerator
 		Frame.Error error = null;
 		if (RAND.nextFloat() < chanceOfError / 100)
 		{
-			switch (RAND.nextInt(3))
+			switch (RAND.nextInt(2))
 			{
 			case 0:
 				error = Frame.Error.DROP;
 				break;
 			case 1:
-				error = Frame.Error.DELAY;
-				break;
-			case 2:
 				error = Frame.Error.CORRUPT;
 				break;
 

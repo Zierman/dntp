@@ -31,7 +31,7 @@ public abstract class Frame
 			super("The check sum failed");
 		}
 	}
-	public enum Error {DROP, DELAY, CORRUPT}
+	public enum Error {DROP, CORRUPT}
 	private static final short BAD = 1;
 	private static final short GOOD = 0;
 	
@@ -81,16 +81,6 @@ public abstract class Frame
 	public boolean failedCheckSum()
 	{
 		return !passedCheckSum();
-	}
-	
-	public void delay()
-	{
-		error = Error.DELAY;
-	}
-	
-	public boolean isDelayed()
-	{
-		return error == Error.DELAY;
 	}
 	
 	public void drop()

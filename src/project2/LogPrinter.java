@@ -2,8 +2,6 @@ package project2;
 
 import java.io.PrintStream;
 import java.util.Date;
-
-import project2.args.LogPrintingArg;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 import project2.frame.Frame;
@@ -13,7 +11,7 @@ public class LogPrinter
 {
 	private Boolean printerIsOn;
 	private PrintStream logPrintStream;
-	private Integer maxChunkPakageSize, ackPackageSize;
+	private Integer maxChunkPakageSize;
 	private Long fileSize;
 	private Integer lastSentSeq = null;
 	private Integer lastSentAck = null;
@@ -25,7 +23,6 @@ public class LogPrinter
 		this.printerIsOn = printerIsOn;
 		this.logPrintStream = logPrintStream;
 		this.maxChunkPakageSize = maxChunkPakageSize;
-		this.ackPackageSize = ackPackageSize;
 		this.fileSize = filesize;
 		this.startTime = startTime;
 	}
@@ -150,10 +147,6 @@ public class LogPrinter
 		case DROP:
 			s = "DROP";
 			break;
-			
-		case DELAY:
-			s = "DLAY";
-			break;
 
 		default:
 			s = "SENT";
@@ -227,5 +220,13 @@ public class LogPrinter
 		
 
 		return startByteOffset;
+	}
+	
+	public void timeout(ChunkFrame f)
+	{
+		if(printerIsOn)
+		{
+			println("TimeOut " + f.getSequenceNumber());
+		}
 	}
 }

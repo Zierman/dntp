@@ -16,6 +16,7 @@ import java.util.Queue;
 import java.util.Random;
 
 import project1.Chunk;
+import project1.FileAssembler;
 import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
@@ -45,11 +46,11 @@ public class ChunkFrameReceiver
 	private static int destinationPort;
 
 	// Printer
-	private static DebugPrinter debug;
-	private static LogPrinter log;
+	private static DebugPrinter debug = new DebugPrinter(false, null);
+	private static LogPrinter log = new LogPrinter(false, null, null, null, null);
 
 	// Arguments to receive from sender
-	private static File file;
+	private static File inFile;
 	private static InetAddress senderAddress = Defaults.SENDER_ADDRESS;
 	private static InetAddress receiverAddress = Defaults.RECEIVER_ADDRESS;
 	private static Integer senderPort = Defaults.SENDER_PORT;
@@ -61,11 +62,8 @@ public class ChunkFrameReceiver
 	private static Boolean debugMode = false;
 	private static Boolean logPrintingMode = false;
 	private static Integer maxDelay = Defaults.MAX_DELAY;
-
-	// Delayed Frames
-	private static DelayedFrameCollection<AckFrame> delayedFrames;
-
 	private static long startTime;
+	private static File outFile;
 
 
 	public static void main(String[] args) throws Exception
@@ -81,26 +79,36 @@ public class ChunkFrameReceiver
 		
 		// initialize the printers
 		debug = new DebugPrinter(debugMode, System.out);
-		log = new LogPrinter(logPrintingMode, System.out, maxSizeOfChunk + 8, file.length(), startTime);
+		log = new LogPrinter(logPrintingMode, System.out, maxSizeOfChunk + 8, inFile.length(), startTime);
 
 		// set destination
+		debug.println("");
+		debug.println("setting destination");
 		destinationAddress = senderAddress;
 		destinationPort = senderPort;
 		
 		// update socket from default to specified values
+		debug.println("");
+		debug.println("updating socket");
+		socket.close();
 		socket = new DatagramSocket(receiverPort);
 		
-		// set up the delayed frame collection
-		delayedFrames = new DelayedFrameCollection<AckFrame>(socket, destinationAddress, destinationPort);
-
+		
 		// Determine Packet Size
+
+		debug.println("");
+		debug.println("determining max packet size");
 		short chunkPacketSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunk);
 
 
-		// set the expected ackNum to 0
+		// set the expected sequence number to 0
+		debug.println("");
+		debug.println("setting expected sequence number to zero");
 		int expectedSequenceNumber = 0;
 
-		// frame, package, and send all chunks using Stop and Wait
+		// receive all chunks using Stop and Wait
+		debug.println("");
+		debug.println("Receiving all chunks with stop and wait");
 		AckFrame ackFrame;
 		DatagramPacket ackPacket;
 		Chunk chunk;
@@ -149,23 +157,8 @@ public class ChunkFrameReceiver
 							ackFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChance));
 						}
 						
-						// simulate delays
-						if(ackFrame.isDelayed())
-						{
-							/*
-							 * The delayedFrames collection is essentially a funnel that we put the frames we want to delay. 
-							 * The collection contains a runnable sender that will automatically send the frames when the 
-							 * delay elapses. 
-							 */
-							delayedFrames.add(ackFrame, delay());
-
-
-							// log the sending
-							log.sent(ackFrame, chunkFrame.getSequenceNumber());
-						}
-						
 						// simulate drops
-						else if(ackFrame.isDropped())
+						if(ackFrame.isDropped())
 						{
 							// we don't actually send it
 							
@@ -207,7 +200,7 @@ public class ChunkFrameReceiver
 							chunkList.add(chunk);
 						}
 
-						// Increment expected sequence number TODO
+						// Increment expected sequence number
 						expectedSequenceNumber++;
 
 						// we are done with this one
@@ -231,11 +224,20 @@ public class ChunkFrameReceiver
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace(); // TODO adjust this if desired
+					e.printStackTrace(); // adjust this if desired
 				}
 			}
 		}
+		
+		// close socket
+		debug.println("");
+		debug.println("closeing socket");
 		socket.close();
+		
+		// assemble file from chunks
+		debug.println("");
+		debug.println("setting destination");
+		FileAssembler assembler = new FileAssembler(inFile);
 	}
 
 	private static int delay()
@@ -247,7 +249,7 @@ public class ChunkFrameReceiver
 	{
 		boolean initilizationDone = false;
 		Queue<Serializable> receivableArg = new LinkedList<Serializable>();
-		receivableArg.add(file);
+		receivableArg.add(inFile);
 		receivableArg.add(senderAddress);
 		receivableArg.add(receiverAddress);
 		receivableArg.add(senderPort);
@@ -356,6 +358,9 @@ public class ChunkFrameReceiver
 				// try again
 			}
 		}
+		
+		// setUp outFile
+		outFile = FileArg.getOutFile(inFile);
 
 	}
 }

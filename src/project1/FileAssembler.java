@@ -31,6 +31,13 @@ public class FileAssembler implements Loggable {
 			this.filename = filename;
 		}
 		
+		/**
+		 * @param inFile
+		 */
+		public FileAssembler(File inFile) {
+			filename = inFile.getAbsolutePath();
+		}
+
 		/** Accepts a chunk
 		 * @param chunk the chunk to accept
 		 */
