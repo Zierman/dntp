@@ -63,7 +63,7 @@ public class FileArg extends Arg<File>
 			isOk = false;
 		}
 		
-		return isOk;
+		return !isOk;
 	}
 
 	/* (non-Javadoc)
