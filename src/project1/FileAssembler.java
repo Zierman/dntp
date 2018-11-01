@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.LinkedList;
+import java.util.Queue;
 
 import log.Log;
 import log.Loggable;
@@ -122,5 +123,17 @@ public class FileAssembler implements Loggable {
 		public void absorbLog(Loggable l)
 		{
 			log.absorb(l.getLog());
+		}
+
+		/** accpets all chunks in chunk list
+		 * @param chunkList the list of chunks to accept
+		 */
+		public void accept(Queue<Chunk> chunkList)
+		{
+			for(Chunk c : chunkList)
+			{
+				accept(c);
+			}
+			
 		}
 }

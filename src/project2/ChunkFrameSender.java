@@ -113,6 +113,9 @@ public class ChunkFrameSender
 		debug.println("Setting up the log printer");
 		log = new LogPrinter(logPrintingArg.getValue(), System.out, (int) maxSizeOfChunkArg.getValue(), fileArg.getValue().length(), startTime);
 		
+		// tell receiver how many chunks will be sent
+		
+		
 		// frame, package, and send all chunks using Stop and Wait
 		debug.println("");
 		debug.println("sending all chunks with stop and wait");
@@ -136,7 +139,7 @@ public class ChunkFrameSender
 		}
 		
 		// signal end of transmission
-		sendWithStopAndWait(new ChunkFrame(new Chunk(new byte[0], 0), sequenceNumber++), socket, destinationAddress, destinationPort);
+		sendEndFlag(sequenceNumber++, socket, destinationAddress, destinationPort);
 		
 		// close socket
 		socket.close();
@@ -194,6 +197,55 @@ public class ChunkFrameSender
 					log.sent(chunkFrame);
 				}
 				
+				// receive a package or timeout
+				socket.receive(ackPacket);
+	
+				// extract ack frame from package
+				AckFrame ackFrame = new AckFrame(ackPacket);
+	
+				// log the received ack
+				log.ackReceived(ackFrame, expectedAckNumber, chunkFrame.getSequenceNumber());
+				
+				// check if received ack number matches expected ack number
+				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
+	
+				// check if the ackFrame passed the check sum
+				sumCheckPass = ackFrame.passedCheckSum();
+	
+				// Determines if we are done trying to send the packet again
+				done = ackMatch && sumCheckPass;
+			}
+			catch (SocketTimeoutException e)
+			{
+				log.timeout(chunkFrame);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace(); // TODO adjust this if desired
+			}
+		}
+	}
+	
+	private static void sendEndFlag(int seqNumber, DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
+	{
+		int numberOfTries = 10;
+		ChunkFrame chunkFrame = new ChunkFrame(new Chunk(new byte[0], 0), seqNumber);
+		boolean done = false;
+		boolean ackMatch = false;
+		boolean sumCheckPass = false;
+		DatagramPacket chunkPacket = chunkFrame.toDatagramPacket(destinationAddress, destinationPort);
+		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
+		int expectedAckNumber = chunkFrame.getSequenceNumber() % numberOfAckNumbersArg.getValue();
+		while(!done && numberOfTries-- > 0)
+		{
+			try
+			{	
+				// send the package
+				socket.send(chunkPacket);
+				
+				// log the sending
+				log.sent(chunkFrame);
+			
 				// receive a package or timeout
 				socket.receive(ackPacket);
 	

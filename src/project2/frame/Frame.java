@@ -118,6 +118,10 @@ public abstract class Frame
 	public void setError(Error error)
 	{
 		this.error = error;
+		if(error == Error.CORRUPT)
+		{
+			checkSum = BAD;
+		}
 	}
 	
 	

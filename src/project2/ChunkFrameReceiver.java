@@ -146,78 +146,75 @@ public class ChunkFrameReceiver
 					// if it passed checksum and is a match to the expected ack number
 					if(seqDeservesAck)
 					{
+						
 						// make acknowledgement frame and packet
 						ackFrame = new AckFrame(chunkFrame, numberOfAckNumbers);
 						
-						// introduce errors
-						if(introduceError)
-						{
-							// generate errors randomly using the generator
-							ackFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChance));
-						}
 
-						ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
-						
-						// simulate drops
-						if(ackFrame.isDropped())
-						{
-							// we don't actually send it
-							
-							// log the send
-							log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
-						}
-						
-						// simulate sending corrupt package
-						else if(ackFrame.failedCheckSum())
-						{						
-							// send the corrupt package
-							socket.send(ackPacket);
-
-							// log the sending
-							log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
-						}
-						
-						// normal case
-						else
-						{
-							// send the package
-							socket.send(ackPacket);
-
-							// log the sending
-							log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
-						}
-						
-						// if the chunk part of the frame is empty...
+						// if the chunk part of the frame is empty, signal for end of transmission
 						if(chunkFrame.getLength() == ChunkFrame.HEADER_SIZE) 
 						{
 							end = true;
-						}
-						
-						// otherwise if the sequence number matches what we expect...
-						else if(chunkFrame.getSequenceNumber() == expectedSequenceNumber)
-						{
-							// store the chunk to the chunk list
-							chunk = chunkFrame.toChunk();
-							chunkList.add(chunk);
-
-							// Increment expected sequence number
-							expectedSequenceNumber++;
-						}
-
-						// we are done with this one
-						done = true;
-					}
-					else if(sumCheckPass) // if it is valid but not the ack number we expect...
-					{
-						// check to see if it was already successfully received
-						if(chunkFrame.getSequenceNumber() <= last.getSequenceNumber())
-						{
-							//if so send acknowledgement
-							ackFrame = new AckFrame(chunkFrame, numberOfAckNumbers);
 							ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
 							socket.send(ackPacket);
 						}
+						else
+						{
+						
+							// introduce errors
+							if(introduceError)
+							{
+								// generate errors randomly using the generator
+								ackFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChance));
+							}
+	
+							ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
+							
+							// simulate drops
+							if(ackFrame.isDropped())
+							{
+								// we don't actually send it
+								
+								// log the send
+								log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
+							}
+							
+							// simulate sending corrupt package
+							else if(ackFrame.failedCheckSum())
+							{			
+								// send the corrupt package
+								socket.send(ackPacket);
+	
+								// log the sending
+								log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
+							}
+							
+							// normal case
+							else
+							{
+								// send the package
+								socket.send(ackPacket);
+	
+								// log the sending
+								log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
+							}
+							
+							
+							// if the sequence number matches what we expect...
+							if(chunkFrame.getSequenceNumber() == expectedSequenceNumber)
+							{
+								// store the chunk to the chunk list
+								chunk = chunkFrame.toChunk();
+								chunkList.add(chunk);
+	
+								// Increment expected sequence number
+								expectedSequenceNumber++;
+							}
+						}
+						// we are done with this one
+						done = true;
 					}
+					
 				}
 				catch (SocketTimeoutException e)
 				{
@@ -237,8 +234,17 @@ public class ChunkFrameReceiver
 		
 		// assemble file from chunks
 		debug.println("");
-		debug.println("setting destination");
-		FileAssembler assembler = new FileAssembler(inFile);
+		debug.println("assembling file from recieved chunks");
+		FileAssembler assembler = new FileAssembler(outFile);
+		assembler.accept(chunkList);
+		assembler.assembleFile();
+		
+
+		debug.println("");
+		debug.println(outFile.getName() + " written.");
+		
+		debug.println("");
+		debug.println("END");
 	}
 
 	private static int delay()
