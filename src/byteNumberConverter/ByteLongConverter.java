@@ -39,10 +39,10 @@ public class ByteLongConverter
 		{
 			throw new IllegalArgumentException();
 		}
-		int val = 0;
+		long val = 0;
 		for(int i = 0; i < bytes.length; i++)
 		{
-			val |= (bytes[i] << (i * 8)) & (0xff << (i * 8));
+			val |= ((long)(bytes[i]) << (long)(i * 8)) & (0xffL << (long)(i * 8));
 		}
 		return val;
 	}

@@ -343,6 +343,9 @@ public class ChunkFrameSender
 		
 		// setup and send start time to keep logs synced
 		startTime = new Date().getTime();
+		System.out.println("Start Time (sender): " + startTime);
+		System.out.println("Start Time (sender): " + ByteLongConverter.convert(ByteLongConverter.convert(startTime)));
+		
 		Chunk c = new Chunk(ByteLongConverter.convert(startTime), 8);
 		ChunkFrame cf = new ChunkFrame(c, seqNum);
 		packet = cf.toDatagramPacket(destinationAddress, destinationPort);

@@ -67,6 +67,7 @@ public class ChunkFrameReceiver
 		// handle the command line arguments
 		ArgList.updateFromMainArgs(args);
 
+		
 		// set up the socket
 		int port = Defaults.RECEIVER_PORT;
 		DatagramSocket socket = new DatagramSocket(port);
@@ -77,7 +78,7 @@ public class ChunkFrameReceiver
 		// initialize the printers
 		debug = new DebugPrinter(debugMode, System.out);
 		log = new LogPrinter(logPrintingMode, System.out, (int) maxSizeOfChunk, inFile.length(), startTime);
-
+		
 		// set destination
 		debug.println("");
 		debug.println("setting destination");
@@ -268,7 +269,7 @@ public class ChunkFrameReceiver
 		
 		// set start time
 		startTime = getStartTime(socket, expecting, numberOfAckNumbers, destinationAddress, destinationPort);
-		
+		System.out.println("StartTime: " + startTime);
 		// setUp outFile
 		outFile = FileArg.getOutFile(inFile);
 		
