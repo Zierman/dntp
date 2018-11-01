@@ -30,7 +30,18 @@ public class LogPrinter
 		{
 			long start = startByteOffset(f);
 			long end = endByteOffset(start, f);
-			if(lastSentSeq == null || f.getSequenceNumber() >= lastSentSeq)
+			if (end < start)
+			{
+				int len = Long.toString(start).length();
+				String s = "";
+				for(int i = 0; i < len; i++)
+				{
+					s += "-";
+				}
+				println("SENDing " + f.getSequenceNumber() + " " + s + ":" + s + " " + time() + " " + sendErr(f));
+				
+			}
+			else if(lastSentSeq == null || f.getSequenceNumber() >= lastSentSeq)
 			{
 				println("SENDing " + f.getSequenceNumber() + " " + start + ":" + end + " " + time() + " " + sendErr(f));
 				lastSentSeq = f.getSequenceNumber();

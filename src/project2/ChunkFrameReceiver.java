@@ -157,6 +157,7 @@ public class ChunkFrameReceiver
 							end = true;
 							ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
 							socket.send(ackPacket);
+							log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
 						}
 						else
 						{
