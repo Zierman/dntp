@@ -320,7 +320,6 @@ public class ChunkFrameReceiver
 		
 		while (!done)
 		{
-			System.out.print(".");
 			try
 			{
 				socket.receive(initializationPacket);
@@ -334,7 +333,7 @@ public class ChunkFrameReceiver
 			}
 			catch (SocketTimeoutException stoe)
 			{
-				System.err.println("timeout");
+				// We don't care about timeouts on receiver side
 			}
 			catch (Exception e)
 			{
@@ -379,7 +378,7 @@ public class ChunkFrameReceiver
 			}
 			catch (SocketTimeoutException stoe)
 			{
-				System.err.println("Timeout");
+				// we don't care about timeouts on reciever side
 			}
 			catch (Exception e)
 			{
