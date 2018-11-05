@@ -6,35 +6,31 @@ package project2;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Random;
-
-import oracle.jrockit.jfr.parser.ChunkParser;
 import project1.Chunk;
 import project1.FileAssembler;
 import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 
-/**
+/**A program that receives chunks and assembles them into a file
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
 public class ChunkFrameReceiver
 {
-	private static final Random RANDOM = new Random();
 	
 	// documentation constants
-	private final static String RECEIVER_PROGRAM_TITLE = "Chunk Frame Sender Program";
-	private final static String RECEIVER_PROGRAM_DESCRIPTION = "This program sends a file using our version of the Stop and Wait algorithm.";
+	private final static String RECEIVER_PROGRAM_TITLE = "Chunk Frame Receiver Program";
+	private final static String RECEIVER_PROGRAM_DESCRIPTION = "This program receives a file using our version of the Stop and Wait algorithm.";
 
 	// Toggle Args
+	@SuppressWarnings("unused")
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameReceiver.RECEIVER_PROGRAM_TITLE, ChunkFrameReceiver.RECEIVER_PROGRAM_DESCRIPTION);
 
 	// Destination vars
@@ -48,7 +44,6 @@ public class ChunkFrameReceiver
 	// Arguments to receive from sender
 	private static File inFile = Defaults.INPUT_FILE;;
 	private static InetAddress senderAddress = Defaults.SENDER_ADDRESS;
-	private static InetAddress receiverAddress = Defaults.RECEIVER_ADDRESS;
 	private static Integer senderPort = Defaults.SENDER_PORT;
 	private static Integer receiverPort = Defaults.RECEIVER_PORT;
 	private static Integer errorChance = Defaults.CHANCE_OF_ERROR;
@@ -57,12 +52,15 @@ public class ChunkFrameReceiver
 	private static Boolean introduceError = false;
 	private static Boolean debugMode = false;
 	private static Boolean logPrintingMode = false;
-	private static Integer maxDelay = Defaults.MAX_DELAY;
 	private static long startTime;
 	private static File outFile;
 
 
-	public static void main(String[] args) throws Exception
+	/** Runs the receiver program
+	 * @param args command line arguments (not used)
+	 * @throws Exception
+	 */
+	public static void main(String[] args) throws Exception 
 	{
 		// handle the command line arguments
 		ArgList.updateFromMainArgs(args);
@@ -111,7 +109,6 @@ public class ChunkFrameReceiver
 		DatagramPacket ackPacket;
 		Chunk chunk;
 		ChunkFrame chunkFrame;
-		ChunkFrame last = null;
 		DatagramPacket chunkPacket = new DatagramPacket(new byte[chunkPacketSize], chunkPacketSize);
 		Queue<Chunk> chunkList = new LinkedList<Chunk>();
 		
@@ -122,7 +119,7 @@ public class ChunkFrameReceiver
 			boolean done = false;
 			boolean seqDeservesAck = false;
 			boolean sumCheckPass = false;
-
+			boolean first = true;
 			while (!done)
 			{
 				try
@@ -157,7 +154,16 @@ public class ChunkFrameReceiver
 							end = true;
 							ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
 							socket.send(ackPacket);
-							log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
+							if(first)
+							{
+							
+								log.sent(ackFrame, chunkFrame.getSequenceNumber());
+								first = false;
+							}
+							else
+							{
+								log.resent(ackFrame, chunkFrame.getSequenceNumber());
+							}
 						}
 						else
 						{
@@ -177,7 +183,16 @@ public class ChunkFrameReceiver
 								// we don't actually send it
 								
 								// log the send
-								log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
+								if(first)
+								{
+								
+									log.sent(ackFrame, chunkFrame.getSequenceNumber());
+									first = false;
+								}
+								else
+								{
+									log.resent(ackFrame, chunkFrame.getSequenceNumber());
+								}
 							}
 							
 							// simulate sending corrupt package
@@ -187,7 +202,16 @@ public class ChunkFrameReceiver
 								socket.send(ackPacket);
 	
 								// log the sending
-								log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
+								if(first)
+								{
+								
+									log.sent(ackFrame, chunkFrame.getSequenceNumber());
+									first = false;
+								}
+								else
+								{
+									log.resent(ackFrame, chunkFrame.getSequenceNumber());
+								}
 							}
 							
 							// normal case
@@ -197,7 +221,16 @@ public class ChunkFrameReceiver
 								socket.send(ackPacket);
 	
 								// log the sending
-								log.sent(ackFrame, chunkFrame.getSequenceNumber(), expectedSequenceNumber);
+								if(first)
+								{
+								
+									log.sent(ackFrame, chunkFrame.getSequenceNumber());
+									first = false;
+								}
+								else
+								{
+									log.resent(ackFrame, chunkFrame.getSequenceNumber());
+								}
 							}
 							
 							
@@ -223,7 +256,7 @@ public class ChunkFrameReceiver
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace(); // adjust this if desired
+					e.printStackTrace();
 				}
 			}
 		}
@@ -248,11 +281,10 @@ public class ChunkFrameReceiver
 		debug.println("END");
 	}
 
-	private static int delay()
-	{
-		return RANDOM.nextInt(maxDelay);
-	}
 
+	/**Gets the args from sender to make demonstrating the program easier
+	 * @param socket The socket that we are using to receive the datagrams
+	 */
 	private static void getArgsFromSender(DatagramSocket socket)
 	{
 		int expecting = 0;
@@ -263,7 +295,6 @@ public class ChunkFrameReceiver
 		// receive all initialization datapackets
 		inFile = (File) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
 		senderAddress = (InetAddress) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		receiverAddress = (InetAddress) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
 		senderPort = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
 		receiverPort = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
 		errorChance = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
@@ -272,7 +303,6 @@ public class ChunkFrameReceiver
 		introduceError = (Boolean) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
 		debugMode = (Boolean) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
 		logPrintingMode = (Boolean) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		maxDelay = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
 		
 		// set start time
 		startTime = getStartTime(socket, expecting, numberOfAckNumbers, destinationAddress, destinationPort);
@@ -282,6 +312,14 @@ public class ChunkFrameReceiver
 		
 	}
 	
+	/**Gets the start time of in ms to keep output times synced
+	 * @param socket The socket that we are using to receive the datagrams
+	 * @param expecting The sequence number we are expecting
+	 * @param numberOfAckNumbers the number of ack numbers valid
+	 * @param destinationAddress the destination address for our ack packets
+	 * @param destinationPortthe destination port for our ack packets
+	 * @return long representation of ms to keep output times synced
+	 */
 	private static long getStartTime(DatagramSocket socket, int expecting, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
 	{
 		long startTime = 0;
@@ -312,6 +350,14 @@ public class ChunkFrameReceiver
 		return startTime;
 	}
 	
+	/** Gets the length of the initilizing datagrams
+	 * @param socket The socket that we are using to receive the datagrams
+	 * @param expecting The sequence number we are expecting
+	 * @param numberOfAckNumbers the number of ack numbers valid
+	 * @param destinationAddress the destination address for our ack packets
+	 * @param destinationPortthe destination port for our ack packets
+	 * @return int representation of the length of inizilizing datagrams
+	 */
 	private static int getLengthOfInitializingDatagrams(DatagramSocket socket, int expecting, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
 	{
 		ChunkFrame incomingFrame;
@@ -344,6 +390,15 @@ public class ChunkFrameReceiver
 		return len;
 	}
 	
+	/** Receives and returns an object
+	 * @param socket 
+	 * @param socket The socket that we are using to receive the datagrams
+	 * @param expecting The sequence number we are expecting
+	 * @param numberOfAckNumbers the number of ack numbers valid
+	 * @param destinationAddress the destination address for our ack packets
+	 * @param destinationPortthe destination port for our ack packets
+	 * @return Object that was received
+	 */
 	private static Object receiveObject(DatagramSocket socket, int expecting, int lengthOfInitializationDatagrams, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
 	{
 		Object o = null;
@@ -357,16 +412,25 @@ public class ChunkFrameReceiver
 		{
 			try
 			{
+				// receive datagram packet
 				socket.receive(initializationPacket);
+				
+				// convert into a ChunkFrame
 				incomingFrame = new ChunkFrame(initializationPacket);
-				if(incomingFrame.getSequenceNumber() < expecting)
+				
+				// if we receive a valid Chunkframe that is sequenced less than what we are expecting we ack but don't do anything with data
+				if(incomingFrame.getSequenceNumber() < expecting && incomingFrame.passedCheckSum())
 				{
 					AckFrame ackFrame = new AckFrame(incomingFrame, numberOfAckNumbers);
 					socket.send(ackFrame.toDatagramPacket(destinationAddress, destinationPort));
 				}
+				// if we receive a valid ChunkFrame that is sequenced equal to what we expect, we ack and return the object in the ChunkFrame
 				else if(incomingFrame.getSequenceNumber() == expecting && incomingFrame.passedCheckSum())
 				{
+					// ack
 					socket.send(new AckFrame(incomingFrame, numberOfAckNumbers).toDatagramPacket(destinationAddress, destinationPort));
+					
+					// set the return value equal to the converted contents of the chunkFrame
 					byte[] bytes = incomingFrame.toChunk().getBytes();
 					bais = new ByteArrayInputStream(bytes);
 					ois = new ObjectInputStream(bais);
@@ -379,7 +443,7 @@ public class ChunkFrameReceiver
 			}
 			catch (SocketTimeoutException stoe)
 			{
-				// we don't care about timeouts on reciever side
+				// we don't care about timeouts on reciever side... just try again
 			}
 			catch (Exception e)
 			{

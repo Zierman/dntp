@@ -18,6 +18,6 @@ public class IntroduceErrorArg extends ToggleArg
     @Override
     protected String getHelpString()
     {
-        return "Use a proxy server to introduce artificial errors into transmission";
+        return "Use to introduce artificial errors into transmission";
     }
 }
