@@ -2,10 +2,18 @@ package project2.frame;
 
 import java.util.Random;
 
+/** A Error Generator for introducing artificial errors
+ * @author Joshua Zierman [py1422xs@metrostate.edu]
+ *
+ */
 public class FrameErrorGenerator
 {
 	private static final Random RAND = new Random();
 
+	/** Generates an error
+	 * @param chanceOfError
+	 * @return Frame.Error that correlates to a pseudo randomly generated error
+	 */
 	public static Frame.Error generateError(int chanceOfError) throws Exception
 	{
 		float rand = RAND.nextFloat();
@@ -25,7 +33,7 @@ public class FrameErrorGenerator
 				break;
 
 			default:
-				throw new Exception();
+				new Exception().printStackTrace();
 			}
 		}
 		return error;
