@@ -7,44 +7,22 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.LinkedList;
-
 import byteNumberConverter.ByteShortConverter;
-import project2.frame.Frame.Error;
 
-/**
+/** Frame abstract class
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
 public abstract class Frame
 {
-	public static class CheckSumFailException extends Exception
-	{
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-
-		public CheckSumFailException()
-		{
-			super("The check sum failed");
-		}
-	}
 	public enum Error {DROP, CORRUPT, NONE}
 	private static final short BAD = 1;
 	private static final short GOOD = 0;
-	
 	protected Error error = Error.NONE;
-	
-	// From specs
 	protected short checkSum = GOOD;
 	protected short length;
-	
-	public Frame()
-	{
-		
-	}
-	
+
+	//TODO document
 	public abstract DatagramPacket toDatagramPacket(InetAddress address, int port);
 
 	
@@ -63,17 +41,20 @@ public abstract class Frame
 	{
 		return checkSum == GOOD;
 	}
-	
+
+	//TODO document
 	public boolean failedCheckSum()
 	{
 		return !passedCheckSum();
 	}
-	
+
+	//TODO document
 	public void drop()
 	{
 		error = Error.DROP;
 	}
 
+	//TODO document
 	public boolean isDropped()
 	{
 		return error == Error.DROP;
@@ -87,14 +68,15 @@ public abstract class Frame
 		error = Error.CORRUPT;
 		checkSum = BAD;
 	}
-	
+
+	//TODO document
 	public void send(DatagramSocket socket, InetAddress address, int port) throws IOException
 	{
 		socket.send(this.toDatagramPacket(address, port));
 	}
 
-//	public static final int DATA_PACKET_LENGTH = MAX_CHUNK_LENGTH + 12;
-	
+
+	//TODO document
 	public static short getLength(DatagramPacket packet)
 	{
 		byte[] bytes = new byte[2];
@@ -104,17 +86,20 @@ public abstract class Frame
 		
 		return ByteShortConverter.convert(bytes);
 	}
-	
+
+	//TODO document
 	public static boolean isLengthOfAck(DatagramPacket packet)
 	{
 		return getLength(packet) == project2.Defaults.ACK_PACKET_LENGTH;
 	}
-	
+
+	//TODO document
 	public int getLength()
 	{
 		return length;
 	}
 
+	//TODO document
 	public void setError(Error error)
 	{
 		this.error = error;

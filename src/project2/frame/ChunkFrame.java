@@ -10,7 +10,7 @@ import byteNumberConverter.ByteIntConverter;
 import byteNumberConverter.ByteShortConverter;
 import project1.Chunk;
 
-/**
+/**Data Chunk Frame
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -19,7 +19,8 @@ public class ChunkFrame extends Frame
 	private Chunk chunk;
 	protected int sequenceNumber;
 	public static final int HEADER_SIZE = 8;
-	
+
+	//TODO document
 	public ChunkFrame(Chunk c, int sequenceNumber)
 	{
 		super();
@@ -27,7 +28,8 @@ public class ChunkFrame extends Frame
 		chunk = c;
 		length = (short) (c.getBytes().length + HEADER_SIZE);
 	}
-	
+
+	//TODO document
 	public ChunkFrame(DatagramPacket packet)
 	{
 		super();
@@ -75,7 +77,8 @@ public class ChunkFrame extends Frame
 			this.error = Error.CORRUPT;
 		}
 	}
-	
+
+	//TODO document
 	public Chunk toChunk()
 	{
 		return chunk;
@@ -117,6 +120,7 @@ public class ChunkFrame extends Frame
 		return new DatagramPacket(bytes, length, address, port);
 	}
 
+	//TODO document
 	public int getSequenceNumber()
 	{
 		return sequenceNumber;

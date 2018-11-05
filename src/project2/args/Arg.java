@@ -5,7 +5,7 @@ package project2.args;
 
 import log.Log;
 
-/**
+/** Argument for a program
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -14,6 +14,9 @@ public abstract class Arg <T>
 	String inlineFlag;
 	T value;
 	
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
+	 */
 	public Arg(String flag)
 	{
 		inlineFlag = flag;
@@ -37,16 +40,27 @@ public abstract class Arg <T>
 		return inlineFlag;
 	}
 	
+	
+	/**Checks to see if the inlineFlag matches
+	 * @param flag the string to check against the arugment's flag 
+	 * @return true if the two match
+	 */
 	public boolean matchesFlag(String flag)
 	{
 		return flag.matches(inlineFlag);
 	}
 	
+	/** gets the value held by the argument
+	 * @return the T object that was set or the default value if it was not set explicitly of an argument
+	 */
 	public T getValue()
 	{
 		return value;
 	}
 	
+	/** Sets the value to a new value
+	 * @param newValue the T object to set the value to
+	 */
 	public void setValue(T newValue)
 	{
 		value = newValue;
@@ -58,10 +72,13 @@ public abstract class Arg <T>
 	 */
 	protected abstract void processInlineArg(String s) throws Exception;
 	
+	/** Gets the default value of the armument
+	 * @return a T object that is the default value
+	 */
 	protected abstract T getDefault();
 
-	/**
-	 * @param e
+	/** Prints an error message for an exception
+	 * @param e the exception that an error message will be displayed for.
 	 */
 	protected void printErr(String arg, Exception e)
 	{
@@ -69,10 +86,14 @@ public abstract class Arg <T>
 	}
 	
 	/**Gets the help string that can be displayed for the argument 
-	 * @return
+	 * @return String of helpful text to be displayed by the help argument case.
 	 */
 	protected abstract String getHelpString();
 	
+	
+	/** Gets the line of help text for this argument
+	 * @return The String of help text for this argument
+	 */
 	protected String getHelpLine()
 	{
 		String argName = getClass().getSimpleName().replace("Arg", "");

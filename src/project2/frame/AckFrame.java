@@ -5,15 +5,11 @@ package project2.frame;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.Queue;
-
 import byteNumberConverter.ByteIntConverter;
 import byteNumberConverter.ByteShortConverter;
 import project2.Defaults;
 
-/**
+/**Acknowledgment Frame
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -31,6 +27,8 @@ public class AckFrame extends Frame
 		return ackNumber;
 	}
 	
+
+	//TODO document
 	public static class AckFrameLengthMismatchException extends Exception
 	{
 		/**
@@ -43,16 +41,19 @@ public class AckFrame extends Frame
 			super("AckFrame's length data and expected length do not match.");
 		}
 	}
-	
+
+	//TODO document
 	public static final int ACK_SIZE = Defaults.ACK_PACKET_LENGTH;
 
+	//TODO document
 	public AckFrame(ChunkFrame f, int numberOfAckNumbers)
 	{
 		super();
 		ackNumber = f.getSequenceNumber() % numberOfAckNumbers;
 		length = ACK_SIZE;
 	}
-	
+
+	//TODO document
 	public AckFrame(DatagramPacket p) throws AckFrameLengthMismatchException
 	{
 		byte[] packetB = p.getData();

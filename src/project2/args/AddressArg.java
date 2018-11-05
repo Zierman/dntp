@@ -7,15 +7,15 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 
-/**
+/** Address Arg
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
 public abstract class AddressArg extends Arg<InetAddress>
 {
 
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public AddressArg(String flag) {
 		super(flag);
