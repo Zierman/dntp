@@ -11,20 +11,15 @@ import project2.args.DebugModeArg;
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class DebugPrinter
+public class DebugPrinter extends Printer
 {
-	private Boolean printerIsOn;
-	private PrintStream debugPrintStream;
-	
-	
 	/** Constructs a DebugPrinter object
 	 * @param arg DebugModeArg that is linked to this printer
 	 * @param debugPrintStream the print stream that is linked to this printer
 	 */
 	public DebugPrinter(DebugModeArg arg, PrintStream debugPrintStream)
 	{
-		this.printerIsOn = arg.getValue();
-		this.debugPrintStream = debugPrintStream;
+		super(arg.getValue(), debugPrintStream);
 	}
 	
 	/** Constructs a DebugPrinter object
@@ -33,25 +28,7 @@ public class DebugPrinter
 	 */
 	public DebugPrinter(Boolean printerIsOn, PrintStream debugPrintStream)
 	{
-		this.printerIsOn = printerIsOn;
-		this.debugPrintStream = debugPrintStream;
+		super(printerIsOn, debugPrintStream);
 	}
 
-	/** Prints a string if printer is on
-	 * @param s the string to print
-	 */
-	public void print(String s)
-	{
-		if(printerIsOn)
-			debugPrintStream.print(s);
-	}
-
-	/** Prints a string as a new line if printer is on
-	 * @param s the string to print
-	 */
-	public void println(String s)
-	{
-		if(printerIsOn)
-			debugPrintStream.println(s);
-	}
 }

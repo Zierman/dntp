@@ -6,65 +6,82 @@ import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 import project2.frame.Frame;
 
-public class LogPrinter
+/** A printer for the required output
+ * @author Joshua Zierman [py1422xs@metrostate.edu]
+ *
+ */
+public class LogPrinter extends Printer
 {
-	private Boolean printerIsOn;
-	private PrintStream logPrintStream;
-	private Integer maxChunkSize;
-	private Integer lastSentSeq = null;
 	private Long startTime;
 
-	public LogPrinter(Boolean printerIsOn, PrintStream logPrintStream, Integer maxChunkSize, Long filesize, Long startTime)
+	/** Constructs a LogPrinter
+	 * @param printerIsOn the starting state of this printer
+	 * @param logPrintStream the print stream that this printer will output to
+	 * @param startTime
+	 */
+	public LogPrinter(Boolean printerIsOn, PrintStream logPrintStream, Long startTime)
 	{
-		this.printerIsOn = printerIsOn;
-		this.logPrintStream = logPrintStream;
-		this.maxChunkSize = maxChunkSize;
+		super(printerIsOn, logPrintStream);
 		this.startTime = startTime;
 	}
 
-	public void sent(ChunkFrame f)
+	/** Logs sent ChunkFrame
+	 * @param f ChunkFrame sent to be logged
+	 * @param startOffset the starting offset of the data
+	 * @param endOffset the ending offset of the data
+	 */
+	public void sent(ChunkFrame f, long startOffset, long endOffset)
 	{
 		if (printerIsOn)
 		{
-			long start = startByteOffset(f);
-			long end = endByteOffset(start, f);
+			long start = startOffset;
+			long end = endOffset;
 			println("SENDing " + f.getSequenceNumber() + " " + start + ":" + end + " " + time() + " " + sendErr(f));
 		}
 	}
 
-	public void resent(ChunkFrame f)
+	/** Logs resent ChunkFrame
+	 * @param f ChunkFrame resent to be logged
+	 * @param startOffset the starting offset of the data
+	 * @param endOffset the ending offset of the data
+	 */
+	public void resent(ChunkFrame f, long startOffset, long endOffset)
 	{
 		if (printerIsOn)
 		{
-			long start = startByteOffset(f);
-			long end = endByteOffset(start, f);
+			long start = startOffset;
+			long end = endOffset;
 			println("ReSend. " + f.getSequenceNumber() + " " + start + ":" + end + " " + time() + " " + sendErr(f));
 		}
 	}
 
-	public void sent(EndFrame f)
+	/** Logs sent EndFrame
+	 * @param f EndFrame sent to be logged
+	 * @param digitLengthOfOffset the length of the largest offset in digits
+	 */
+	public void sent(EndFrame f, int digitLengthOfOffset)
 	{
 		if (printerIsOn)
 		{
-			long start = startByteOffset(f);
-			int len = Long.toString(start).length();
 			String s = "";
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < digitLengthOfOffset; i++)
 			{
 				s += "-";
 			}
 			println("SENDing " + f.getSequenceNumber() + " " + s + ":" + s + " " + time() + " " + sendErr(f));
 		}
 	}
-
-	public void resent(EndFrame f)
+	
+	/** Logs resent EndFrame
+	 * @param f EndFrame resent to be logged
+	 * @param digitLengthOfOffset the length of the largest offset in digits
+	 */
+	public void resent(EndFrame f,  int digitLengthOfOffset)
 	{
 		if (printerIsOn)
 		{
-			long start = startByteOffset(f);
-			int len = Long.toString(start).length();
 			String s = "";
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < digitLengthOfOffset; i++)
 			{
 				s += "-";
 			}
@@ -72,6 +89,10 @@ public class LogPrinter
 		}
 	}
 
+	/** Logs sent AckFrame
+	 * @param f AckFrame sent to be logged
+	 * @param chunkSequenceNumber sequence number of the linked ChunkFrame
+	 */
 	public void sent(AckFrame f, int chunkSequenceNumber)
 	{
 		if (printerIsOn)
@@ -80,6 +101,10 @@ public class LogPrinter
 		}
 	}
 
+	/** Logs resent AckFrame
+	 * @param f AckFrame resent to be logged
+	 * @param chunkSequenceNumber sequence number of the linked ChunkFrame
+	 */
 	public void resent(AckFrame f, int chunkSequenceNumber)
 	{
 		if (printerIsOn)
@@ -108,19 +133,7 @@ public class LogPrinter
 				}
 				else
 				{
-					println("RECV " + time() + " " + f.getSequenceNumber() + " " + "!Seq"); // we
-																							// throw
-																							// away
-																							// all
-																							// packets
-																							// received
-																							// out
-																							// of
-																							// sequence
-																							// even
-																							// if
-																							// not
-																							// duplicates
+					println("RECV " + time() + " " + f.getSequenceNumber() + " " + "!Seq"); 
 				}
 			}
 			// if there is no error we move window because this is stop and wait
@@ -210,34 +223,6 @@ public class LogPrinter
 	{
 		return new Date().getTime() - startTime;
 	}
-
-	private long endByteOffset(long startOffset, ChunkFrame f)
-	{
-		long endByteOffset = (long) f.getLength() - ChunkFrame.HEADER_SIZE + startOffset - 1;
-
-		return endByteOffset;
-	}
-
-	public void print(String s)
-	{
-		if (printerIsOn)
-			logPrintStream.print(s);
-	}
-
-	public void println(String s)
-	{
-		if (printerIsOn)
-			logPrintStream.println(s);
-	}
-
-	private long startByteOffset(ChunkFrame f)
-	{
-
-		long startByteOffset = (long) f.getSequenceNumber() * (long) maxChunkSize;
-
-		return startByteOffset;
-	}
-
 	public void timeout(ChunkFrame f)
 	{
 		if (printerIsOn)

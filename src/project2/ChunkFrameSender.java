@@ -51,10 +51,14 @@ public class ChunkFrameSender
 
 	// Printers
 	private static DebugPrinter debug = new DebugPrinter(false, null);
-	private static LogPrinter log = new LogPrinter(false, null, null, null, null);
+	private static LogPrinter log = new LogPrinter(false, null, null);
 
 	// start time
 	private static Long startTime;
+	
+	// offsets for logging
+	private static long startOffset = 0;
+	private static long endOffset = 0;
 
 	/** Runs the sender program
 	 * @param args use -help arg to see about valid args
@@ -106,7 +110,7 @@ public class ChunkFrameSender
 		// set up log printer (has to happen after the start time is established)
 		debug.println("");
 		debug.println("Setting up the log printer");
-		log = new LogPrinter(logPrintingArg.getValue(), System.out, (int) maxSizeOfChunkArg.getValue(), fileArg.getValue().length(), startTime);
+		log = new LogPrinter(logPrintingArg.getValue(), System.out, startTime);
 		
 		// tell receiver how many chunks will be sent
 		
@@ -159,6 +163,11 @@ public class ChunkFrameSender
 		DatagramPacket chunkPacket = chunkFrame.toDatagramPacket(destinationAddress, destinationPort);
 		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
 		int expectedAckNumber = chunkFrame.getSequenceNumber() % numberOfAckNumbersArg.getValue();
+		
+		// Update offsets
+		startOffset = endOffset + 1;
+		endOffset = startOffset + chunkFrame.getLength() - ChunkFrame.HEADER_SIZE;
+		
 		while(!done)
 		{
 			try
@@ -178,12 +187,12 @@ public class ChunkFrameSender
 					if(first)
 					{
 					
-						log.sent(chunkFrame);
+						log.sent(chunkFrame, startOffset, endOffset);
 						first = false;
 					}
 					else
 					{
-						log.resent(chunkFrame);
+						log.resent(chunkFrame, startOffset, endOffset);
 					}
 				}
 				
@@ -198,12 +207,12 @@ public class ChunkFrameSender
 					if(first)
 					{
 					
-						log.sent(chunkFrame);
+						log.sent(chunkFrame, startOffset, endOffset);
 						first = false;
 					}
 					else
 					{
-						log.resent(chunkFrame);
+						log.resent(chunkFrame, startOffset, endOffset);
 					}
 				}
 				
@@ -217,12 +226,12 @@ public class ChunkFrameSender
 					if(first)
 					{
 					
-						log.sent(chunkFrame);
+						log.sent(chunkFrame, startOffset, endOffset);
 						first = false;
 					}
 					else
 					{
-						log.resent(chunkFrame);
+						log.resent(chunkFrame, startOffset, endOffset);
 					}
 				}
 				
@@ -269,26 +278,30 @@ public class ChunkFrameSender
 		boolean ackMatch = false;
 		boolean sumCheckPass = false;
 		boolean first = true;
-		DatagramPacket chunkPacket = endFrame.toDatagramPacket(destinationAddress, destinationPort);
+		DatagramPacket endPacket = endFrame.toDatagramPacket(destinationAddress, destinationPort);
 		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
 		int expectedAckNumber = endFrame.getSequenceNumber() % numberOfAckNumbersArg.getValue();
+		
+		// Update offsets
+		int digitLengthOfOffset = Long.toString(startOffset).length();
+		
 		while(!done && numberOfTries-- > 0)
 		{
 			try
 			{	
 				// send the package
-				socket.send(chunkPacket);
+				socket.send(endPacket);
 				
 				// log the sending
 				if(first)
 				{
 				
-					log.sent(endFrame);
+					log.sent(endFrame, digitLengthOfOffset);
 					first = false;
 				}
 				else
 				{
-					log.resent(endFrame);
+					log.resent(endFrame, digitLengthOfOffset);
 				}
 			
 				// receive a package or timeout

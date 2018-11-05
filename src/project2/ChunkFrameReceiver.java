@@ -39,7 +39,7 @@ public class ChunkFrameReceiver
 
 	// Printer
 	private static DebugPrinter debug = new DebugPrinter(false, null);
-	private static LogPrinter log = new LogPrinter(false, null, null, null, null);
+	private static LogPrinter log = new LogPrinter(false, null, null);
 
 	// Arguments to receive from sender
 	private static File inFile = Defaults.INPUT_FILE;;
@@ -75,7 +75,7 @@ public class ChunkFrameReceiver
 		
 		// initialize the printers
 		debug = new DebugPrinter(debugMode, System.out);
-		log = new LogPrinter(logPrintingMode, System.out, (int) maxSizeOfChunk, inFile.length(), startTime);
+		log = new LogPrinter(logPrintingMode, System.out, startTime);
 		
 		// set destination
 		debug.println("");
