@@ -1,7 +1,9 @@
-package project2;
+package project2.printer;
 
 import java.io.PrintStream;
 import java.util.Date;
+
+import project2.EndFrame;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 import project2.frame.Frame;
@@ -114,6 +116,7 @@ public class LogPrinter extends Printer
 		}
 	}
 
+	//TODO document
 	public void chunkReceived(ChunkFrame f, int expectedSequenceNumber)
 	{
 		if (printerIsOn)
@@ -145,6 +148,7 @@ public class LogPrinter extends Printer
 		}
 	}
 
+	//TODO document
 	public void ackReceived(AckFrame ackFrame, int expectedAckNumber, int sequenceNumber)
 	{
 		if (printerIsOn)
@@ -197,6 +201,7 @@ public class LogPrinter extends Printer
 		}
 	}
 
+	//TODO document
 	private String sendErr(Frame f)
 	{
 		String s;
@@ -219,10 +224,13 @@ public class LogPrinter extends Printer
 		return s;
 	}
 
+	//TODO document
 	private Long time()
 	{
 		return new Date().getTime() - startTime;
 	}
+	
+	//TODO document
 	public void timeout(ChunkFrame f)
 	{
 		if (printerIsOn)

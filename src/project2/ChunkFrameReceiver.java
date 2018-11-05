@@ -17,6 +17,8 @@ import project1.FileAssembler;
 import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
+import project2.printer.DebugPrinter;
+import project2.printer.LogPrinter;
 
 /**A program that receives chunks and assembles them into a file
  * @author Joshua Zierman [py1422xs@metrostate.edu]

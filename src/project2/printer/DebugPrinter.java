@@ -1,7 +1,7 @@
 /**
  * File Created by Joshua Zierman on Oct 5, 2018
  */
-package project2;
+package project2.printer;
 
 import java.io.PrintStream;
 

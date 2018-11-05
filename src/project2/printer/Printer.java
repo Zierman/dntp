@@ -1,4 +1,4 @@
-package project2;
+package project2.printer;
 
 import java.io.PrintStream;
 
