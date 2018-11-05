@@ -5,11 +5,9 @@ package project2;
 
 import java.io.File;
 import java.net.InetAddress;
-
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import project1.Project1;
 
-/**
+/** Default constants for program 2
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -39,7 +37,7 @@ public class Defaults
 	public static final int CHANCE_OF_ERROR = 20;
 	
 	// timeout time in ms
-	public final static int TIMEOUT = 2000;
+	public static final int TIMEOUT = 2000;
 	
 	// maximum delay for delayed packets in ms
 	public static final Integer MAX_DELAY = 10000;
