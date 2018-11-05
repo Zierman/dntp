@@ -3,9 +3,9 @@ package project2.printer;
 import java.io.PrintStream;
 import java.util.Date;
 
-import project2.EndFrame;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
+import project2.frame.EndFrame;
 import project2.frame.Frame;
 
 /** A printer for the required output

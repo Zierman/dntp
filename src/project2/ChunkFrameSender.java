@@ -21,6 +21,7 @@ import project1.FileSplitter;
 import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
+import project2.frame.EndFrame;
 import project2.printer.DebugPrinter;
 import project2.printer.LogPrinter;
 

@@ -1,7 +1,6 @@
-package project2;
+package project2.frame;
 
 import project1.Chunk;
-import project2.frame.ChunkFrame;
 
 /** A special ChunkFrame that contains no data that is used to flag end of transmission
  * @author Joshua Zierman [py1422xs@metrostate.edu]
