@@ -297,8 +297,17 @@ public class LogPrinter extends Printer
 	 * 
 	 * @return the Long number of elapsed ms since the synced start time
 	 */
-	private Long time()
+	private String time()
 	{
-		return new Date().getTime() - startTime;
+		final int MAX_LENGTH = 6;
+		long t = new Date().getTime() - startTime;
+		int n = MAX_LENGTH - Long.toString(t).length();
+		String s = "";
+		for(int i = 0; i < n; i++)
+		{
+			s += " ";
+		}
+		s += t;
+		return s;
 	}
 }
