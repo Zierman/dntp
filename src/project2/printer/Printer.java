@@ -11,7 +11,7 @@ public class Printer
 	protected Boolean printerIsOn;
 	protected PrintStream printStream;
 	
-	/** Constructs a DebugPrinter object
+	/** Constructs a Printer object
 	 * @param printerIsOn a boolean value indicating that the printer is on or off 
 	 * @param printStream
 	 */

@@ -9,7 +9,9 @@ import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 import project1.Chunk;
@@ -17,7 +19,7 @@ import project1.FileAssembler;
 import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
-import project2.printer.DebugPrinter;
+import project2.printer.TracePrinter;
 import project2.printer.LogPrinter;
 
 /**A program that receives chunks and assembles them into a file
@@ -40,7 +42,7 @@ public class ChunkFrameReceiver
 	private static int destinationPort = Defaults.SENDER_PORT;
 
 	// Printer
-	private static DebugPrinter debug = new DebugPrinter(false, null);
+	private static TracePrinter tracePrinter = new TracePrinter(false, null);
 	private static LogPrinter log = new LogPrinter(false, null, null);
 
 	// Arguments to receive from sender
@@ -76,37 +78,36 @@ public class ChunkFrameReceiver
 		getArgsFromSender(socket);
 		
 		// initialize the printers
-		debug = new DebugPrinter(debugMode, System.out);
+		tracePrinter = new TracePrinter(debugMode, System.out);
 		log = new LogPrinter(logPrintingMode, System.out, startTime);
 		
 		// set destination
-		debug.println("");
-		debug.println("setting destination");
+		tracePrinter.println("");
+		tracePrinter.println("setting destination");
 		destinationAddress = senderAddress;
 		destinationPort = senderPort;
 		
 		// update socket from default to specified values
-		debug.println("");
-		debug.println("updating socket");
+		tracePrinter.println("");
+		tracePrinter.println("updating socket");
 		socket.close();
 		socket = new DatagramSocket(receiverPort);
 		
 		
 		// Determine Packet Size
-
-		debug.println("");
-		debug.println("determining max packet size");
+		tracePrinter.println("");
+		tracePrinter.println("determining max packet size");
 		short chunkPacketSize = (short) (project2.Defaults.ACK_PACKET_LENGTH + 4 + maxSizeOfChunk);
 
 
 		// set the expected sequence number to 0
-		debug.println("");
-		debug.println("setting expected sequence number to zero");
+		tracePrinter.println("");
+		tracePrinter.println("setting expected sequence number to zero");
 		int expectedSequenceNumber = 0;
 
 		// receive all chunks using Stop and Wait
-		debug.println("");
-		debug.println("Receiving all chunks with stop and wait");
+		tracePrinter.println("");
+		tracePrinter.println("Receiving all chunks with stop and wait");
 		AckFrame ackFrame;
 		Chunk chunk;
 		ChunkFrame chunkFrame;
@@ -127,20 +128,46 @@ public class ChunkFrameReceiver
 			{
 				try
 				{
+					tracePrinter.println("\t" + "expecting sequence number " + expectedSequenceNumber);
+					
+					
 					// receive chunk packet
+					tracePrinter.println("\t" + "receive chunk DatagramPacket");
+					
 					socket.receive(chunkPacket);
 					
 					// extract the chunk frame
+					tracePrinter.println("\t" + "Extract Chunk Frame");
+					
 					chunkFrame = new ChunkFrame(chunkPacket);
+
+					tracePrinter.println("\t\t" + "chunkFrame.getSequenceNumber(): " + chunkFrame.getSequenceNumber());
+					tracePrinter.println("\t\t" + "chunkFrame.getLength(): " + chunkFrame.getLength());
+					tracePrinter.println("\t\t" + "chunkFrame.failedCheckSum(): " + chunkFrame.failedCheckSum());
+					
 					
 					// Log received packet info
+					tracePrinter.println("\t" + "Log received packet info");
+					
 					log.chunkReceived(chunkFrame, expectedSequenceNumber);
 
+					
+					
 					// check if the ackFrame passed the check sum
+					tracePrinter.println("\t" + "check if the ackFrame passed the check sum");
+					
 					sumCheckPass = chunkFrame.passedCheckSum();
-					debug.println("sumCheck: " + sumCheckPass);
+					tracePrinter.println("\t\t" + "sumCheck: " + sumCheckPass);
+					
+					
+					
 					// check if received chunk deserves an ack response
+					tracePrinter.println("\t" + "check if received chunk deserves an ack response");
+
 					seqDeservesAck = chunkFrame.getSequenceNumber() <= expectedSequenceNumber && sumCheckPass;
+					tracePrinter.println("\t\t" + "seqDeservesAck: " + seqDeservesAck);
+					
+					
 					
 					// if it passed checksum and is a match to the expected ack number
 					if(seqDeservesAck)
@@ -148,21 +175,45 @@ public class ChunkFrameReceiver
 						// check to see if this is the first time we acked this
 						if(last < chunkFrame.getSequenceNumber())
 						{
+							tracePrinter.println("\t" + "Fisrt time we acked this");
+							tracePrinter.println("\t\t" + "last:" + last);
+							tracePrinter.println("\t\t" + "chunkFrame.getSequenceNumber():" + chunkFrame.getSequenceNumber());
+							tracePrinter.println("\t\t" + "last < chunkFrame.getSequenceNumber():" + (last < chunkFrame.getSequenceNumber()));
+							
 							first = true;
 							last = chunkFrame.getSequenceNumber();
+							
+
+							tracePrinter.println("\t\t" + "last set to:" + last);
+							tracePrinter.println("\t\t" + "first set to:" + first);
 						}
 						else
 						{
+
+							tracePrinter.println("\t" + "Not the Fisrt time we acked this");
+							tracePrinter.println("\t\t" + "last:" + last);
+							tracePrinter.println("\t\t" + "chunkFrame.getSequenceNumber():" + chunkFrame.getSequenceNumber());
+							tracePrinter.println("\t\t" + "last < chunkFrame.getSequenceNumber():" + (last < chunkFrame.getSequenceNumber()));
+							
+							
 							first = false;
+							
+
+							tracePrinter.println("\t\t" + "first set to:" + first);
 						}
 						
-						// make acknowledgement frame and packet
+						
+						// make acknowledgement frame
+						tracePrinter.println("\t" + "make acknowledgement frame");
+						
 						ackFrame = new AckFrame(chunkFrame, numberOfAckNumbers);
 						
 
+						
 						// if the chunk part of the frame is empty, signal for end of transmission
 						if(chunkFrame.getLength() == ChunkFrame.HEADER_SIZE) 
 						{
+							tracePrinter.println("\t" + "Case: EndFrame");
 							
 							end = true;
 							
@@ -195,6 +246,8 @@ public class ChunkFrameReceiver
 							// simulate drops
 							if(ackFrame.isDropped())
 							{
+								tracePrinter.println("\t" + "Case: Drop");
+								
 								// log the send
 								if(first)
 								{
@@ -213,6 +266,8 @@ public class ChunkFrameReceiver
 							// simulate sending corrupt package
 							else if(ackFrame.failedCheckSum())
 							{		
+								tracePrinter.println("\t" + "Case: corrupt");
+								
 								// log the sending
 								if(first)
 								{
@@ -232,6 +287,9 @@ public class ChunkFrameReceiver
 							// normal case
 							else
 							{
+
+								tracePrinter.println("\t" + "Case: Normal");
+								
 								// log the sending
 								if(first)
 								{
@@ -253,11 +311,13 @@ public class ChunkFrameReceiver
 							// if the sequence number matches what we expect...
 							if(chunkFrame.getSequenceNumber() == expectedSequenceNumber)
 							{
-								// store the chunk to the chunk list
+								// add the chunk to the chunk list
+								tracePrinter.println("\t" + "add the chunk to the chunklist");
 								chunk = chunkFrame.extractChunk();
 								chunkList.add(chunk);
 	
 								// Increment expected sequence number
+								tracePrinter.println("\t" + "increment the expeced sequence number");
 								expectedSequenceNumber++;
 							}
 						}
@@ -269,6 +329,7 @@ public class ChunkFrameReceiver
 				catch (SocketTimeoutException e)
 				{
 					// We don't care about timeouts on the receiver
+					tracePrinter.println("\t" + "timout");
 				}
 				catch (Exception e)
 				{
@@ -278,23 +339,23 @@ public class ChunkFrameReceiver
 		}
 		
 		// close socket
-		debug.println("");
-		debug.println("closeing socket");
+		tracePrinter.println("");
+		tracePrinter.println("closeing socket");
 		socket.close();
 		
 		// assemble file from chunks
-		debug.println("");
-		debug.println("assembling file from recieved chunks");
+		tracePrinter.println("");
+		tracePrinter.println("assembling file from recieved chunks");
 		FileAssembler assembler = new FileAssembler(outFile);
 		assembler.accept(chunkList);
 		assembler.assembleFile();
 		
 
-		debug.println("");
-		debug.println(outFile.getName() + " written.");
+		tracePrinter.println("");
+		tracePrinter.println(outFile.getName() + " written.");
 		
-		debug.println("");
-		debug.println("END");
+		tracePrinter.println("");
+		tracePrinter.println("END");
 	}
 
 
@@ -309,22 +370,53 @@ public class ChunkFrameReceiver
 		int len = getLengthOfInitializingDatagrams(socket, expecting++, numberOfAckNumbers, destinationAddress, destinationPort);
 
 		// receive all initialization datapackets
-		inFile = (File) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		senderAddress = (InetAddress) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		senderPort = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		receiverPort = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		errorChance = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		maxSizeOfChunk = (Short) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		numberOfAckNumbers = (Integer) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		introduceError = (Boolean) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		debugMode = (Boolean) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
-		logPrintingMode = (Boolean) receiveObject(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		inFile = (File) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		senderAddress = (InetAddress) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		senderPort = (Integer) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		receiverPort = (Integer) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		errorChance = (Integer) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		maxSizeOfChunk = (Short) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		numberOfAckNumbers = (Integer) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		introduceError = (Boolean) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		debugMode = (Boolean) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
+		logPrintingMode = (Boolean) receiveObjectForSetup(socket, expecting++, len, numberOfAckNumbers, destinationAddress, destinationPort);
 		
 		// set start time
 		startTime = getStartTime(socket, expecting, numberOfAckNumbers, destinationAddress, destinationPort);
 		
 		// setUp outFile
 		outFile = FileArg.getOutFile(inFile);
+
+		// catch delayed packets
+		int tmp = 0;
+		try
+		{
+			tmp = socket.getSoTimeout();
+			socket.setSoTimeout(1);
+		}
+		catch (SocketException e1)
+		{
+			e1.printStackTrace();
+		}
+		DatagramPacket p = new DatagramPacket(new byte[1], 1);
+		while(new Date().getTime() < startTime)
+		{
+			try
+			{
+				socket.receive(p);
+			}
+			catch (Exception e) {
+				// keep trying
+			}
+		}
+		try
+		{
+			socket.setSoTimeout(tmp);
+		}
+		catch (SocketException e)
+		{
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -415,7 +507,7 @@ public class ChunkFrameReceiver
 	 * @param destinationPortthe destination port for our ack packets
 	 * @return Object that was received
 	 */
-	private static Object receiveObject(DatagramSocket socket, int expecting, int lengthOfInitializationDatagrams, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
+	private static Object receiveObjectForSetup(DatagramSocket socket, int expecting, int lengthOfInitializationDatagrams, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
 	{
 		Object o = null;
 		ByteArrayInputStream bais;

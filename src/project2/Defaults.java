@@ -52,4 +52,5 @@ public class Defaults
 
 	// logging
 	public static final Boolean REQUIRED_LOGGING = true;
+	public static final Integer STARTING_DELAY = 1000;
 }

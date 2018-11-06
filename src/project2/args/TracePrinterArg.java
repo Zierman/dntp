@@ -3,21 +3,21 @@
  */
 package project2.args;
 
-/** A command-line argument for using a debug printer
+/** A command-line argument for using a trace printer
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
-public class DebugModeArg extends ToggleArg
+public class TracePrinterArg extends ToggleArg
 {
 
 	/** Constructs an instance of this class
 	 * @param flag the string that is a flag in the command line argument
 	 */
-	public DebugModeArg(String flag) {
+	public TracePrinterArg(String flag) {
 		super(flag);
 	}
 
-	private static final String HELP_MSG = "Prints additional debugging output.";
+	private static final String HELP_MSG = "Prints additional trace output.";
 
 
 	/* (non-Javadoc)
@@ -33,7 +33,7 @@ public class DebugModeArg extends ToggleArg
 	@Override
 	protected void processInlineArg()
 	{
-		System.out.println("Debug mode is on");
+		System.out.println("trace mode is on");
 	}
 
 }

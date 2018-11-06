@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.LinkedList;
@@ -22,7 +23,7 @@ import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 import project2.frame.EndFrame;
-import project2.printer.DebugPrinter;
+import project2.printer.TracePrinter;
 import project2.printer.LogPrinter;
 
 /**
@@ -44,16 +45,17 @@ public class ChunkFrameSender
 	private static ErrorChanceArg errorChanceArg = new ErrorChanceArg("-d");
 	private static MaxSizeOfChunkArg maxSizeOfChunkArg = new MaxSizeOfChunkArg("-s");
 	private static NumberOfAckNumbersArg numberOfAckNumbersArg = new NumberOfAckNumbersArg("-acknums");
-
+	private static StartingDelayArg startingDelayArg = new StartingDelayArg("-startDelay");
+	
 	// Toggle Args
 	private static IntroduceErrorArg introduceErrorArg = new IntroduceErrorArg("-e");
-	private static DebugModeArg debugModeArg = new DebugModeArg("-debug");
+	private static TracePrinterArg tracePrinterArg = new TracePrinterArg("-trace");
 	private static LogPrintingArg logPrintingArg = new LogPrintingArg("-reqlog");
 	@SuppressWarnings("unused")
 	private static HelpArg helpArg = new HelpArg("-help", ChunkFrameSender.SENDER_PROGRAM_TITLE, ChunkFrameSender.SENDER_PROGRAM_DESCRIPTION);
 
 	// Printers
-	private static DebugPrinter debug = new DebugPrinter(false, null);
+	private static TracePrinter tracePrinter = new TracePrinter(false, null);
 	private static LogPrinter log = new LogPrinter(false, null, null);
 
 	// start time
@@ -65,89 +67,126 @@ public class ChunkFrameSender
 
 	/** Runs the sender program
 	 * @param args use -help arg to see about valid args
-	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception
+	public static void main(String[] args)
 	{
 		int sequenceNumber = 0;
 		InetAddress destinationAddress;
 		int destinationPort;
 		
 		// handle the command line arguments
-		ArgList.updateFromMainArgs(args);
+		try
+		{
+			ArgList.updateFromMainArgs(args);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 
 
-		// set up debug printer 
-		debug = new DebugPrinter(debugModeArg, System.out);
+		// set up tracePrinter printer 
+		tracePrinter = new TracePrinter(tracePrinterArg, System.out);
 		
 		// set destination
-		debug.println("");
-		debug.println("setting destination");
+		tracePrinter.println("");
+		tracePrinter.println("setting destination");
 		destinationAddress = receiverAddressArg.getValue();
 		destinationPort = receiverPortArg.getValue();
 
 		// gets the input file
-		debug.println("");
-		debug.println("geting input file");
+		tracePrinter.println("");
+		tracePrinter.println("geting input file");
 		File inFile = fileArg.getValue();
-		debug.println("inFile = " + inFile.getAbsolutePath());
+		tracePrinter.println("inFile = " + inFile.getAbsolutePath());
 
 		// split up the file into chunks
-		debug.println("");
-		debug.println("splitting up the file into chunks");
+		tracePrinter.println("");
+		tracePrinter.println("splitting up the file into chunks");
 		LinkedList<Chunk> chunkList = new LinkedList<Chunk>();
 		FileSplitter splitter = new FileSplitter(inFile.getAbsolutePath(), maxSizeOfChunkArg.getValue());
-		splitter.overwrite(chunkList);
+		try
+		{
+			splitter.overwrite(chunkList);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 
 		// set up the socket
-		debug.println("");
-		debug.println("setting up the socket");
-		DatagramSocket socket = new DatagramSocket(senderPortArg.getValue());
-		socket.setSoTimeout(timeoutArg.getValue());
-
-		// make connection and transmit setup info 
-		debug.println("");
-		debug.println("making connection and transmitting setup info");
-		setupConnection(socket, destinationAddress, destinationPort);
-
-		// set up log printer (has to happen after the start time is established)
-		debug.println("");
-		debug.println("Setting up the log printer");
-		log = new LogPrinter(logPrintingArg.getValue(), System.out, startTime);
+		tracePrinter.println("");
+		tracePrinter.println("setting up the socket");
+		DatagramSocket socket = null;
 		
-		// tell receiver how many chunks will be sent
-		
-		
-		// frame, package, and send all chunks using Stop and Wait
-		debug.println("");
-		debug.println("sending all chunks with stop and wait");
-		while (!chunkList.isEmpty())
+		try
 		{
-			ChunkFrame chunkFrame = null;
+			socket = new DatagramSocket(senderPortArg.getValue());
+			socket.setSoTimeout(timeoutArg.getValue());
 
-			// get the next chunk if we are not handling a delayed frame
-			Chunk chunk = chunkList.remove();
+			// make connection and transmit setup info 
+			tracePrinter.println("");
+			tracePrinter.println("making connection and transmitting setup info");
+			sendArgs(socket, destinationAddress, destinationPort);
 
-			// frame the chunk
-			chunkFrame = new ChunkFrame(chunk, sequenceNumber);
-
+			// set up log printer (has to happen after the start time is established)
+			tracePrinter.println("");
+			tracePrinter.println("Setting up the log printer");
+			log = new LogPrinter(logPrintingArg.getValue(), System.out, startTime);
 			
-			// Send it with the stop and wait
-			sendWithStopAndWait(chunkFrame, socket, destinationAddress, destinationPort);
+			// tell receiver how many chunks will be sent
+			
+			
+			// frame, package, and send all chunks using Stop and Wait
+			tracePrinter.println("");
+			tracePrinter.println("sending all chunks with stop and wait");
+			while (!chunkList.isEmpty())
+			{
+				tracePrinter.println("\t" + "chunkList.size(): " + chunkList.size());
+				ChunkFrame chunkFrame = null;
+
+				// get the next chunk if we are not handling a delayed frame
+				tracePrinter.println("\t" + "chunk removed from chunk list");
+				
+				Chunk chunk = chunkList.remove();
+				
+				// frame the chunk
+				tracePrinter.println("\t" + "chunk framed");
+				chunkFrame = new ChunkFrame(chunk, sequenceNumber);
 
 
-			// progress to next sequence number
-			sequenceNumber++;
+				tracePrinter.println("\t\t" + "chunkFrame.getSequenceNumber(): " + chunkFrame.getSequenceNumber());
+				tracePrinter.println("\t\t" + "chunkFrame.getLength(): " + chunkFrame.getLength());
+				tracePrinter.println("\t\t" + "chunkFrame.failedCheckSum(): " + chunkFrame.failedCheckSum());
+				
+				
+				// Send it with the stop and wait
+				tracePrinter.println("\t" + "send chunk frame with stop and wait");
+				sendWithStopAndWait(chunkFrame, socket, destinationAddress, destinationPort);
+
+
+				// progress to next sequence number
+				tracePrinter.println("\t" + "sequence number increased");
+				sequenceNumber++;
+			}
+			
+			// signal end of transmission
+			sendEndFlag(sequenceNumber++, socket, destinationAddress, destinationPort);
 		}
-		
-		// signal end of transmission
-		sendEndFlag(sequenceNumber++, socket, destinationAddress, destinationPort);
+		catch (SocketException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 		
 		// close socket
 		socket.close();
 		
-		debug.println("");
-		debug.println("END");
+		tracePrinter.println("");
+		tracePrinter.println("END");
 	}
 
 
@@ -348,93 +387,121 @@ public class ChunkFrameSender
 	 * @param socket the socket that the datagram will be sent with
 	 * @param destinationAddress the address of the destination for this ChunkFrame
 	 * @param destinationPort the destination for this ChunkFrame
-	 * @throws IOException
 	 */
-	private static void setupConnection(DatagramSocket socket, InetAddress destinationAddress, int destinationPort) throws IOException
+	private static void sendArgs(DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
 	{
-		int maxLength = 0;
-		boolean ackReceived = false;
-		ByteArrayOutputStream baos;
-		ObjectOutputStream oos;
-		Queue<Chunk> chunks = new LinkedList<Chunk>();
-		Queue<Arg<?>> args = new LinkedList<Arg<?>>();
-		DatagramPacket packet;
-		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
-		AckFrame ackFrame;
-		
-		// add needed Args to the args queue
-		args.add(fileArg);
-		args.add(senderAddressArg);
-		args.add(senderPortArg);
-		args.add(receiverPortArg);
-		args.add(errorChanceArg);
-		args.add(maxSizeOfChunkArg);
-		args.add(numberOfAckNumbersArg);
-		args.add(introduceErrorArg);
-		args.add(debugModeArg);
-		args.add(logPrintingArg);
-
-		// backup the timout setting of the socket and use default timeout for
-		// this
-		int timeoutBackup = socket.getSoTimeout();
-		int seqNum = 0;
-		socket.setSoTimeout(Defaults.TIMEOUT);
-
-		// convert the values of all needed args to byte arrays
-		for (Arg<?> arg : args)
+		try
 		{
-			baos = new ByteArrayOutputStream();
-			oos = new ObjectOutputStream(baos);
-			oos.writeObject(arg.getValue());
-			oos.flush();
-			byte[] bytes = baos.toByteArray();
-			if (bytes.length > maxLength)
-			{
-				maxLength = bytes.length + Defaults.ACK_PACKET_LENGTH + 4;
-			}
-			chunks.add(new Chunk(bytes, bytes.length));
-			oos.close();
-			baos.close();
-		}
+			int maxLength = 0;
+			boolean ackReceived = false;
+			ByteArrayOutputStream baos;
+			ObjectOutputStream oos;
+			Queue<Chunk> chunks = new LinkedList<Chunk>();
+			Queue<Arg<?>> args = new LinkedList<Arg<?>>();
+			DatagramPacket packet;
+			DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
+			AckFrame ackFrame;
+			
+			// add needed Args to the args queue
+			args.add(fileArg);
+			args.add(senderAddressArg);
+			args.add(senderPortArg);
+			args.add(receiverPortArg);
+			args.add(errorChanceArg);
+			args.add(maxSizeOfChunkArg);
+			args.add(numberOfAckNumbersArg);
+			args.add(introduceErrorArg);
+			args.add(tracePrinterArg);
+			args.add(logPrintingArg);
 
-		// Send max length of packet
-		packet = new ChunkFrame(new Chunk(ByteIntConverter.convert(maxLength), 4), seqNum).toDatagramPacket(destinationAddress, destinationPort);
+			// backup the timout setting of the socket and use default timeout for
+			// this
+			int timeoutBackup = socket.getSoTimeout();
+			int seqNum = 0;
+			socket.setSoTimeout(Defaults.TIMEOUT);
 
-		ackReceived = false;
-		while (!ackReceived)
-		{
-			socket.send(packet);
-			try
+			// convert the values of all needed args to byte arrays
+			for (Arg<?> arg : args)
 			{
-				socket.receive(ackPacket);
-				ackFrame = new AckFrame(ackPacket);
-				if (ackFrame.getAckNumber() == seqNum % numberOfAckNumbersArg.getValue())
+				baos = new ByteArrayOutputStream();
+				oos = new ObjectOutputStream(baos);
+				oos.writeObject(arg.getValue());
+				oos.flush();
+				byte[] bytes = baos.toByteArray();
+				if (bytes.length > maxLength)
 				{
-					ackReceived = true;
-					seqNum++;
+					maxLength = bytes.length + Defaults.ACK_PACKET_LENGTH + 4;
 				}
+				chunks.add(new Chunk(bytes, bytes.length));
+				oos.close();
+				baos.close();
 			}
-			catch (Exception e)
-			{
-				// try again
-				debug.println(e.getLocalizedMessage());
-			}
-		}
 
-		// send the args
-		for (Chunk c : chunks)
-		{	
+			// Send max length of packet
+			packet = new ChunkFrame(new Chunk(ByteIntConverter.convert(maxLength), 4), seqNum).toDatagramPacket(destinationAddress, destinationPort);
+
 			ackReceived = false;
 			while (!ackReceived)
 			{
+				socket.send(packet);
 				try
 				{
-					ChunkFrame f = new ChunkFrame(c, seqNum);
-					packet = f.toDatagramPacket(destinationAddress, destinationPort);
-					socket.send(packet);
-
 					socket.receive(ackPacket);
-					if (new AckFrame(ackPacket).passedCheckSum())
+					ackFrame = new AckFrame(ackPacket);
+					if (ackFrame.getAckNumber() == seqNum % numberOfAckNumbersArg.getValue())
+					{
+						ackReceived = true;
+						seqNum++;
+					}
+				}
+				catch (Exception e)
+				{
+					// try again
+					tracePrinter.println(e.getLocalizedMessage());
+				}
+			}
+
+			// send the args
+			for (Chunk c : chunks)
+			{	
+				ackReceived = false;
+				while (!ackReceived)
+				{
+					try
+					{
+						ChunkFrame f = new ChunkFrame(c, seqNum);
+						packet = f.toDatagramPacket(destinationAddress, destinationPort);
+						socket.send(packet);
+
+						socket.receive(ackPacket);
+						if (new AckFrame(ackPacket).passedCheckSum())
+						{
+							ackReceived = true;
+							seqNum++;
+						}
+					}
+					catch (Exception e)
+					{
+						// try again
+					}
+				}
+			}
+			
+			// setup and send start time to keep logs synced
+			startTime = new Date().getTime() + startingDelayArg.getValue();
+			Chunk c = new Chunk(ByteLongConverter.convert(startTime), 8);
+			ChunkFrame cf = new ChunkFrame(c, seqNum);
+			packet = cf.toDatagramPacket(destinationAddress, destinationPort);
+			
+			ackReceived = false;
+			while (!ackReceived)
+			{
+				socket.send(packet);
+				try
+				{
+					socket.receive(ackPacket);
+					ackFrame = new AckFrame(ackPacket);
+					if (ackFrame.getAckNumber() == seqNum % numberOfAckNumbersArg.getValue())
 					{
 						ackReceived = true;
 						seqNum++;
@@ -445,36 +512,36 @@ public class ChunkFrameSender
 					// try again
 				}
 			}
-		}
-		
-		// setup and send start time to keep logs synced
-		startTime = new Date().getTime();
-		Chunk c = new Chunk(ByteLongConverter.convert(startTime), 8);
-		ChunkFrame cf = new ChunkFrame(c, seqNum);
-		packet = cf.toDatagramPacket(destinationAddress, destinationPort);
-		
-		ackReceived = false;
-		while (!ackReceived)
-		{
-			socket.send(packet);
-			try
+
+
+			// catch delayed packets
+			int tmp = socket.getSoTimeout();
+			socket.setSoTimeout(1);
+			while(new Date().getTime() < startTime)
 			{
-				socket.receive(ackPacket);
-				ackFrame = new AckFrame(ackPacket);
-				if (ackFrame.getAckNumber() == seqNum % numberOfAckNumbersArg.getValue())
+				try
 				{
-					ackReceived = true;
-					seqNum++;
+					socket.receive(ackPacket);
+				}
+				catch (Exception e) {
+					// keep trying
 				}
 			}
-			catch (Exception e)
-			{
-				// try again
-			}
-		}
+			socket.setSoTimeout(tmp);
 
-		// restore timout value of socket
-		socket.setSoTimeout(timeoutBackup);
+			// restore timout value of socket
+			socket.setSoTimeout(timeoutBackup);
+			
+			// catch delayed acks
+		}
+		catch (SocketException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 		
 	}
 }
