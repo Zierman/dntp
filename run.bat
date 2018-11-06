@@ -17,9 +17,6 @@ pause > nul
 
 echo The first thing we transmit is a small text file because it is easy to trace the output.
 
-echo Press any key to show in.txt...
-pause > nul
-start in.txt
 
 echo Press any key to start the receiver program...
 pause > nul
@@ -30,16 +27,13 @@ pause > nul
 start SenderTxt.bat
 
 
-echo Press any key to show out.txt...
+echo Press any key to show in_copy.txt...
 pause > nul
 start in_copy.txt
 
 pause
 
-echo The second thing we will transmit is a jpeg.
 
-echo Press any key to show test.jpeg...
-pause > nul
 
 echo Press any key to start the receiver program...
 pause > nul
@@ -49,7 +43,7 @@ echo Press any key to start the sender program...
 pause > nul
 start SenderJpeg.bat
 
-echo Press any key to show out.jpeg...
+echo Press any key to show in_copy.jpeg...
 pause > nul
 start in_copy.jpeg
 
