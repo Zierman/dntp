@@ -240,7 +240,7 @@ public class ChunkFrameReceiver
 							if(chunkFrame.getSequenceNumber() == expectedSequenceNumber)
 							{
 								// store the chunk to the chunk list
-								chunk = chunkFrame.toChunk();
+								chunk = chunkFrame.extractChunk();
 								chunkList.add(chunk);
 	
 								// Increment expected sequence number
@@ -338,7 +338,7 @@ public class ChunkFrameReceiver
 				incomingFrame = new ChunkFrame(initializationPacket);
 				if(incomingFrame.getSequenceNumber() == expecting && incomingFrame.passedCheckSum())
 				{
-					startTime = byteNumberConverter.ByteLongConverter.convert(incomingFrame.toChunk().getBytes());
+					startTime = byteNumberConverter.ByteLongConverter.convert(incomingFrame.extractChunk().getBytes());
 					socket.send(new AckFrame(incomingFrame, numberOfAckNumbers).toDatagramPacket(destinationAddress, destinationPort));
 					done = true;
 				}
@@ -375,7 +375,7 @@ public class ChunkFrameReceiver
 				incomingFrame = new ChunkFrame(initializationPacket);
 				if(incomingFrame.getSequenceNumber() == expecting && incomingFrame.passedCheckSum())
 				{
-					len = byteNumberConverter.ByteIntConverter.convert(incomingFrame.toChunk().getBytes());
+					len = byteNumberConverter.ByteIntConverter.convert(incomingFrame.extractChunk().getBytes());
 					socket.send(new AckFrame(incomingFrame, numberOfAckNumbers).toDatagramPacket(destinationAddress, destinationPort));
 					done = true;
 				}
@@ -433,7 +433,7 @@ public class ChunkFrameReceiver
 					socket.send(new AckFrame(incomingFrame, numberOfAckNumbers).toDatagramPacket(destinationAddress, destinationPort));
 					
 					// set the return value equal to the converted contents of the chunkFrame
-					byte[] bytes = incomingFrame.toChunk().getBytes();
+					byte[] bytes = incomingFrame.extractChunk().getBytes();
 					bais = new ByteArrayInputStream(bytes);
 					ois = new ObjectInputStream(bais);
 					o = ois.readObject();
