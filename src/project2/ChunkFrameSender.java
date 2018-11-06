@@ -137,7 +137,7 @@ public class ChunkFrameSender
 			// tell receiver how many chunks will be sent
 			
 			
-			// frame, package, and send all chunks using Stop and Wait
+			// frame and send all chunks using Stop and Wait
 			tracePrinter.println("");
 			tracePrinter.println("sending all chunks with stop and wait");
 			while (!chunkList.isEmpty())
