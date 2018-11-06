@@ -308,7 +308,7 @@ public class ChunkFrameReceiver
 		
 		// set start time
 		startTime = getStartTime(socket, expecting, numberOfAckNumbers, destinationAddress, destinationPort);
-		System.out.println("StartTime: " + startTime);
+		
 		// setUp outFile
 		outFile = FileArg.getOutFile(inFile);
 		
