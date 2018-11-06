@@ -16,7 +16,7 @@ public class ByteShortConverter
 	}
 	
 	/** converts from int to byte[]
-	 * @param integer the integer to be converted
+	 * @param short0 the short to be converted
 	 * @return byte array converted from the int where the lowest significant byte is in stored at index 0
 	 */
 	public static byte[] convert(short short0)

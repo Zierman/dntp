@@ -62,10 +62,11 @@ public class ChunkFrameReceiver
 
 	/** Runs the receiver program
 	 * @param args command line arguments (not used)
-	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception 
+	public static void main(String[] args)
 	{
+		try
+		{
 		// handle the command line arguments
 		ArgList.updateFromMainArgs(args);
 
@@ -356,6 +357,9 @@ public class ChunkFrameReceiver
 		
 		tracePrinter.println("");
 		tracePrinter.println("END");
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 
@@ -425,7 +429,7 @@ public class ChunkFrameReceiver
 	 * @param expecting The sequence number we are expecting
 	 * @param numberOfAckNumbers the number of ack numbers valid
 	 * @param destinationAddress the destination address for our ack packets
-	 * @param destinationPortthe destination port for our ack packets
+	 * @param destinationPort the destination port for our ack packets
 	 * @return long representation of ms to keep output times synced
 	 */
 	private static long getStartTime(DatagramSocket socket, int expecting, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
@@ -463,7 +467,7 @@ public class ChunkFrameReceiver
 	 * @param expecting The sequence number we are expecting
 	 * @param numberOfAckNumbers the number of ack numbers valid
 	 * @param destinationAddress the destination address for our ack packets
-	 * @param destinationPortthe destination port for our ack packets
+	 * @param destinationPort the destination port for our ack packets
 	 * @return int representation of the length of inizilizing datagrams
 	 */
 	private static int getLengthOfInitializingDatagrams(DatagramSocket socket, int expecting, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)
@@ -499,12 +503,12 @@ public class ChunkFrameReceiver
 	}
 	
 	/** Receives and returns an object
-	 * @param socket 
 	 * @param socket The socket that we are using to receive the datagrams
 	 * @param expecting The sequence number we are expecting
+	 * @param lengthOfInitializationDatagrams The largest length of the initialization datagrams
 	 * @param numberOfAckNumbers the number of ack numbers valid
 	 * @param destinationAddress the destination address for our ack packets
-	 * @param destinationPortthe destination port for our ack packets
+	 * @param destinationPort the destination port for our ack packets
 	 * @return Object that was received
 	 */
 	private static Object receiveObjectForSetup(DatagramSocket socket, int expecting, int lengthOfInitializationDatagrams, int numberOfAckNumbers, InetAddress destinationAddress, int destinationPort)

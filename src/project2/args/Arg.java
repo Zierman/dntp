@@ -77,13 +77,6 @@ public abstract class Arg <T>
 	 */
 	protected abstract T getDefault();
 
-	/** Prints an error message for an exception
-	 * @param e the exception that an error message will be displayed for.
-	 */
-	protected void printErr(String arg, Exception e)
-	{
-		System.err.println(this.getClass().getName() + " failed to process " + inlineFlag + " " + arg);
-	}
 	
 	/**Gets the help string that can be displayed for the argument 
 	 * @return String of helpful text to be displayed by the help argument case.

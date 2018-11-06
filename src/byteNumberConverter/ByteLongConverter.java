@@ -16,8 +16,8 @@ public class ByteLongConverter
 	}
 	
 	/** converts from long to byte[]
-	 * @param long the integer to be converted
-	 * @return byte array converted from the long where the lowest significant byte is in stored at index 0
+	 * @param longVal the integer to be converted
+	 * @return byte[] converted from the long where the lowest significant byte is in stored at index 0
 	 */
 	public static byte[] convert(long longVal)
 	{

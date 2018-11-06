@@ -11,10 +11,10 @@ public class FrameErrorGenerator
 	private static final Random RAND = new Random();
 
 	/** Generates an error
-	 * @param chanceOfError
+	 * @param chanceOfError the int percent chance of error
 	 * @return Frame.Error that correlates to a pseudo randomly generated error
 	 */
-	public static Frame.Error generateError(int chanceOfError) throws Exception
+	public static Frame.Error generateError(int chanceOfError)
 	{
 		float rand = RAND.nextFloat();
 		float errChance = (float) (chanceOfError / 100.0);

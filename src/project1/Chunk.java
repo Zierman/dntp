@@ -59,6 +59,7 @@ public class Chunk implements Iterable<Byte>
 	 * Constructs a chunk with the given bytes
 	 * 
 	 * @param bytes an array of bytes that holds the data for the chunk
+	 * @param length the length of the chunk in bytes
 	 */
 	public Chunk(byte[] bytes, int length) {
 		if(length != bytes.length)

@@ -15,20 +15,20 @@ public class TracePrinter extends Printer
 {
 	/** Constructs a TracePrinter object
 	 * @param arg TracePrinterArg that is linked to this printer
-	 * @param debugPrintStream the print stream that is linked to this printer
+	 * @param tracePrintStream the print stream that is linked to this printer
 	 */
-	public TracePrinter(TracePrinterArg arg, PrintStream debugPrintStream)
+	public TracePrinter(TracePrinterArg arg, PrintStream tracePrintStream)
 	{
-		super(arg.getValue(), debugPrintStream);
+		super(arg.getValue(), tracePrintStream);
 	}
 	
 	/** Constructs a TracePrinter object
 	 * @param printerIsOn a boolean value indcating that the printer is on or off 
-	 * @param debugPrintStream
+	 * @param tracePrintStream the printStream of the trace printer
 	 */
-	public TracePrinter(Boolean printerIsOn, PrintStream debugPrintStream)
+	public TracePrinter(Boolean printerIsOn, PrintStream tracePrintStream)
 	{
-		super(printerIsOn, debugPrintStream);
+		super(printerIsOn, tracePrintStream);
 	}
 
 }

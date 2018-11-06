@@ -83,14 +83,7 @@ public class ArgList implements Iterable<Arg<?>>
 					}
 					else // else (if not a toggle)
 					{
-						try
-						{
-							a.processInlineArg(args[i+1]); // attempt to process
-						}
-						catch (Exception e) {
-							a.printErr(args[i+1], e);
-							throw e;
-						}
+						a.processInlineArg(args[i+1]); // attempt to process
 					}
 				}
 			}

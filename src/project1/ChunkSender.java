@@ -32,7 +32,7 @@ public class ChunkSender implements Sender, Loggable
 	
 	/** Constructs a ChunkSender
 	 * @param ip InetAddress of destination
-	 * @param port
+	 * @param port int port number of destination
 	 */
 	public ChunkSender(InetAddress ip, int port)
 	{

@@ -37,9 +37,9 @@ public class FileArg extends Arg<File>
 		}
 	}
 
-	/**
-	 * @param s
-	 * @return
+	/**Cleans the string
+	 * @param s the string to be cleaned
+	 * @return the clean string
 	 */
 	private String clean(String s)
 	{
@@ -47,8 +47,9 @@ public class FileArg extends Arg<File>
 		return s;
 	}
 
-	/**
-	 * @return
+	/** Checks to see if the string is a bad argument
+	 * @param s the String to check
+	 * @return true if it is a bad argument
 	 */
 	private boolean isBadArg(String s)
 	{

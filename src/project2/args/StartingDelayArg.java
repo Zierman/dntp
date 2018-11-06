@@ -9,7 +9,7 @@ import project2.Defaults;
 public class StartingDelayArg extends Arg<Integer>
 {
 	/** constructs an instance of this object
-	 * @param flag
+	 * @param flag the string flag that is used to indicate in the command-line that this is the argument to use
 	 */
 	public StartingDelayArg(String flag)
 	{

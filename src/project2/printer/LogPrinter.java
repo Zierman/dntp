@@ -9,7 +9,6 @@ import project2.frame.EndFrame;
 import project2.frame.Frame;
 
 /** A printer for the required output
- * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
 public class LogPrinter extends Printer
@@ -19,7 +18,7 @@ public class LogPrinter extends Printer
 	/** Constructs a LogPrinter
 	 * @param printerIsOn the starting state of this printer
 	 * @param logPrintStream the print stream that this printer will output to
-	 * @param startTime
+	 * @param startTime the time that the logged part of the program started started
 	 */
 	public LogPrinter(Boolean printerIsOn, PrintStream logPrintStream, Long startTime)
 	{
@@ -156,6 +155,7 @@ public class LogPrinter extends Printer
 	 * @param ackFrame the AckFrame recieved
 	 * @param expectedAckNumber the int expected acknowledgement number
 	 * @param sequenceNumber the sequence number of the ack
+	 * @param numberOfAckNumbers the int number of possible ack numbers
 	 */
 	public void ackReceived(AckFrame ackFrame, int expectedAckNumber, int sequenceNumber, int numberOfAckNumbers)
 	{

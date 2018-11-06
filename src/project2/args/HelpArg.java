@@ -20,6 +20,8 @@ public class HelpArg extends ToggleArg
 
 	/** Constructs an instance of this class
 	 * @param flag the string that is a flag in the command line argument
+	 * @param title title of the program
+	 * @param description of the program
 	 */
 	public HelpArg(String flag, String title, String description) {
 		super(flag);

@@ -13,7 +13,7 @@ public class Printer
 	
 	/** Constructs a Printer object
 	 * @param printerIsOn a boolean value indicating that the printer is on or off 
-	 * @param printStream
+	 * @param printStream the print stream to set the printer's print stream to
 	 */
 	public Printer(Boolean printerIsOn, PrintStream printStream)
 	{

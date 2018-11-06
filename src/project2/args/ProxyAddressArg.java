@@ -12,13 +12,10 @@ import java.net.InetAddress;
 public class ProxyAddressArg extends AddressArg
 {
 
-	/** Constructs an instance of this class
-	 * @param flag the string that is a flag in the command line argument
-	 */
 	private final static String CLIENT_NAME = "proxy";
 	
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public ProxyAddressArg(String flag) {
 		super(flag);
