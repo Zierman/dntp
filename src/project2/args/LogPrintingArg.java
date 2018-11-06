@@ -4,12 +4,15 @@
 package project2.args;
 
 
+/** command-line argument for enabling a printer to print the required output
+ *
+ */
 public class LogPrintingArg extends ToggleArg
 {
 
-    /**
-     * @param flag
-     */
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
+	 */
     public LogPrintingArg(String flag) {
         super(flag);
     }

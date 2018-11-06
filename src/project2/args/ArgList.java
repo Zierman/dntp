@@ -16,7 +16,6 @@ public class ArgList implements Iterable<Arg<?>>
 	private final static ArgList argList = new ArgList(0);
 	private static int maxArgNameLength = 0;
 	private static int maxArgFlagLength = 0;
-	private static final long serialVersionUID = 5503336292592915469L;
 	
 	
 	/**
@@ -66,13 +65,12 @@ public class ArgList implements Iterable<Arg<?>>
 		}
 	}
 	
-	/** Updtates from a string array as passed in by a main function
+	/** Updates from a string array as passed in by a main function
 	 * @param args String[] of arguments passed by main()
 	 * @throws Exception if there are any issues processing any arguments
 	 */
 	public static void updateFromMainArgs(String[] args) throws Exception
 	{
-		Exception exeption = null;
 		for(int i = 0; i < args.length; i++) // for each String argument in args
 		{
 			for(Arg<?> a : argList) // for each Arg in argList

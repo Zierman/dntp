@@ -3,7 +3,7 @@
  */
 package project2.args;
 
-/**
+/** command-line argument for the timeout
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -12,8 +12,8 @@ public class TimeoutArg extends Arg<Integer>
 
 	private final static String HELP_MSG = "The amount of time in ms before timeout.";
 	
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public TimeoutArg(String flag) {
 		super(flag);

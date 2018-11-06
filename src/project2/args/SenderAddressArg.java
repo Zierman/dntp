@@ -5,7 +5,7 @@ package project2.args;
 
 import java.net.InetAddress;
 
-/**
+/** command-line argument for the sender's address
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -14,8 +14,8 @@ public class SenderAddressArg extends AddressArg
 
 	private final static String CLIENT_NAME = "sender";
 	
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public SenderAddressArg(String flag) {
 		super(flag);

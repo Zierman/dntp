@@ -3,7 +3,7 @@
  */
 package project2.args;
 
-/**
+/** command-line argument for a window size
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -11,8 +11,8 @@ public class WindowSizeArg extends Arg<Integer>
 {
 	private final static String HELP_MSG = "The size of the sliding window.";
 
-	/**
-	 * @param flag the String that precedes the filearg value inline
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public WindowSizeArg(String flag) {
 		super(flag);

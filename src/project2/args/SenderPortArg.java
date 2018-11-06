@@ -3,7 +3,7 @@
  */
 package project2.args;
 
-/**
+/** command-line argument for the sender port
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -11,8 +11,8 @@ public class SenderPortArg extends PortArg
 {
 	private final static String CLIENT_NAME = "sender";
 
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public SenderPortArg(String flag) {
 		super(flag);

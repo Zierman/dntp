@@ -3,15 +3,15 @@
  */
 package project2.args;
 
-/**
+/** command-line argument for a port
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
 public abstract class PortArg extends Arg<Integer>
 {
 
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public PortArg(String flag) {
 		super(flag);

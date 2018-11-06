@@ -3,19 +3,22 @@
  */
 package project2.args;
 
-/**
+/** command-line argument for a toggle type argument
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
 public abstract class ToggleArg extends Arg<Boolean>
 {
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public ToggleArg(String flag) {
 		super(flag);
 	}
 
+	/** Processes the In-line arg
+	 * 
+	 */
 	protected abstract void processInlineArg();
 
 	/* (non-Javadoc)

@@ -22,7 +22,12 @@ public abstract class Frame
 	protected short checkSum = GOOD;
 	protected short length;
 
-	//TODO document
+	
+	/** Creates a DatagramPacket
+	 * @param address The INetAddress of the destination
+	 * @param port the int representation of the destination port
+	 * @return a DatagramPacket that can be converted back into a frame addressed to the destination
+	 */
 	public abstract DatagramPacket toDatagramPacket(InetAddress address, int port);
 
 	
@@ -42,19 +47,28 @@ public abstract class Frame
 		return checkSum == GOOD;
 	}
 
-	//TODO document
+	
+	/** Checks to see if the check sum fails for the frame
+	 * @return true if the checksum fails else false
+	 */
 	public boolean failedCheckSum()
 	{
 		return !passedCheckSum();
 	}
 
-	//TODO document
+	
+	/** Drops the packet
+	 * 
+	 */
 	public void drop()
 	{
 		error = Error.DROP;
 	}
 
-	//TODO document
+	
+	/** checks to see if the frame is dropped
+	 * @return true if the frame is dropped else false
+	 */
 	public boolean isDropped()
 	{
 		return error == Error.DROP;
@@ -69,14 +83,23 @@ public abstract class Frame
 		checkSum = BAD;
 	}
 
-	//TODO document
+	
+	/** Send the frame
+	 * @param socket the DatagramSocket to use to send the frame
+	 * @param address the InetAddress of the destination
+	 * @param port the int port of the destination
+	 * @throws IOException if an IOException results during the sending process.
+	 */
 	public void send(DatagramSocket socket, InetAddress address, int port) throws IOException
 	{
 		socket.send(this.toDatagramPacket(address, port));
 	}
 
 
-	//TODO document
+	/** Gets the length of the frame contained in the packet from the length bytes
+	 * @param packet the packet to check the length of
+	 * @return the length of the frame contained in the packet
+	 */
 	public static short getLength(DatagramPacket packet)
 	{
 		byte[] bytes = new byte[2];
@@ -87,19 +110,28 @@ public abstract class Frame
 		return ByteShortConverter.convert(bytes);
 	}
 
-	//TODO document
+	
+	/** checks to see if the length of the packet is the lenght of an Ack packet 
+	 * @param packet the packet to check the length of
+	 * @return true if the packet has a length equal to the length of an ack packet, else false
+	 */
 	public static boolean isLengthOfAck(DatagramPacket packet)
 	{
 		return getLength(packet) == project2.Defaults.ACK_PACKET_LENGTH;
 	}
 
-	//TODO document
+	/** returns the length of the frame
+	 * @return the int length of the frame
+	 */
 	public int getLength()
 	{
 		return length;
 	}
 
-	//TODO document
+	
+	/** Sets the error to the parameter
+	 * @param error the error to set to
+	 */
 	public void setError(Error error)
 	{
 		this.error = error;

@@ -3,15 +3,15 @@
  */
 package project2.args;
 
-/**
+/** A command-line argument for using a debug printer
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
 public class DebugModeArg extends ToggleArg
 {
 
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public DebugModeArg(String flag) {
 		super(flag);

@@ -5,7 +5,7 @@ package project2.args;
 
 import java.io.PrintStream;
 
-/**
+/** command-line argument for showing the help output
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -18,8 +18,8 @@ public class HelpArg extends ToggleArg
 	private static final String[] DESIGNERS = project2.Defaults.DESIGNERS;
 	private static final PrintStream out = System.out;
 
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public HelpArg(String flag, String title, String description) {
 		super(flag);

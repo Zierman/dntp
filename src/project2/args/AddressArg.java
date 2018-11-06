@@ -7,7 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 
-/** Address Arg
+/**  command-line argument for an address
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */

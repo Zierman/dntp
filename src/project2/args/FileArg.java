@@ -5,7 +5,7 @@ package project2.args;
 
 import java.io.File;
 
-/**
+/** command-line argument for indicating a file
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -13,8 +13,8 @@ public class FileArg extends Arg<File>
 {
 	private final static String HELP_MSG = "The Filepath of input file.";
 
-	/**
-	 * @param flag the String that precedes the filearg value inline
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public FileArg(String flag) {
 		super(flag);

@@ -3,7 +3,7 @@
  */
 package project2.args;
 
-/**
+/** command-line argument for the max size of chunk
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -12,8 +12,8 @@ public class MaxSizeOfChunkArg extends Arg<Short>
 
 	private static final String HELP_MSG = "The maximum size of a chunk in bytes.";
 	
-	/**
-	 * @param flag
+	/** Constructs an instance of this class
+	 * @param flag the string that is a flag in the command line argument
 	 */
 	public MaxSizeOfChunkArg(String flag) {
 		super(flag);
