@@ -20,7 +20,10 @@ public class ChunkFrame extends Frame
 	protected int sequenceNumber;
 	public static final int HEADER_SIZE = 8;
 
-	//TODO document
+	/** Constructs a ChunkFrame
+	 * @param c the Chunk of data held in this frame as payload
+	 * @param sequenceNumber The int sequenceNumber of this ChunkFrame
+	 */
 	public ChunkFrame(Chunk c, int sequenceNumber)
 	{
 		super();
@@ -29,7 +32,9 @@ public class ChunkFrame extends Frame
 		length = (short) (c.getBytes().length + HEADER_SIZE);
 	}
 
-	//TODO document
+	/** Constructs a ChunkFrame from a packet
+	 * @param packet the DatagramPacket to extract a ChunkFrame from
+	 */
 	public ChunkFrame(DatagramPacket packet)
 	{
 		super();
@@ -78,8 +83,10 @@ public class ChunkFrame extends Frame
 		}
 	}
 
-	//TODO document
-	public Chunk toChunk()
+	/** Extracts Chunk from the ChunkFrame
+	 * @return the Chunk contained in the ChunkFrame
+	 */
+	public Chunk extractChunk()
 	{
 		return chunk;
 	}
@@ -120,7 +127,10 @@ public class ChunkFrame extends Frame
 		return new DatagramPacket(bytes, length, address, port);
 	}
 
-	//TODO document
+	
+	/**Gets the sequence number
+	 * @return the int sequence number
+	 */
 	public int getSequenceNumber()
 	{
 		return sequenceNumber;
