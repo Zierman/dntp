@@ -245,7 +245,7 @@ public class ChunkFrameSender
 				AckFrame ackFrame = new AckFrame(ackPacket);
 	
 				// log the received ack
-				log.ackReceived(ackFrame, expectedAckNumber, chunkFrame.getSequenceNumber());
+				log.ackReceived(ackFrame, expectedAckNumber, chunkFrame.getSequenceNumber(), numberOfAckNumbersArg.getValue());
 				
 				// check if received ack number matches expected ack number
 				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
@@ -314,7 +314,7 @@ public class ChunkFrameSender
 				AckFrame ackFrame = new AckFrame(ackPacket);
 	
 				// log the received ack
-				log.ackReceived(ackFrame, expectedAckNumber, endFrame.getSequenceNumber());
+				log.ackReceived(ackFrame, expectedAckNumber, endFrame.getSequenceNumber(), numberOfAckNumbersArg.getValue());
 				
 				// check if received ack number matches expected ack number
 				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;

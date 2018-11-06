@@ -116,7 +116,11 @@ public class LogPrinter extends Printer
 		}
 	}
 
-	//TODO document
+	
+	/** Logs that a ChunkFrame was received
+	 * @param f the ChunkFrame received
+	 * @param expectedSequenceNumber the int expected sequence number
+	 */
 	public void chunkReceived(ChunkFrame f, int expectedSequenceNumber)
 	{
 		if (printerIsOn)
@@ -148,8 +152,13 @@ public class LogPrinter extends Printer
 		}
 	}
 
-	//TODO document
-	public void ackReceived(AckFrame ackFrame, int expectedAckNumber, int sequenceNumber)
+	
+	/** Logs that an AckFrame was recieved
+	 * @param ackFrame the AckFrame recieved
+	 * @param expectedAckNumber the int expected acknowledgement number
+	 * @param sequenceNumber the sequence number of the ack
+	 */
+	public void ackReceived(AckFrame ackFrame, int expectedAckNumber, int sequenceNumber, int numberOfAckNumbers)
 	{
 		if (printerIsOn)
 		{
@@ -172,16 +181,14 @@ public class LogPrinter extends Printer
 					}
 				}
 				// if the ack number does not match what was expected we assume
-				// that it was for the previously received chunkFrame
+				// that it was for the most recently received chunkFrame that works with the ackNumber
 				else
 				{
-					int machedSequenceNumber = sequenceNumber - 1; // TODO This
-																	// will need
-																	// to change
-																	// if window
-																	// size is
-																	// not fixed
-																	// at 1
+					int machedSequenceNumber = sequenceNumber - 1; 
+					while(machedSequenceNumber % numberOfAckNumbers != ackFrame.getAckNumber())
+					{
+						machedSequenceNumber--;
+					}
 
 					// if the matched sequence number is negitive we throw an
 					// exception
@@ -201,7 +208,11 @@ public class LogPrinter extends Printer
 		}
 	}
 
-	//TODO document
+	
+	/** gets the error string for the frame's error
+	 * @param f Frame that we get the error string for
+	 * @return "ERRR" if frame was corrupt, "DROP" if frame was dropped, or "SENT" if no error
+	 */
 	private String sendErr(Frame f)
 	{
 		String s;
@@ -224,13 +235,19 @@ public class LogPrinter extends Printer
 		return s;
 	}
 
-	//TODO document
+	
+	/** logs the number of elapsed ms since the synced start time
+	 * @return the Long number of elapsed ms since the synced start time
+	 */
 	private Long time()
 	{
 		return new Date().getTime() - startTime;
 	}
 	
-	//TODO document
+	
+	/** Logs timeout
+	 * @param f the ChunkFrame that we timed out on the ack for
+	 */
 	public void timeout(ChunkFrame f)
 	{
 		if (printerIsOn)
