@@ -32,7 +32,7 @@ public abstract class Frame
 
 	
 	/** gets the type of error 
-	 * @return an Error value assosiated with the type of error, DROP if the frame was dropped, DELAY if delayed, CORRUPT if corrupted, null if no error
+	 * @return an Error value associated with the type of error, DROP if the frame was dropped, DELAY if delayed, CORRUPT if corrupted, null if no error
 	 */
 	public Error getError()
 	{
