@@ -543,25 +543,28 @@ public class ChunkFrameSender
 				e.printStackTrace();
 			}
 			try
-			{
-
-				// receive a package or timeout
-				socket.receive(ackPacket);
-
-				// extract ack frame from package
-				AckFrame ackFrame = new AckFrame(ackPacket);
-
-				// log the received ack
-				log.ackReceived(ackFrame, expectedAckNumber, chunkFrame.getSequenceNumber(), numberOfAckNumbersArg.getValue());
-
-				// check if received ack number matches expected ack number
-				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
-
-				// check if the ackFrame passed the check sum
-				sumCheckPass = ackFrame.passedCheckSum();
-
-				// Determines if we are done trying to send the packet again
-				done = ackMatch && sumCheckPass;
+			{		
+				long timeoutTime = new Date().getTime() + timeoutArg.getValue();
+				do
+				{
+					// receive a package or timeout
+					socket.receive(ackPacket);
+	
+					// extract ack frame from package
+					AckFrame ackFrame = new AckFrame(ackPacket);
+	
+					// log the received ack
+					log.ackReceived(ackFrame, expectedAckNumber, chunkFrame.getSequenceNumber(), numberOfAckNumbersArg.getValue());
+	
+					// check if received ack number matches expected ack number
+					ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
+	
+					// check if the ackFrame passed the check sum
+					sumCheckPass = ackFrame.passedCheckSum();
+	
+					// Determines if we are done trying to send the packet again
+					done = ackMatch && sumCheckPass;
+				}while(!done && new Date().getTime() < timeoutTime);
 			}
 			catch (SocketTimeoutException e)
 			{
