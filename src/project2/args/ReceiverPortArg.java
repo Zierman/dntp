@@ -3,7 +3,9 @@
  */
 package project2.args;
 
-/** command-line argument for the receiver port
+/**
+ * command-line argument for the receiver port
+ * 
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -11,14 +13,20 @@ public class ReceiverPortArg extends PortArg
 {
 	private final static String CLIENT_NAME = "receiver";
 
-	/** Constructs an instance of this class
-	 * @param flag the string that is a flag in the command line argument
+	/**
+	 * Constructs an instance of this class
+	 * 
+	 * @param flag
+	 *            the string that is a flag in the command line argument
 	 */
-	public ReceiverPortArg(String flag) {
+	public ReceiverPortArg(String flag)
+	{
 		super(flag);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see project2.args.PortArg#getClientName()
 	 */
 	@Override
@@ -27,7 +35,9 @@ public class ReceiverPortArg extends PortArg
 		return CLIENT_NAME;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see project2.args.Arg#getDefault()
 	 */
 	@Override

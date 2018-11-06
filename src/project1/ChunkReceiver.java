@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.util.LinkedList;
 
 import byteNumberConverter.ByteIntConverter;
@@ -15,11 +14,11 @@ import log.Loggable;
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
- * compile with the following line (from project root):
- * javac -d bin -cp bin -sourcepath src src\project1\ChunkReceiver.java
- * 
- * run with the follwoing line (from project root):
- * java -cp bin project1.ChunkReceiver
+ *         compile with the following line (from project root): javac -d bin -cp
+ *         bin -sourcepath src src\project1\ChunkReceiver.java
+ *
+ *         run with the follwoing line (from project root): java -cp bin
+ *         project1.ChunkReceiver
  */
 public class ChunkReceiver implements Loggable
 {
@@ -28,33 +27,67 @@ public class ChunkReceiver implements Loggable
 	private int port;
 	private int INITIAL_BYTE_SIZE = 4;
 
-
 	public ChunkReceiver(InetAddress ip, int port)
 	{
 		setReceivingAddress(ip);
 		setReceivingPort(port);
 	}
 
-	private void setReceivingPort(int port)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see log.Loggable#absorbLog(log.Loggable)
+	 */
+	@Override
+	public void absorbLog(Loggable l)
 	{
-		this.port = port;
-		
+		log.absorb(l.getLog());
 	}
 
-	private void setReceivingAddress(InetAddress ip)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see log.Loggable#clearLog()
+	 */
+	@Override
+	public void clearLog()
 	{
-		this.ip = ip;
-		
+		log.clear();
+
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see log.Loggable#getLog()
+	 */
+	@Override
+	public Log getLog()
+	{
+		return log;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see log.Loggable#printLog(java.io.PrintStream)
+	 */
+	@Override
+	public void printLog(PrintStream printStream)
+	{
+		log.print(printStream);
+
+	}
+
 	public LinkedList<Chunk> receive() throws IOException
 	{
 		LinkedList<Chunk> chunks = new LinkedList<Chunk>();
-		
-		try {
+
+		try
+		{
 			// set up socket
 			DatagramSocket socket = new DatagramSocket(port);
-			
+
 			byte[] initialSize = new byte[INITIAL_BYTE_SIZE];
 			DatagramPacket packet = new DatagramPacket(initialSize, initialSize.length);
 
@@ -62,8 +95,9 @@ public class ChunkReceiver implements Loggable
 			System.out.println("Ready to receive chunks");
 			// receive first packet
 			socket.receive(packet);
-			
-			// Determine the number of chunks to expect by converting the byte[] to int
+
+			// Determine the number of chunks to expect by converting the byte[]
+			// to int
 			int numberOfChunks = ByteIntConverter.convert(packet.getData());
 			log.add("Receiver got first datagram");
 			log.addLine(" {" + Log.getHexString(packet.getData()) + "}");
@@ -77,17 +111,18 @@ public class ChunkReceiver implements Loggable
 			log.addLine(" {" + Log.getHexString(packet.getData()) + "}");
 			log.addLine("\tExpecting " + maxSizeOfChunk + " as maximum bytes per chunk");
 			log.addLine("");
-			
+
 			// Receive all chunks
 			packet = new DatagramPacket(new byte[maxSizeOfChunk], maxSizeOfChunk);
-			for(int i = 0; i < numberOfChunks; i++)
+			for (int i = 0; i < numberOfChunks; i++)
 			{
 				// receive a packet
 				socket.receive(packet);
-				
-				// Make a new chunk from the data of the packet and put it in the collection
+
+				// Make a new chunk from the data of the packet and put it in
+				// the collection
 				chunks.add(new Chunk(packet.getData(), packet.getLength()));
-				
+
 				log.add("ChunkReceiver received datagram " + i + "-" + packet.getOffset() + "-" + packet.getOffset() + packet.getLength());
 				log.addLine(" {" + Log.getHexString(packet.getData()) + "}");
 				log.addLine("");
@@ -95,50 +130,25 @@ public class ChunkReceiver implements Loggable
 
 			// close socket
 			socket.close();
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			System.err.println("ChunkReceiver.receive() Failed");
 		}
-
 
 		// return list
 		return chunks;
 	}
-	
-	/* (non-Javadoc)
-	 * @see log.Loggable#getLog()
-	 */
-	@Override
-	public Log getLog()
+
+	private void setReceivingAddress(InetAddress ip)
 	{
-		return log;
+		this.ip = ip;
+
 	}
 
-	/* (non-Javadoc)
-	 * @see log.Loggable#printLog(java.io.PrintStream)
-	 */
-	@Override
-	public void printLog(PrintStream printStream)
+	private void setReceivingPort(int port)
 	{
-		log.print(printStream);
-		
-	}
+		this.port = port;
 
-	/* (non-Javadoc)
-	 * @see log.Loggable#clearLog()
-	 */
-	@Override
-	public void clearLog()
-	{
-		log.clear();
-		
-	}
-	
-	/* (non-Javadoc)
-	 * @see log.Loggable#absorbLog(log.Loggable)
-	 */
-	@Override
-	public void absorbLog(Loggable l)
-	{
-		log.absorb(l.getLog());
 	}
 }

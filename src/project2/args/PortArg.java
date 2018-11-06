@@ -3,31 +3,31 @@
  */
 package project2.args;
 
-/** command-line argument for a port
+/**
+ * command-line argument for a port
+ * 
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
 public abstract class PortArg extends Arg<Integer>
 {
 
-	/** Constructs an instance of this class
-	 * @param flag the string that is a flag in the command line argument
+	/**
+	 * Constructs an instance of this class
+	 * 
+	 * @param flag
+	 *            the string that is a flag in the command line argument
 	 */
-	public PortArg(String flag) {
+	public PortArg(String flag)
+	{
 		super(flag);
 	}
 
-	/* (non-Javadoc)
-	 * @see project2.args.Arg#processInlineArg(java.lang.String)
-	 */
-	@Override
-	protected void processInlineArg(String s) throws Exception
-	{
-		value = Integer.parseInt(s);
-	}
+	protected abstract String getClientName();
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see project2.args.Arg#getHelpString()
 	 */
 	@Override
@@ -35,7 +35,16 @@ public abstract class PortArg extends Arg<Integer>
 	{
 		return "The " + getClientName() + "'s port number";
 	}
-	
-	protected abstract String getClientName();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see project2.args.Arg#processInlineArg(java.lang.String)
+	 */
+	@Override
+	protected void processInlineArg(String s) throws Exception
+	{
+		value = Integer.parseInt(s);
+	}
 
 }

@@ -1,15 +1,12 @@
 package project1;
 
-import java.io.PrintStream;
-import java.net.DatagramPacket;
 import java.util.Iterator;
 
 import log.Log;
-import log.Loggable;
 
 /**
  * A chunk of bytes
- * 
+ *
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -18,7 +15,7 @@ public class Chunk implements Iterable<Byte>
 
 	/**
 	 * The iterator that makes Chunk iterable
-	 * 
+	 *
 	 * @author Joshua Zierman [py1422xs@metrostate.edu]
 	 *
 	 */
@@ -28,7 +25,7 @@ public class Chunk implements Iterable<Byte>
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.util.Iterator#hasNext()
 		 */
 		@Override
@@ -39,7 +36,7 @@ public class Chunk implements Iterable<Byte>
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.util.Iterator#next()
 		 */
 		@Override
@@ -57,15 +54,18 @@ public class Chunk implements Iterable<Byte>
 
 	/**
 	 * Constructs a chunk with the given bytes
-	 * 
-	 * @param bytes an array of bytes that holds the data for the chunk
-	 * @param length the length of the chunk in bytes
+	 *
+	 * @param bytes
+	 *            an array of bytes that holds the data for the chunk
+	 * @param length
+	 *            the length of the chunk in bytes
 	 */
-	public Chunk(byte[] bytes, int length) {
-		if(length != bytes.length)
+	public Chunk(byte[] bytes, int length)
+	{
+		if (length != bytes.length)
 		{
 			byte[] tmp = new byte[length];
-			for(int i = 0; i < length; i ++)
+			for (int i = 0; i < length; i++)
 			{
 				tmp[i] = bytes[i];
 			}
@@ -73,13 +73,13 @@ public class Chunk implements Iterable<Byte>
 		}
 		else
 		{
-			setBytes (bytes);
+			setBytes(bytes);
 		}
 	}
 
 	/**
 	 * Gets the bytes stored in the Chunk
-	 * 
+	 *
 	 * @return the bytes
 	 */
 	public byte[] getBytes()
@@ -89,7 +89,7 @@ public class Chunk implements Iterable<Byte>
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Iterable#iterator()
 	 */
 	@Override
@@ -98,20 +98,9 @@ public class Chunk implements Iterable<Byte>
 		return new byteIterator();
 	}
 
-	/**
-	 * Sets the bytes stored in the chunk
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param bytes
-	 *            the bytes to set
-	 */
-	private void setBytes(byte[] bytes)
-	{
-		this.bytes = bytes;
-		
-	}
-
-	
-	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -120,5 +109,16 @@ public class Chunk implements Iterable<Byte>
 		return "{" + Log.getString(bytes) + "}";
 	}
 
-	
+	/**
+	 * Sets the bytes stored in the chunk
+	 *
+	 * @param bytes
+	 *            the bytes to set
+	 */
+	private void setBytes(byte[] bytes)
+	{
+		this.bytes = bytes;
+
+	}
+
 }

@@ -3,24 +3,31 @@
  */
 package project2.args;
 
-/** A command-line argument for using a trace printer
+/**
+ * A command-line argument for using a trace printer
+ * 
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
 public class TracePrinterArg extends ToggleArg
 {
 
-	/** Constructs an instance of this class
-	 * @param flag the string that is a flag in the command line argument
+	private static final String HELP_MSG = "Prints additional trace output.";
+
+	/**
+	 * Constructs an instance of this class
+	 * 
+	 * @param flag
+	 *            the string that is a flag in the command line argument
 	 */
-	public TracePrinterArg(String flag) {
+	public TracePrinterArg(String flag)
+	{
 		super(flag);
 	}
 
-	private static final String HELP_MSG = "Prints additional trace output.";
-
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see project2.args.Arg#getHelpString()
 	 */
 	@Override
@@ -28,7 +35,6 @@ public class TracePrinterArg extends ToggleArg
 	{
 		return HELP_MSG;
 	}
-
 
 	@Override
 	protected void processInlineArg()

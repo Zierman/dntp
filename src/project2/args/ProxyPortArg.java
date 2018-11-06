@@ -3,7 +3,9 @@
  */
 package project2.args;
 
-/** command-line argument for error proxy's port
+/**
+ * command-line argument for error proxy's port
+ * 
  * @author Joshua Zierman [py1422xs@metrostate.edu]
  *
  */
@@ -11,14 +13,20 @@ public class ProxyPortArg extends PortArg
 {
 	private final static String CLIENT_NAME = "proxy";
 
-	/** Constructs an instance of this class
-	 * @param flag the string that is a flag in the command line argument
+	/**
+	 * Constructs an instance of this class
+	 * 
+	 * @param flag
+	 *            the string that is a flag in the command line argument
 	 */
-	public ProxyPortArg(String flag) {
+	public ProxyPortArg(String flag)
+	{
 		super(flag);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see project2.args.PortArg#getClientName()
 	 */
 	@Override
@@ -27,7 +35,9 @@ public class ProxyPortArg extends PortArg
 		return CLIENT_NAME;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see project2.args.Arg#getDefault()
 	 */
 	@Override

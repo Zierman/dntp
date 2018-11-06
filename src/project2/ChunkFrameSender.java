@@ -15,16 +15,32 @@ import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
+
 import byteNumberConverter.ByteIntConverter;
 import byteNumberConverter.ByteLongConverter;
 import project1.Chunk;
 import project1.FileSplitter;
-import project2.args.*;
+import project2.args.Arg;
+import project2.args.ArgList;
+import project2.args.ErrorChanceArg;
+import project2.args.FileArg;
+import project2.args.HelpArg;
+import project2.args.IntroduceErrorArg;
+import project2.args.LogPrintingArg;
+import project2.args.MaxSizeOfChunkArg;
+import project2.args.NumberOfAckNumbersArg;
+import project2.args.ReceiverAddressArg;
+import project2.args.ReceiverPortArg;
+import project2.args.SenderAddressArg;
+import project2.args.SenderPortArg;
+import project2.args.StartingDelayArg;
+import project2.args.TimeoutArg;
+import project2.args.TracePrinterArg;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
 import project2.frame.EndFrame;
-import project2.printer.TracePrinter;
 import project2.printer.LogPrinter;
+import project2.printer.TracePrinter;
 
 /**
  * @author Joshua Zierman [py1422xs@metrostate.edu]
@@ -46,7 +62,7 @@ public class ChunkFrameSender
 	private static MaxSizeOfChunkArg maxSizeOfChunkArg = new MaxSizeOfChunkArg("-s");
 	private static NumberOfAckNumbersArg numberOfAckNumbersArg = new NumberOfAckNumbersArg("-acknums");
 	private static StartingDelayArg startingDelayArg = new StartingDelayArg("-startDelay");
-	
+
 	// Toggle Args
 	private static IntroduceErrorArg introduceErrorArg = new IntroduceErrorArg("-e");
 	private static TracePrinterArg tracePrinterArg = new TracePrinterArg("-trace");
@@ -60,20 +76,23 @@ public class ChunkFrameSender
 
 	// start time
 	private static Long startTime;
-	
+
 	// offsets for logging
 	private static long startOffset = 0;
 	private static long endOffset = -1;
 
-	/** Runs the sender program
-	 * @param args use -help arg to see about valid args
+	/**
+	 * Runs the sender program
+	 * 
+	 * @param args
+	 *            use -help arg to see about valid args
 	 */
 	public static void main(String[] args)
 	{
 		int sequenceNumber = 0;
 		InetAddress destinationAddress;
 		int destinationPort;
-		
+
 		// handle the command line arguments
 		try
 		{
@@ -84,10 +103,9 @@ public class ChunkFrameSender
 			e.printStackTrace();
 		}
 
-
-		// set up tracePrinter printer 
+		// set up tracePrinter printer
 		tracePrinter = new TracePrinter(tracePrinterArg, System.out);
-		
+
 		// set destination
 		tracePrinter.println("");
 		tracePrinter.println("setting destination");
@@ -118,25 +136,25 @@ public class ChunkFrameSender
 		tracePrinter.println("");
 		tracePrinter.println("setting up the socket");
 		DatagramSocket socket = null;
-		
+
 		try
 		{
 			socket = new DatagramSocket(senderPortArg.getValue());
 			socket.setSoTimeout(timeoutArg.getValue());
 
-			// make connection and transmit setup info 
+			// make connection and transmit setup info
 			tracePrinter.println("");
 			tracePrinter.println("making connection and transmitting setup info");
 			sendArgs(socket, destinationAddress, destinationPort);
 
-			// set up log printer (has to happen after the start time is established)
+			// set up log printer (has to happen after the start time is
+			// established)
 			tracePrinter.println("");
 			tracePrinter.println("Setting up the log printer");
 			log = new LogPrinter(logPrintingArg.getValue(), System.out, startTime);
-			
+
 			// tell receiver how many chunks will be sent
-			
-			
+
 			// frame and send all chunks using Stop and Wait
 			tracePrinter.println("");
 			tracePrinter.println("sending all chunks with stop and wait");
@@ -147,29 +165,26 @@ public class ChunkFrameSender
 
 				// get the next chunk if we are not handling a delayed frame
 				tracePrinter.println("\t" + "chunk removed from chunk list");
-				
+
 				Chunk chunk = chunkList.remove();
-				
+
 				// frame the chunk
 				tracePrinter.println("\t" + "chunk framed");
 				chunkFrame = new ChunkFrame(chunk, sequenceNumber);
 
-
 				tracePrinter.println("\t\t" + "chunkFrame.getSequenceNumber(): " + chunkFrame.getSequenceNumber());
 				tracePrinter.println("\t\t" + "chunkFrame.getLength(): " + chunkFrame.getLength());
 				tracePrinter.println("\t\t" + "chunkFrame.failedCheckSum(): " + chunkFrame.failedCheckSum());
-				
-				
+
 				// Send it with the stop and wait
 				tracePrinter.println("\t" + "send chunk frame with stop and wait");
 				sendWithStopAndWait(chunkFrame, socket, destinationAddress, destinationPort);
-
 
 				// progress to next sequence number
 				tracePrinter.println("\t" + "sequence number increased");
 				sequenceNumber++;
 			}
-			
+
 			// signal end of transmission
 			sendEndFlag(sequenceNumber++, socket, destinationAddress, destinationPort);
 		}
@@ -177,212 +192,23 @@ public class ChunkFrameSender
 		{
 			e.printStackTrace();
 		}
-		
+
 		// close socket
 		socket.close();
-		
+
 		tracePrinter.println("");
 		tracePrinter.println("END");
 	}
 
-
-	/** Sends a ChunkFrame with stop and wait.
-	 * @param chunkFrame the ChunkFrame to send
-	 * @param socket the socket that the datagram will be sent with
-	 * @param destinationAddress the address of the destination for this ChunkFrame
-	 * @param destinationPort the destination for this ChunkFrame
-	 */
-	private static void sendWithStopAndWait(ChunkFrame chunkFrame, DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
-	{
-		boolean done = false;
-		boolean ackMatch = false;
-		boolean sumCheckPass = false;
-		boolean first = true;
-		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
-		int expectedAckNumber = chunkFrame.getSequenceNumber() % numberOfAckNumbersArg.getValue();
-		
-		// Update offsets
-		startOffset = endOffset + 1;
-		endOffset = startOffset + chunkFrame.getLength() - ChunkFrame.HEADER_SIZE - 1;
-		
-		while(!done)
-		{
-			try
-			{		
-				// generate errors randomly using the generator
-				if(introduceErrorArg.getValue())
-				{
-					chunkFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChanceArg.getValue()));
-				}
-				
-				// simulate drops
-				if(chunkFrame.isDropped())
-				{
-					// log the drop
-					if(first)
-					{
-					
-						log.sent(chunkFrame, startOffset, endOffset);
-						first = false;
-					}
-					else
-					{
-						log.resent(chunkFrame, startOffset, endOffset);
-					}
-					
-					// do not actually send
-					
-				}
-				
-				// simulate sending corrupt package
-				else if(chunkFrame.failedCheckSum())
-				{			
-					
-					
-					// log the sending
-					if(first)
-					{
-					
-						log.sent(chunkFrame, startOffset, endOffset);
-						first = false;
-					}
-					else
-					{
-						log.resent(chunkFrame, startOffset, endOffset);
-					}
-					
-					// send the package
-					chunkFrame.send(socket, destinationAddress, destinationPort);
-					
-				}
-				
-				// normal case
-				else
-				{
-					
-					// log the sending
-					if(first)
-					{
-					
-						log.sent(chunkFrame, startOffset, endOffset);
-						first = false;
-					}
-					else
-					{
-						log.resent(chunkFrame, startOffset, endOffset);
-					}
-					
-					// send the package
-					chunkFrame.send(socket, destinationAddress, destinationPort);
-				}
-			}catch (Exception e) {
-				e.printStackTrace();
-			}
-			try
-			{
-				
-				// receive a package or timeout
-				socket.receive(ackPacket);
-	
-				// extract ack frame from package
-				AckFrame ackFrame = new AckFrame(ackPacket);
-	
-				// log the received ack
-				log.ackReceived(ackFrame, expectedAckNumber, chunkFrame.getSequenceNumber(), numberOfAckNumbersArg.getValue());
-				
-				// check if received ack number matches expected ack number
-				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
-	
-				// check if the ackFrame passed the check sum
-				sumCheckPass = ackFrame.passedCheckSum();
-	
-				// Determines if we are done trying to send the packet again
-				done = ackMatch && sumCheckPass;
-			}
-			catch (SocketTimeoutException e)
-			{
-				log.timeout(chunkFrame);
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	/** Sends the End Flag, an empty payload ChunkFrame
-	 * @param seqNumber The sequence number for the ChunkFrame
-	 * @param socket the socket that the datagram will be sent with
-	 * @param destinationAddress the address of the destination for this ChunkFrame
-	 * @param destinationPort the destination for this ChunkFrame
-	 */
-	private static void sendEndFlag(int seqNumber, DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
-	{
-		int numberOfTries = 10;
-		EndFrame endFrame = new EndFrame(seqNumber);
-		boolean done = false;
-		boolean ackMatch = false;
-		boolean sumCheckPass = false;
-		boolean first = true;
-		DatagramPacket endPacket = endFrame.toDatagramPacket(destinationAddress, destinationPort);
-		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
-		int expectedAckNumber = endFrame.getSequenceNumber() % numberOfAckNumbersArg.getValue();
-		
-		// Update offsets
-		int digitLengthOfOffset = Long.toString(startOffset).length();
-		
-		while(!done && numberOfTries-- > 0)
-		{
-			try
-			{	
-				// send the package
-				socket.send(endPacket);
-				
-				// log the sending
-				if(first)
-				{
-				
-					log.sent(endFrame, digitLengthOfOffset);
-					first = false;
-				}
-				else
-				{
-					log.resent(endFrame, digitLengthOfOffset);
-				}
-			
-				// receive a package or timeout
-				socket.receive(ackPacket);
-	
-				// extract ack frame from package
-				AckFrame ackFrame = new AckFrame(ackPacket);
-	
-				// log the received ack
-				log.ackReceived(ackFrame, expectedAckNumber, endFrame.getSequenceNumber(), numberOfAckNumbersArg.getValue());
-				
-				// check if received ack number matches expected ack number
-				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
-	
-				// check if the ackFrame passed the check sum
-				sumCheckPass = ackFrame.passedCheckSum();
-	
-				// Determines if we are done trying to send the packet again
-				done = ackMatch && sumCheckPass;
-			}
-			catch (SocketTimeoutException e)
-			{
-				log.timeout(endFrame);
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/** Sends the needed arguments to the sender
-	 * @param socket the socket that the datagram will be sent with
-	 * @param destinationAddress the address of the destination for this ChunkFrame
-	 * @param destinationPort the destination for this ChunkFrame
+	/**
+	 * Sends the needed arguments to the sender
+	 * 
+	 * @param socket
+	 *            the socket that the datagram will be sent with
+	 * @param destinationAddress
+	 *            the address of the destination for this ChunkFrame
+	 * @param destinationPort
+	 *            the destination for this ChunkFrame
 	 */
 	private static void sendArgs(DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
 	{
@@ -397,7 +223,7 @@ public class ChunkFrameSender
 			DatagramPacket packet;
 			DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
 			AckFrame ackFrame;
-			
+
 			// add needed Args to the args queue
 			args.add(fileArg);
 			args.add(senderAddressArg);
@@ -410,7 +236,8 @@ public class ChunkFrameSender
 			args.add(tracePrinterArg);
 			args.add(logPrintingArg);
 
-			// backup the timout setting of the socket and use default timeout for
+			// backup the timout setting of the socket and use default timeout
+			// for
 			// this
 			int timeoutBackup = socket.getSoTimeout();
 			int seqNum = 0;
@@ -459,7 +286,7 @@ public class ChunkFrameSender
 
 			// send the args
 			for (Chunk c : chunks)
-			{	
+			{
 				ackReceived = false;
 				while (!ackReceived)
 				{
@@ -482,13 +309,13 @@ public class ChunkFrameSender
 					}
 				}
 			}
-			
+
 			// setup and send start time to keep logs synced
 			startTime = new Date().getTime() + startingDelayArg.getValue();
 			Chunk c = new Chunk(ByteLongConverter.convert(startTime), 8);
 			ChunkFrame cf = new ChunkFrame(c, seqNum);
 			packet = cf.toDatagramPacket(destinationAddress, destinationPort);
-			
+
 			ackReceived = false;
 			while (!ackReceived)
 			{
@@ -509,17 +336,17 @@ public class ChunkFrameSender
 				}
 			}
 
-
 			// catch delayed packets
 			int tmp = socket.getSoTimeout();
 			socket.setSoTimeout(1);
-			while(new Date().getTime() < startTime)
+			while (new Date().getTime() < startTime)
 			{
 				try
 				{
 					socket.receive(ackPacket);
 				}
-				catch (Exception e) {
+				catch (Exception e)
+				{
 					// keep trying
 				}
 			}
@@ -527,7 +354,7 @@ public class ChunkFrameSender
 
 			// restore timout value of socket
 			socket.setSoTimeout(timeoutBackup);
-			
+
 			// catch delayed acks
 		}
 		catch (SocketException e)
@@ -538,6 +365,212 @@ public class ChunkFrameSender
 		{
 			e.printStackTrace();
 		}
-		
+
+	}
+
+	/**
+	 * Sends the End Flag, an empty payload ChunkFrame
+	 * 
+	 * @param seqNumber
+	 *            The sequence number for the ChunkFrame
+	 * @param socket
+	 *            the socket that the datagram will be sent with
+	 * @param destinationAddress
+	 *            the address of the destination for this ChunkFrame
+	 * @param destinationPort
+	 *            the destination for this ChunkFrame
+	 */
+	private static void sendEndFlag(int seqNumber, DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
+	{
+		int numberOfTries = 10;
+		EndFrame endFrame = new EndFrame(seqNumber);
+		boolean done = false;
+		boolean ackMatch = false;
+		boolean sumCheckPass = false;
+		boolean first = true;
+		DatagramPacket endPacket = endFrame.toDatagramPacket(destinationAddress, destinationPort);
+		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
+		int expectedAckNumber = endFrame.getSequenceNumber() % numberOfAckNumbersArg.getValue();
+
+		// Update offsets
+		int digitLengthOfOffset = Long.toString(startOffset).length();
+
+		while (!done && numberOfTries-- > 0)
+		{
+			try
+			{
+				// send the package
+				socket.send(endPacket);
+
+				// log the sending
+				if (first)
+				{
+
+					log.sent(endFrame, digitLengthOfOffset);
+					first = false;
+				}
+				else
+				{
+					log.resent(endFrame, digitLengthOfOffset);
+				}
+
+				// receive a package or timeout
+				socket.receive(ackPacket);
+
+				// extract ack frame from package
+				AckFrame ackFrame = new AckFrame(ackPacket);
+
+				// log the received ack
+				log.ackReceived(ackFrame, expectedAckNumber, endFrame.getSequenceNumber(), numberOfAckNumbersArg.getValue());
+
+				// check if received ack number matches expected ack number
+				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
+
+				// check if the ackFrame passed the check sum
+				sumCheckPass = ackFrame.passedCheckSum();
+
+				// Determines if we are done trying to send the packet again
+				done = ackMatch && sumCheckPass;
+			}
+			catch (SocketTimeoutException e)
+			{
+				log.timeout(endFrame);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Sends a ChunkFrame with stop and wait.
+	 * 
+	 * @param chunkFrame
+	 *            the ChunkFrame to send
+	 * @param socket
+	 *            the socket that the datagram will be sent with
+	 * @param destinationAddress
+	 *            the address of the destination for this ChunkFrame
+	 * @param destinationPort
+	 *            the destination for this ChunkFrame
+	 */
+	private static void sendWithStopAndWait(ChunkFrame chunkFrame, DatagramSocket socket, InetAddress destinationAddress, int destinationPort)
+	{
+		boolean done = false;
+		boolean ackMatch = false;
+		boolean sumCheckPass = false;
+		boolean first = true;
+		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
+		int expectedAckNumber = chunkFrame.getSequenceNumber() % numberOfAckNumbersArg.getValue();
+
+		// Update offsets
+		startOffset = endOffset + 1;
+		endOffset = startOffset + chunkFrame.getLength() - ChunkFrame.HEADER_SIZE - 1;
+
+		while (!done)
+		{
+			try
+			{
+				// generate errors randomly using the generator
+				if (introduceErrorArg.getValue())
+				{
+					chunkFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChanceArg.getValue()));
+				}
+
+				// simulate drops
+				if (chunkFrame.isDropped())
+				{
+					// log the drop
+					if (first)
+					{
+
+						log.sent(chunkFrame, startOffset, endOffset);
+						first = false;
+					}
+					else
+					{
+						log.resent(chunkFrame, startOffset, endOffset);
+					}
+
+					// do not actually send
+
+				}
+
+				// simulate sending corrupt package
+				else if (chunkFrame.failedCheckSum())
+				{
+
+					// log the sending
+					if (first)
+					{
+
+						log.sent(chunkFrame, startOffset, endOffset);
+						first = false;
+					}
+					else
+					{
+						log.resent(chunkFrame, startOffset, endOffset);
+					}
+
+					// send the package
+					chunkFrame.send(socket, destinationAddress, destinationPort);
+
+				}
+
+				// normal case
+				else
+				{
+
+					// log the sending
+					if (first)
+					{
+
+						log.sent(chunkFrame, startOffset, endOffset);
+						first = false;
+					}
+					else
+					{
+						log.resent(chunkFrame, startOffset, endOffset);
+					}
+
+					// send the package
+					chunkFrame.send(socket, destinationAddress, destinationPort);
+				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			try
+			{
+
+				// receive a package or timeout
+				socket.receive(ackPacket);
+
+				// extract ack frame from package
+				AckFrame ackFrame = new AckFrame(ackPacket);
+
+				// log the received ack
+				log.ackReceived(ackFrame, expectedAckNumber, chunkFrame.getSequenceNumber(), numberOfAckNumbersArg.getValue());
+
+				// check if received ack number matches expected ack number
+				ackMatch = ackFrame.getAckNumber() == expectedAckNumber;
+
+				// check if the ackFrame passed the check sum
+				sumCheckPass = ackFrame.passedCheckSum();
+
+				// Determines if we are done trying to send the packet again
+				done = ackMatch && sumCheckPass;
+			}
+			catch (SocketTimeoutException e)
+			{
+				log.timeout(chunkFrame);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }
