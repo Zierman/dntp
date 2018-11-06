@@ -173,11 +173,7 @@ public class ChunkFrameSender
 			// signal end of transmission
 			sendEndFlag(sequenceNumber++, socket, destinationAddress, destinationPort);
 		}
-		catch (SocketException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
