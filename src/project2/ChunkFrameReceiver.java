@@ -17,6 +17,7 @@ import project1.FileAssembler;
 import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
+import project2.frame.Frame;
 import project2.printer.DebugPrinter;
 import project2.printer.LogPrinter;
 
@@ -138,7 +139,7 @@ public class ChunkFrameReceiver
 					
 					// check if the ackFrame passed the check sum
 					sumCheckPass = chunkFrame.passedCheckSum();
-					
+					debug.println("sumCheck: " + sumCheckPass);
 					// check if received chunk deserves an ack response
 					seqDeservesAck = chunkFrame.getSequenceNumber() <= expectedSequenceNumber && sumCheckPass;
 					

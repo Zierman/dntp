@@ -163,7 +163,6 @@ public class ChunkFrameSender
 		boolean ackMatch = false;
 		boolean sumCheckPass = false;
 		boolean first = true;
-		DatagramPacket chunkPacket = chunkFrame.toDatagramPacket(destinationAddress, destinationPort);
 		DatagramPacket ackPacket = new DatagramPacket(new byte[AckFrame.ACK_SIZE], AckFrame.ACK_SIZE);
 		int expectedAckNumber = chunkFrame.getSequenceNumber() % numberOfAckNumbersArg.getValue();
 		
@@ -204,7 +203,7 @@ public class ChunkFrameSender
 				{			
 					
 					// send the package
-					socket.send(chunkPacket);
+					chunkFrame.send(socket, destinationAddress, destinationPort);
 					
 					// log the sending
 					if(first)
@@ -223,7 +222,7 @@ public class ChunkFrameSender
 				else
 				{
 					// send the package
-					socket.send(chunkPacket);
+					chunkFrame.send(socket, destinationAddress, destinationPort);
 					
 					// log the sending
 					if(first)
@@ -237,6 +236,11 @@ public class ChunkFrameSender
 						log.resent(chunkFrame, startOffset, endOffset);
 					}
 				}
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+			try
+			{
 				
 				// receive a package or timeout
 				socket.receive(ackPacket);

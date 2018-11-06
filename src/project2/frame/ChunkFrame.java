@@ -51,6 +51,7 @@ public class ChunkFrame extends Frame
 		for(j = 0; j < checkSumB.length; j++, i++)
 		{
 			checkSumB[j] = packetB[i];
+			System.err.println(checkSumB[j]);
 		}
 		this.checkSum = byteNumberConverter.ByteShortConverter.convert(checkSumB);
 		
@@ -104,6 +105,7 @@ public class ChunkFrame extends Frame
 		for(byte b : ByteShortConverter.convert(checkSum))
 		{
 			bytes[i++] = b;
+			System.err.println(b);
 		}
 		
 		// pack length

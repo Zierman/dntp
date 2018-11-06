@@ -139,6 +139,10 @@ public abstract class Frame
 		{
 			checkSum = BAD;
 		}
+		else
+		{
+			checkSum = GOOD;
+		}
 	}
 	
 	

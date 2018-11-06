@@ -128,7 +128,7 @@ public class LogPrinter extends Printer
 			// if there is an error we output differently
 			if (f.failedCheckSum())
 			{
-				println("RECV " + f.getSequenceNumber() + " " + "CRPT");
+				println("RECV " + time() + " " + f.getSequenceNumber() + " " + "CRPT");
 			}
 			else if (f.getSequenceNumber() != expectedSequenceNumber)
 			{
