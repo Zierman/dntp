@@ -28,24 +28,31 @@ public class AckFrame extends Frame
 	}
 	
 
-	//TODO document
+	
+	/** An exception for ack frame length mismatch
+	 * @author Joshua Zierman [py1422xs@metrostate.edu]
+	 *
+	 */
 	public static class AckFrameLengthMismatchException extends Exception
 	{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 
+		/** constructor
+		 * 
+		 */
 		AckFrameLengthMismatchException()
 		{
 			super("AckFrame's length data and expected length do not match.");
 		}
 	}
 
-	//TODO document
+	
 	public static final int ACK_SIZE = Defaults.ACK_PACKET_LENGTH;
 
-	//TODO document
+	/** constructs an AckFrame
+	 * @param f the ChunkFrame that this acknowledges
+	 * @param numberOfAckNumbers the number of available ack numbers
+	 */
 	public AckFrame(ChunkFrame f, int numberOfAckNumbers)
 	{
 		super();
@@ -53,7 +60,10 @@ public class AckFrame extends Frame
 		length = ACK_SIZE;
 	}
 
-	//TODO document
+	/** Constructs an AckFrame
+	 * @param p a DatagramPacket that will be converted into a AckFrame
+	 * @throws AckFrameLengthMismatchException if p contains a frame that doesn't have the length of an ackFrame
+	 */
 	public AckFrame(DatagramPacket p) throws AckFrameLengthMismatchException
 	{
 		byte[] packetB = p.getData();
