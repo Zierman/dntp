@@ -31,7 +31,7 @@ public class Defaults
 	public static final InetAddress RECEIVER_ADDRESS = project1.Project1.getDestinationIp();
 
 	// Ports
-	public static final int SENDER_PORT = 1012;
+	public static final int SENDER_PORT = 8012;
 	public static final int PROXY_PORT = 1011;
 	public static final int RECEIVER_PORT = Project1.getPort();
 

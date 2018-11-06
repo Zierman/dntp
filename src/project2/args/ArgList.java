@@ -103,7 +103,7 @@ public class ArgList implements Iterable<Arg<?>>
 		{
 			for (Arg<?> a : argList) // for each Arg in argList
 			{
-				if (a.matchesFlag(args[i])) // if the flag maches
+				if (a.matchesFlag(args[i])) // if the flag matches
 				{
 					if (a instanceof ToggleArg) // and if a toggle
 					{

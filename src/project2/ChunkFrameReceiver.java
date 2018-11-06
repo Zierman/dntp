@@ -87,7 +87,6 @@ public class ChunkFrameReceiver
 			// initialize the printers
 			tracePrinter = new TracePrinter(debugMode, System.out);
 			log = new LogPrinter(logPrintingMode, System.out, startTime);
-
 			// set destination
 			tracePrinter.println("");
 			tracePrinter.println("setting destination");
@@ -320,7 +319,7 @@ public class ChunkFrameReceiver
 					catch (SocketTimeoutException e)
 					{
 						// We don't care about timeouts on the receiver
-						tracePrinter.println("\t" + "timout");
+						tracePrinter.println("\t" + "timeout");
 					}
 					catch (Exception e)
 					{
@@ -331,12 +330,12 @@ public class ChunkFrameReceiver
 
 			// close socket
 			tracePrinter.println("");
-			tracePrinter.println("closeing socket");
+			tracePrinter.println("closing socket");
 			socket.close();
 
 			// assemble file from chunks
 			tracePrinter.println("");
-			tracePrinter.println("assembling file from recieved chunks");
+			tracePrinter.println("assembling file from received chunks");
 			FileAssembler assembler = new FileAssembler(outFile);
 			assembler.accept(chunkList);
 			assembler.assembleFile();
