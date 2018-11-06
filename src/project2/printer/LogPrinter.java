@@ -112,7 +112,6 @@ public class LogPrinter extends Printer
 		if (printerIsOn)
 		{
 			println("ReSend. ACK " + chunkSequenceNumber + " " + time() + " " + sendErr(f));
-
 		}
 	}
 

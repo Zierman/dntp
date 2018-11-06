@@ -17,7 +17,6 @@ import project1.FileAssembler;
 import project2.args.*;
 import project2.frame.AckFrame;
 import project2.frame.ChunkFrame;
-import project2.frame.Frame;
 import project2.printer.DebugPrinter;
 import project2.printer.LogPrinter;
 
@@ -116,13 +115,15 @@ public class ChunkFrameReceiver
 		Queue<Chunk> chunkList = new LinkedList<Chunk>();
 		
 		
+		boolean first = true;
+		Integer last = Integer.MIN_VALUE;
 		boolean end = false;
 		while (!end)
 		{
 			boolean done = false;
 			boolean seqDeservesAck = false;
 			boolean sumCheckPass = false;
-			boolean first = true;
+			
 			while (!done)
 			{
 				try
@@ -136,7 +137,6 @@ public class ChunkFrameReceiver
 					// Log received packet info
 					log.chunkReceived(chunkFrame, expectedSequenceNumber);
 
-					
 					// check if the ackFrame passed the check sum
 					sumCheckPass = chunkFrame.passedCheckSum();
 					debug.println("sumCheck: " + sumCheckPass);
@@ -146,6 +146,16 @@ public class ChunkFrameReceiver
 					// if it passed checksum and is a match to the expected ack number
 					if(seqDeservesAck)
 					{
+						// check to see if this is the first time we acked this
+						if(last < chunkFrame.getSequenceNumber())
+						{
+							first = true;
+							last = chunkFrame.getSequenceNumber();
+						}
+						else
+						{
+							first = false;
+						}
 						
 						// make acknowledgement frame and packet
 						ackFrame = new AckFrame(chunkFrame, numberOfAckNumbers);
@@ -190,7 +200,6 @@ public class ChunkFrameReceiver
 								{
 								
 									log.sent(ackFrame, chunkFrame.getSequenceNumber());
-									first = false;
 								}
 								else
 								{
@@ -209,7 +218,6 @@ public class ChunkFrameReceiver
 								{
 								
 									log.sent(ackFrame, chunkFrame.getSequenceNumber());
-									first = false;
 								}
 								else
 								{
