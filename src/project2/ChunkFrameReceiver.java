@@ -108,7 +108,6 @@ public class ChunkFrameReceiver
 		debug.println("");
 		debug.println("Receiving all chunks with stop and wait");
 		AckFrame ackFrame;
-		DatagramPacket ackPacket;
 		Chunk chunk;
 		ChunkFrame chunkFrame;
 		DatagramPacket chunkPacket = new DatagramPacket(new byte[chunkPacketSize], chunkPacketSize);
@@ -164,9 +163,10 @@ public class ChunkFrameReceiver
 						// if the chunk part of the frame is empty, signal for end of transmission
 						if(chunkFrame.getLength() == ChunkFrame.HEADER_SIZE) 
 						{
+							
 							end = true;
-							ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
-							socket.send(ackPacket);
+							
+							// log the ack
 							if(first)
 							{
 							
@@ -177,6 +177,9 @@ public class ChunkFrameReceiver
 							{
 								log.resent(ackFrame, chunkFrame.getSequenceNumber());
 							}
+
+							// send the ack
+							ackFrame.send(socket, destinationAddress, destinationPort);
 						}
 						else
 						{
@@ -188,13 +191,10 @@ public class ChunkFrameReceiver
 								ackFrame.setError(project2.frame.FrameErrorGenerator.generateError(errorChance));
 							}
 	
-							ackPacket = ackFrame.toDatagramPacket(destinationAddress, destinationPort);
 							
 							// simulate drops
 							if(ackFrame.isDropped())
 							{
-								// we don't actually send it
-								
 								// log the send
 								if(first)
 								{
@@ -205,14 +205,14 @@ public class ChunkFrameReceiver
 								{
 									log.resent(ackFrame, chunkFrame.getSequenceNumber());
 								}
+								
+								// we don't actually send it
+								
 							}
 							
 							// simulate sending corrupt package
 							else if(ackFrame.failedCheckSum())
-							{			
-								// send the corrupt package
-								socket.send(ackPacket);
-	
+							{		
 								// log the sending
 								if(first)
 								{
@@ -223,14 +223,15 @@ public class ChunkFrameReceiver
 								{
 									log.resent(ackFrame, chunkFrame.getSequenceNumber());
 								}
+								
+
+								// send the ack
+								ackFrame.send(socket, destinationAddress, destinationPort);
 							}
 							
 							// normal case
 							else
 							{
-								// send the package
-								socket.send(ackPacket);
-	
 								// log the sending
 								if(first)
 								{
@@ -242,6 +243,10 @@ public class ChunkFrameReceiver
 								{
 									log.resent(ackFrame, chunkFrame.getSequenceNumber());
 								}
+								
+
+								// send the ack
+								ackFrame.send(socket, destinationAddress, destinationPort);
 							}
 							
 							

@@ -61,7 +61,7 @@ public class ChunkFrameSender
 	
 	// offsets for logging
 	private static long startOffset = 0;
-	private static long endOffset = 0;
+	private static long endOffset = -1;
 
 	/** Runs the sender program
 	 * @param args use -help arg to see about valid args
@@ -168,7 +168,7 @@ public class ChunkFrameSender
 		
 		// Update offsets
 		startOffset = endOffset + 1;
-		endOffset = startOffset + chunkFrame.getLength() - ChunkFrame.HEADER_SIZE;
+		endOffset = startOffset + chunkFrame.getLength() - ChunkFrame.HEADER_SIZE - 1;
 		
 		while(!done)
 		{
@@ -183,8 +183,6 @@ public class ChunkFrameSender
 				// simulate drops
 				if(chunkFrame.isDropped())
 				{
-					// do not actually send
-					
 					// log the drop
 					if(first)
 					{
@@ -196,14 +194,15 @@ public class ChunkFrameSender
 					{
 						log.resent(chunkFrame, startOffset, endOffset);
 					}
+					
+					// do not actually send
+					
 				}
 				
 				// simulate sending corrupt package
 				else if(chunkFrame.failedCheckSum())
 				{			
 					
-					// send the package
-					chunkFrame.send(socket, destinationAddress, destinationPort);
 					
 					// log the sending
 					if(first)
@@ -216,13 +215,15 @@ public class ChunkFrameSender
 					{
 						log.resent(chunkFrame, startOffset, endOffset);
 					}
+					
+					// send the package
+					chunkFrame.send(socket, destinationAddress, destinationPort);
+					
 				}
 				
 				// normal case
 				else
 				{
-					// send the package
-					chunkFrame.send(socket, destinationAddress, destinationPort);
 					
 					// log the sending
 					if(first)
@@ -235,6 +236,9 @@ public class ChunkFrameSender
 					{
 						log.resent(chunkFrame, startOffset, endOffset);
 					}
+					
+					// send the package
+					chunkFrame.send(socket, destinationAddress, destinationPort);
 				}
 			}catch (Exception e) {
 				e.printStackTrace();
