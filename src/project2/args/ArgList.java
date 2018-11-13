@@ -102,6 +102,7 @@ public class ArgList implements Iterable<Arg<?>>
 												// args
 		{
 			for (Arg<?> a : argList) // for each Arg in argList
+				//System.out.println("current arg in loop: " + a);
 			{
 				if (a.matchesFlag(args[i])) // if the flag matches
 				{

@@ -89,6 +89,8 @@ public class ChunkFrameSender
 	 */
 	public static void main(String[] args)
 	{
+		System.out.println("chunkFramSender Main running");
+
 		int sequenceNumber = 0;
 		InetAddress destinationAddress;
 		int destinationPort;
@@ -114,7 +116,7 @@ public class ChunkFrameSender
 
 		// gets the input file
 		tracePrinter.println("");
-		tracePrinter.println("geting input file");
+		tracePrinter.println("getting input file");
 		File inFile = fileArg.getValue();
 		tracePrinter.println("inFile = " + inFile.getAbsolutePath());
 

@@ -2,7 +2,8 @@
 
 #!/usr/bin/env bash
 
-echo -n -e "\033]0;Sender\007"
+echo -n -e "\033]0;SenderJpeg\007"
+printf '\e[8;20;100t'
 cd /Users/dw/Dropbox/GitHub/dntp
 echo "macSenderJpeg.sh script started"
 
