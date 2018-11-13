@@ -89,8 +89,6 @@ public class ChunkFrameSender
 	 */
 	public static void main(String[] args)
 	{
-		System.out.println("chunkFramSender Main running");
-
 		int sequenceNumber = 0;
 		InetAddress destinationAddress;
 		int destinationPort;

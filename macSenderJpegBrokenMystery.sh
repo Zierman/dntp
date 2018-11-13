@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "starting macSenderJpeg.sh"
+echo "macSenderJpeg.sh script started"
 printf '\e[8;20;100t'
 
 echo -n -e "\033]0;SenderJpeg\007"

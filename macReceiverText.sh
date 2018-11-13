@@ -8,4 +8,5 @@ cd /Users/dw/Dropbox/GitHub/dntp
 
 java -cp bin project2.ChunkFrameReceiver
 
-bash
+echo "Press return to end bash session"
+read -n1 -r button
