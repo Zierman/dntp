@@ -172,7 +172,7 @@ public class ChunkFrameReceiver
 							// this
 							if (last < chunkFrame.getSequenceNumber())
 							{
-								tracePrinter.println("\t" + "Fisrt time we acked this");
+								tracePrinter.println("\t" + "First time we acked this");
 								tracePrinter.println("\t\t" + "last:" + last);
 								tracePrinter.println("\t\t" + "chunkFrame.getSequenceNumber():" + chunkFrame.getSequenceNumber());
 								tracePrinter.println("\t\t" + "last < chunkFrame.getSequenceNumber():" + (last < chunkFrame.getSequenceNumber()));
@@ -186,7 +186,7 @@ public class ChunkFrameReceiver
 							else
 							{
 
-								tracePrinter.println("\t" + "Not the Fisrt time we acked this");
+								tracePrinter.println("\t" + "Not the First time we acked this");
 								tracePrinter.println("\t\t" + "last:" + last);
 								tracePrinter.println("\t\t" + "chunkFrame.getSequenceNumber():" + chunkFrame.getSequenceNumber());
 								tracePrinter.println("\t\t" + "last < chunkFrame.getSequenceNumber():" + (last < chunkFrame.getSequenceNumber()));
@@ -307,7 +307,7 @@ public class ChunkFrameReceiver
 									chunkList.add(chunk);
 
 									// Increment expected sequence number
-									tracePrinter.println("\t" + "increment the expeced sequence number");
+									tracePrinter.println("\t" + "increment the expected sequence number");
 									expectedSequenceNumber++;
 								}
 							}

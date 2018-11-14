@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 echo "starting macSenderJpeg.sh"
-printf '\e[8;20;100t'
-
+printf '\e[8;100;50t'
 echo -n -e "\033]0;SenderJpeg\007"
-cd /Users/dw/Dropbox/GitHub/dntp
+cd $(dirname $0)
 
-java -cp bin project2.ChunkFrameSender -f in.jpeg -s 10000 -t 500 -e -reqlog
+
+java -cp bin project2.ChunkFrameSender -f in.jpeg -s 1000 -t 500 -e -reqlog
 
 echo "Press return to end bash session"
 read -n1 -r button

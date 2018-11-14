@@ -4,6 +4,7 @@ printf '\e[8;25;130t'
 clear
 
 
+
 echo "\n\n\n"
 echo "###########################################################################"
 echo "  Welcome to the demonstration script for the dntp transfer protocol."
@@ -13,18 +14,14 @@ echo "  These will be logged in the popup receiver & sender terminal windows."
 echo "###########################################################################"
 echo "\n\n\n"
 
-
 echo "Press return to continue"
 read -n1 -r button
 
 echo We will compile the programs...
 
 javac -d bin -cp bin -sourcepath src src/project2/ChunkFrameSender.java
-
 javac -d bin -cp bin -sourcepath src src/project1/FileReceiver.java
 javac -d bin -cp bin -sourcepath src src/project2/ChunkFrameReceiver.java
-# javac -d bin -cp bin -sourcepath src src/project2/ChunkFrameReceiver.java
-
 
 
 echo "Lets look at the help message for the sender quick"
@@ -42,7 +39,7 @@ open -a "Sublime Text" in.txt
 
 echo "Press any key to start the receiver program..."
 read -n1 -r button
-open -a Terminal.app  macReceiverText.sh
+open -a Terminal.app macReceiverText.sh
 
 echo "Press any key to start the sender program..."
 read -n1 -r button

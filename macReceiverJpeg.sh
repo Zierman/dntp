@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 echo "starting macReceiverJpeg.sh"
-printf '\e[8;20;100t'
-
+printf '\e[8;100;50t'
 echo -n -e "\033]0;ReceiverJpeg\007"
-cd /Users/dw/Dropbox/GitHub/dntp
+cd $(dirname $0)
+
 
 java -cp bin project2.ChunkFrameReceiver
 
