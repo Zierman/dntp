@@ -114,7 +114,7 @@ public class ChunkFrameSender
 
 		// gets the input file
 		tracePrinter.println("");
-		tracePrinter.println("geting input file");
+		tracePrinter.println("getting input file");
 		File inFile = fileArg.getValue();
 		tracePrinter.println("inFile = " + inFile.getAbsolutePath());
 

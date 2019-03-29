@@ -60,12 +60,12 @@ public class HelpArg extends ToggleArg
 		out.println(project2.Defaults.PROJECT_TITLE);
 		out.println("");
 
-		// Show the course the project was assinged in
-		out.println("Assinged in " + project2.Defaults.COURSE_STRING);
+		// Show the course the project was assigned in
+		out.println("Assigned in " + project2.Defaults.COURSE_STRING);
 		out.println("");
 
 		// print the designers
-		out.print("Desinged by ");
+		out.print("Designed by ");
 		for (int i = 0; i < DESIGNERS.length; i++)
 		{
 			if (i != 0)
@@ -88,8 +88,8 @@ public class HelpArg extends ToggleArg
 		out.println(PROGRAM_DESCRIPTION);
 		out.println("");
 
-		// Print the list of argumetn flags and info about them
-		out.println("list of inline arguments:");
+		// Print the list of argument flags and info about them
+		out.println("List of inline arguments: ");
 		for (Arg<?> arg : ArgList.instance())
 		{
 			out.println(arg.getHelpLine());

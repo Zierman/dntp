@@ -10,7 +10,7 @@ import project2.Defaults;
  */
 public class StartingDelayArg extends Arg<Integer>
 {
-	private static final String HELP_MSG = "The amount of time to delay the start of the data transfer after settings are tranfered";
+	private static final String HELP_MSG = "The amount of time to delay the start of the data transfer after settings are transferred";
 
 	/**
 	 * constructs an instance of this object

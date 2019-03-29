@@ -87,7 +87,6 @@ public class ChunkFrameReceiver
 			// initialize the printers
 			tracePrinter = new TracePrinter(debugMode, System.out);
 			log = new LogPrinter(logPrintingMode, System.out, startTime);
-
 			// set destination
 			tracePrinter.println("");
 			tracePrinter.println("setting destination");
@@ -173,7 +172,7 @@ public class ChunkFrameReceiver
 							// this
 							if (last < chunkFrame.getSequenceNumber())
 							{
-								tracePrinter.println("\t" + "Fisrt time we acked this");
+								tracePrinter.println("\t" + "First time we acked this");
 								tracePrinter.println("\t\t" + "last:" + last);
 								tracePrinter.println("\t\t" + "chunkFrame.getSequenceNumber():" + chunkFrame.getSequenceNumber());
 								tracePrinter.println("\t\t" + "last < chunkFrame.getSequenceNumber():" + (last < chunkFrame.getSequenceNumber()));
@@ -187,7 +186,7 @@ public class ChunkFrameReceiver
 							else
 							{
 
-								tracePrinter.println("\t" + "Not the Fisrt time we acked this");
+								tracePrinter.println("\t" + "Not the First time we acked this");
 								tracePrinter.println("\t\t" + "last:" + last);
 								tracePrinter.println("\t\t" + "chunkFrame.getSequenceNumber():" + chunkFrame.getSequenceNumber());
 								tracePrinter.println("\t\t" + "last < chunkFrame.getSequenceNumber():" + (last < chunkFrame.getSequenceNumber()));
@@ -308,7 +307,7 @@ public class ChunkFrameReceiver
 									chunkList.add(chunk);
 
 									// Increment expected sequence number
-									tracePrinter.println("\t" + "increment the expeced sequence number");
+									tracePrinter.println("\t" + "increment the expected sequence number");
 									expectedSequenceNumber++;
 								}
 							}
@@ -320,7 +319,7 @@ public class ChunkFrameReceiver
 					catch (SocketTimeoutException e)
 					{
 						// We don't care about timeouts on the receiver
-						tracePrinter.println("\t" + "timout");
+						tracePrinter.println("\t" + "timeout");
 					}
 					catch (Exception e)
 					{
@@ -331,12 +330,12 @@ public class ChunkFrameReceiver
 
 			// close socket
 			tracePrinter.println("");
-			tracePrinter.println("closeing socket");
+			tracePrinter.println("closing socket");
 			socket.close();
 
 			// assemble file from chunks
 			tracePrinter.println("");
-			tracePrinter.println("assembling file from recieved chunks");
+			tracePrinter.println("assembling file from received chunks");
 			FileAssembler assembler = new FileAssembler(outFile);
 			assembler.accept(chunkList);
 			assembler.assembleFile();
